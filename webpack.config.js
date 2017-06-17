@@ -1,5 +1,8 @@
+/* eslint-disable object-shorthand,func-names */
+
 const webpack = require('webpack');
 const path = require('path');
+const autoprefixer = require('autoprefixer');
 
 module.exports = {
   entry: [
@@ -34,6 +37,13 @@ module.exports = {
         },
       }, {
         loader: 'sass-loader',
+      }, {
+        loader: 'postcss-loader',
+        options: {
+          plugins: function () {
+            return [autoprefixer('last 2 versions', 'ie 9')];
+          },
+        },
       }],
     }],
   },

@@ -1,7 +1,8 @@
-/* eslint-disable import/no-extraneous-dependencies,prefer-template */
+/* eslint-disable import/no-extraneous-dependencies,prefer-template,object-shorthand,func-names */
 
 const webpack = require('webpack');
 const productionConfig = require('./webpack.config');
+const autoprefixer = require('autoprefixer');
 
 const HOST = 'localhost';
 const PORT = 8000;
@@ -26,7 +27,20 @@ module.exports = {
       }],
     }, {
       test: /\.scss$/,
-      use: ['style-loader', 'css-loader', 'sass-loader'],
+      use: [{
+        loader: 'style-loader',
+      }, {
+        loader: 'css-loader',
+      }, {
+        loader: 'sass-loader',
+      }, {
+        loader: 'postcss-loader',
+        options: {
+          plugins: function () {
+            return [autoprefixer('last 2 versions', 'ie 9')];
+          },
+        },
+      }],
     }],
   },
   plugins: [
