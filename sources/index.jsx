@@ -1,11 +1,9 @@
 /* global document */
-
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Layout from './components/layout/Layout';
 
 ReactDOM.render(
-  <div>
-    TEST
-  </div>,
+  <Layout />,
   document.getElementById('app'),
 );
