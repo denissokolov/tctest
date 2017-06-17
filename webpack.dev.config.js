@@ -1,4 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies,prefer-template,object-shorthand,func-names */
+/* eslint-disable prefer-template,object-shorthand,func-names */
 
 const webpack = require('webpack');
 const productionConfig = require('./webpack.config');

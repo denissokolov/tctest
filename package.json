@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "lint": "npm run jsonlint && npm run stylelint && npm run eslint",
-    "eslint": "eslint sources/**/*.jsx webpack.*",
+    "eslint": "eslint sources/**/*.jsx *.js",
     "jsonlint": "jsonlint -q package.json && jsonlint -q .eslintrc && jsonlint -q .babelrc && jsonlint -q .stylelintrc",
     "stylelint": "stylelint **/*.scss",
     "start": "webpack-dev-server --config webpack.dev.config.js --progress --inline --colors",
-    "build": "webpack"
+    "build": "webpack",
+    "test": "jest sources/*",
+    "coverage": "npm test -- --coverage"
   },
   "repository": {
     "type": "git",
@@ -28,14 +30,17 @@
     "babel-preset-env": "^1.5.2",
     "babel-preset-react": "^6.24.1",
     "css-loader": "^0.28.4",
+    "enzyme": "^2.8.2",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^15.0.1",
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-jsx-a11y": "^5.0.3",
     "eslint-plugin-react": "^7.1.0",
+    "jest": "^20.0.4",
     "jsonlint": "^1.6.2",
     "node-sass": "^4.5.3",
     "postcss-loader": "^2.0.6",
+    "react-test-renderer": "^15.6.1",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
     "stylelint": "^7.11.1",
