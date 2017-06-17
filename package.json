@@ -10,7 +10,7 @@
     "start": "webpack-dev-server --config webpack.dev.config.js --progress --inline --colors",
     "build": "webpack",
     "test": "jest sources/*",
-    "coverage": "npm test -- --coverage"
+    "test-coverage": "npm test -- --coverage"
   },
   "repository": {
     "type": "git",
