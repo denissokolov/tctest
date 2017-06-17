@@ -1,7 +1,11 @@
+const webpack = require('webpack');
 const path = require('path');
 
 module.exports = {
   entry: [
+    'react-hot-loader/patch',
+    'webpack-dev-server/client?http://localhost:8000',
+    'webpack/hot/only-dev-server',
     './sources',
   ],
   resolve: {
@@ -22,10 +26,13 @@ module.exports = {
       use: ['style-loader', 'css-loader', 'sass-loader'],
     }],
   },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+  ],
   devServer: {
     contentBase: 'public',
-    inline: true,
-    port: 8000,
+    hot: true,
     host: 'localhost',
+    port: 8000,
   },
 };
