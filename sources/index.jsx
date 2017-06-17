@@ -1,5 +1,4 @@
 /* global document */
-/* eslint global-require:0 */
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -19,6 +18,7 @@ render(Layout);
 
 if (module.hot) {
   module.hot.accept('./components/layout/Layout', () => {
+    // eslint-disable-next-line global-require
     const NextLayout = require('./components/layout/Layout').default;
     render(NextLayout);
   });

@@ -1,26 +1,29 @@
+/* eslint-disable import/no-extraneous-dependencies,prefer-template */
+
 const webpack = require('webpack');
-const path = require('path');
+const productionConfig = require('./webpack.config');
+
+const HOST = 'localhost';
+const PORT = 8000;
 
 module.exports = {
   entry: [
     'react-hot-loader/patch',
-    'webpack-dev-server/client?http://localhost:8000',
+    'webpack-dev-server/client?http://' + HOST + ':' + PORT,
     'webpack/hot/only-dev-server',
-    './sources',
-  ],
-  resolve: {
-    extensions: ['.js', '.jsx'],
-  },
-  output: {
-    path: path.join(__dirname, 'public/built/'),
-    publicPath: '/built/',
-    filename: 'bundle.js',
-  },
+  ].concat(productionConfig.entry),
+  resolve: productionConfig.resolve,
+  output: productionConfig.output,
   module: {
     rules: [{
       test: /\.jsx?$/,
       exclude: /node_modules/,
-      loader: 'babel-loader',
+      use: [{
+        loader: 'babel-loader',
+        options: {
+          forceEnv: 'development',
+        },
+      }],
     }, {
       test: /\.scss$/,
       use: ['style-loader', 'css-loader', 'sass-loader'],
@@ -32,7 +35,7 @@ module.exports = {
   devServer: {
     contentBase: 'public',
     hot: true,
-    host: 'localhost',
-    port: 8000,
+    host: HOST,
+    port: PORT,
   },
 };
