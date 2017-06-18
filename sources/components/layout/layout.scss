@@ -1,4 +1,14 @@
 .layout {
   max-width: 1280px;
   padding: 20px;
+
+  &__configure-projects-link {
+    font-size: 14px;
+    color: #1564c2;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }

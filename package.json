@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/testdenis/tctest#readme",
   "dependencies": {
+    "classnames": "^2.2.5",
     "immutable": "^3.8.1",
+    "normalize.css": "^7.0.0",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",

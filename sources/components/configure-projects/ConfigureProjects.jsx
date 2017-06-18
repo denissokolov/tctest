@@ -6,6 +6,8 @@ import { loadProjects } from '../../actions/ConfigureProjectsActions';
 
 import VisibleProjects from './visible-projects/VisibleProjects';
 
+import './configure-projects.scss';
+
 export class ConfigureProjects extends React.Component {
   static propTypes = {
     configureProjects: PropTypes.instanceOf(Map).isRequired,
@@ -22,14 +24,16 @@ export class ConfigureProjects extends React.Component {
     const error = configureProjects.get('error');
 
     return (
-      <div>
-        <div>Projects</div>
-
+      <div className="configure-projects">
         {error && error.message}
 
         {configureProjects.get('loading') && <span>Loading...</span>}
 
-        {!visibleProjects.isEmpty() && <VisibleProjects items={visibleProjects} />}
+        {!visibleProjects.isEmpty() && (
+          <div className="configure-projects__items">
+            <VisibleProjects items={visibleProjects} />
+          </div>
+        )}
       </div>
     );
   }

@@ -7,6 +7,9 @@ import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 
+import 'normalize.css';
+import './base.scss';
+
 import rootReducer from './reducers';
 import Layout from './components/layout/Layout';
 

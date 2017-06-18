@@ -1,0 +1,9 @@
+.configure-projects {
+  height: 100%;
+
+  &__items {
+    width: 300px;
+    height: 100%;
+    overflow: auto;
+  }
+}
