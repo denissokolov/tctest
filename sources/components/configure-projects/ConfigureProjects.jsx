@@ -19,10 +19,13 @@ export class ConfigureProjects extends React.Component {
   render() {
     const { configureProjects } = this.props;
     const visibleProjects = configureProjects.get('visible');
+    const error = configureProjects.get('error');
 
     return (
       <div>
         <div>Projects</div>
+
+        {error && error.message}
 
         {configureProjects.get('loading') && <span>Loading...</span>}
 
