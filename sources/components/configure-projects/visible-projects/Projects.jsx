@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
 
-function VisibleProjects({ items }) {
+function Projects({ items }) {
   return (
     <ul>
       {items.map(item => (
@@ -14,9 +14,9 @@ function VisibleProjects({ items }) {
   );
 }
 
-VisibleProjects.propTypes = {
+Projects.propTypes = {
   items: PropTypes.instanceOf(List).isRequired,
 };
 
-export default VisibleProjects;
+export default Projects;
 

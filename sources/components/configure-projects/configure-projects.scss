@@ -1,9 +1,33 @@
 .configure-projects {
+  $title-height: 20px;
+
   height: 100%;
 
-  &__items {
-    width: 300px;
+  &__buttons {
+    float: left;
+    width: 50px;
     height: 100%;
+
+    &_move {
+      width: 62px;
+    }
+  }
+
+  &__items-wrapper {
+    float: left;
+    width: calc((100% - 50px - 62px) / 2);
+    height: 100%;
+  }
+
+  &__items-title {
+    height: $title-height;
+    font-size: 12px;
+    color: #737373;
+  }
+
+  &__items {
+    height: calc(100% - #{$title-height});
     overflow: auto;
+    border: 1px solid #e7e7e7;
   }
 }

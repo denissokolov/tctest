@@ -4,12 +4,18 @@ import { fromJS } from 'immutable';
 
 import projects from '../../__mocks__/projects';
 import { ConfigureProjects } from './ConfigureProjects';
-import VisibleProjects from './visible-projects/VisibleProjects';
+import Projects from './visible-projects/Projects';
 
-function create({ visible = [], loading = false, dispatch = jest.fn() }, needMount = false) {
+function create({
+                  visible = [],
+                  hidden = [],
+                  loading = false,
+                  dispatch = jest.fn(),
+                }, needMount = false) {
   const configureProjects = fromJS({
     loading,
     visible,
+    hidden,
   });
 
   const render = needMount ? mount : shallow;
@@ -23,14 +29,14 @@ function create({ visible = [], loading = false, dispatch = jest.fn() }, needMou
 }
 
 describe('ConfigureProjects', () => {
-  it('should no render VisibleProjects for empty list', () => {
+  it('should no render Projects for empty list', () => {
     const wrapper = create({});
-    expect(wrapper.find(VisibleProjects).length).toBe(0);
+    expect(wrapper.find(Projects).length).toBe(0);
   });
 
-  it('should render VisibleProjects for filled list', () => {
+  it('should render Projects for filled list', () => {
     const wrapper = create({ visible: projects });
-    expect(wrapper.find(VisibleProjects).length).toBe(1);
+    expect(wrapper.find(Projects).length).toBe(1);
   });
 
   it('dispatch should be called on componentDidMount', () => {

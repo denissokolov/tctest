@@ -67,7 +67,9 @@
   }
 
   &__content {
+    $padding: 12px;
+
     height: 100%;
-    padding-top: 43px;
+    padding: (43px + $padding) $padding $padding $padding;
   }
 }

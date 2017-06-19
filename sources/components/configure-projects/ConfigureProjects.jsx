@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Map } from 'immutable';
 import { loadProjects } from '../../actions/ConfigureProjectsActions';
 
-import VisibleProjects from './visible-projects/VisibleProjects';
+import Projects from './visible-projects/Projects';
 
 import './configure-projects.scss';
 
@@ -21,6 +21,7 @@ export class ConfigureProjects extends React.Component {
   render() {
     const { configureProjects } = this.props;
     const visibleProjects = configureProjects.get('visible');
+    const hiddenProjects = configureProjects.get('hidden');
     const error = configureProjects.get('error');
 
     return (
@@ -29,11 +30,33 @@ export class ConfigureProjects extends React.Component {
 
         {configureProjects.get('loading') && <span>Loading...</span>}
 
-        {!visibleProjects.isEmpty() && (
-          <div className="configure-projects__items">
-            <VisibleProjects items={visibleProjects} />
+        <div className="configure-projects__buttons" />
+
+        <div className="configure-projects__items-wrapper">
+          <div className="configure-projects__items-title">
+            Visible projects
           </div>
-        )}
+
+          <div className="configure-projects__items">
+            {!visibleProjects.isEmpty() && (
+              <Projects items={visibleProjects} />
+            )}
+          </div>
+        </div>
+
+        <div className="configure-projects__buttons configure-projects__buttons_move" />
+
+        <div className="configure-projects__items-wrapper">
+          <div className="configure-projects__items-title">
+            Hidden projects
+          </div>
+
+          <div className="configure-projects__items">
+            {!hiddenProjects.isEmpty() && (
+              <Projects items={hiddenProjects} />
+            )}
+          </div>
+        </div>
       </div>
     );
   }
