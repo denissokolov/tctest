@@ -62,4 +62,74 @@ export default [
       ],
     },
   },
+  {
+    id: 'Hibernate',
+    name: 'Hibernate',
+    parentProject: {
+      id: 'OpenSourceProjects',
+    },
+    buildTypes: {
+      count: 0,
+      buildType: [],
+    },
+  },
+  {
+    id: 'Hibernate_HibernateOrm',
+    name: 'Hibernate Orm',
+    parentProject: {
+      id: 'Hibernate',
+    },
+    buildTypes: {
+      count: 1,
+      buildType: [
+        {
+          id: 'Hibernate_HibernateOrm_Build',
+          name: 'Build',
+        },
+      ],
+    },
+  },
+  {
+    id: 'cb_Root',
+    name: 'teamcity.codebetter.com',
+    parentProject: {
+      id: '_Root',
+    },
+    buildTypes: {
+      count: 0,
+      buildType: [],
+    },
+  },
+  {
+    id: 'Nose',
+    name: '#Nose',
+    parentProject: {
+      id: 'cb_Root',
+    },
+    buildTypes: {
+      count: 1,
+      buildType: [
+        {
+          id: 'bt409',
+          name: '#Nose Trunk',
+        },
+      ],
+    },
+  },
+  {
+    id: 'Less',
+    name: '.Less',
+    parentProject: {
+      id: 'cb_Root',
+    },
+    buildTypes: {
+      count: 1,
+      buildType: [
+        {
+          id: 'bt113',
+          name: '.Less Trunk',
+        },
+      ],
+    },
+  },
 ];

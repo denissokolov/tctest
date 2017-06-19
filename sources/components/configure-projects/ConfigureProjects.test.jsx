@@ -2,9 +2,9 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import { fromJS } from 'immutable';
 
-import projects from '../../__mocks__/projects';
+import formattedProjects from '../../__mocks__/formattedProjects';
 import { ConfigureProjects } from './ConfigureProjects';
-import Projects from './visible-projects/Projects';
+import Projects from './visible-projects/ProjectsSelect';
 
 function create({
                   visible = [],
@@ -29,13 +29,18 @@ function create({
 }
 
 describe('ConfigureProjects', () => {
+  it('should has .configure-projects class', () => {
+    const wrapper = create({});
+    expect(wrapper.find('.configure-projects').length).toBe(1);
+  });
+
   it('should no render Projects for empty list', () => {
     const wrapper = create({});
     expect(wrapper.find(Projects).length).toBe(0);
   });
 
   it('should render Projects for filled list', () => {
-    const wrapper = create({ visible: projects });
+    const wrapper = create({ visible: formattedProjects });
     expect(wrapper.find(Projects).length).toBe(1);
   });
 

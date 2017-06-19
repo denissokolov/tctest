@@ -36,14 +36,14 @@ module.exports = {
           minimize: true,
         },
       }, {
-        loader: 'sass-loader',
-      }, {
         loader: 'postcss-loader',
         options: {
           plugins: function () {
             return [autoprefixer('last 2 versions', 'ie 9')];
           },
         },
+      }, {
+        loader: 'sass-loader',
       }],
     }],
   },

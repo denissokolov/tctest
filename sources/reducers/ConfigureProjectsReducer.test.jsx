@@ -1,6 +1,8 @@
 import { fromJS } from 'immutable';
 import ConfigureProjectsReducer from './ConfigureProjectsReducer';
-import projects from '../__mocks__/projects';
+
+import serverProjects from '../__mocks__/serverProjects';
+import formattedProjects from '../__mocks__/formattedProjects';
 
 describe('ConfigureProjectsReducer', () => {
   it('should return the initial state', () => {
@@ -27,14 +29,14 @@ describe('ConfigureProjectsReducer', () => {
   it('should handle LOAD_PROJECTS_SUCCESS', () => {
     const action = {
       type: 'LOAD_PROJECTS_SUCCESS',
-      projects,
+      projects: serverProjects,
     };
 
     const state = ConfigureProjectsReducer(undefined, action);
 
     expect(state.get('loading')).toBeFalsy();
     expect(state.get('error')).toBeNull();
-    expect(state.get('visible')).toEqual(fromJS(action.projects));
+    expect(state.get('visible')).toEqual(fromJS(formattedProjects));
   });
 
   it('should handle LOAD_PROJECTS_FAIL', () => {

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Map } from 'immutable';
 import { loadProjects } from '../../actions/ConfigureProjectsActions';
 
-import Projects from './visible-projects/Projects';
+import ProjectsSelect from './visible-projects/ProjectsSelect';
 
 import './configure-projects.scss';
 
@@ -39,7 +39,7 @@ export class ConfigureProjects extends React.Component {
 
           <div className="configure-projects__items">
             {!visibleProjects.isEmpty() && (
-              <Projects items={visibleProjects} />
+              <ProjectsSelect items={visibleProjects} />
             )}
           </div>
         </div>
@@ -53,7 +53,7 @@ export class ConfigureProjects extends React.Component {
 
           <div className="configure-projects__items">
             {!hiddenProjects.isEmpty() && (
-              <Projects items={hiddenProjects} />
+              <ProjectsSelect items={hiddenProjects} />
             )}
           </div>
         </div>
