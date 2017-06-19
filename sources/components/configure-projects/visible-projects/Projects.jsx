@@ -2,11 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
 
+import './projects.scss';
+
 function Projects({ items }) {
   return (
-    <ul>
+    <ul className="projects">
       {items.map(item => (
-        <li key={item.get('id')}>
+        <li key={item.get('id')} className="projects__item">
           {item.get('name')}
         </li>
       ))}
