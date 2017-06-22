@@ -1,9 +1,14 @@
+/* global fetch */
+
+import ProjectsStorage from '../storages/ProjectsStorage';
+
+let projectsStorage;
+
 export function loadProjects() {
   return (dispatch) => {
     dispatch({ type: 'LOAD_PROJECTS_PROGRESS' });
 
     // TODO: add polyfill
-    // eslint-disable-next-line no-undef
     fetch('data.json')
       .then((response) => {
         if (response.ok) {
@@ -13,9 +18,12 @@ export function loadProjects() {
         throw new Error('Network response was not ok.');
       })
       .then((data) => {
+        projectsStorage = new ProjectsStorage(data.project);
+
         dispatch({
           type: 'LOAD_PROJECTS_SUCCESS',
-          projects: data.project,
+          visible: projectsStorage.getVisible(),
+          hidden: projectsStorage.getHidden(),
         });
       })
       .catch((error) => {
@@ -24,5 +32,15 @@ export function loadProjects() {
           error,
         });
       });
+  };
+}
+
+export function hideProjects(keys) {
+  projectsStorage.hideItems(keys);
+
+  return {
+    type: 'HIDE_PROJECTS',
+    visible: projectsStorage.getVisible(),
+    hidden: projectsStorage.getHidden(),
   };
 }

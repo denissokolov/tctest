@@ -15,35 +15,21 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         .set('error', null);
 
     case 'LOAD_PROJECTS_SUCCESS': {
-      const depthObj = {};
-      const projects = [];
-
-      action.projects.forEach((project) => {
-        const formattedProject = {};
-        formattedProject.id = project.id;
-        formattedProject.name = project.name;
-
-        if (project.parentProject) {
-          formattedProject.depth = depthObj[project.parentProject.id] + 1;
-          formattedProject.parentProjectId = project.parentProject.id;
-        } else {
-          formattedProject.depth = 0;
-        }
-
-        depthObj[project.id] = formattedProject.depth;
-
-        projects.push(formattedProject);
-      });
-
       return state
         .set('loading', false)
-        .set('visible', fromJS(projects));
+        .set('visible', fromJS(action.visible))
+        .set('hidden', fromJS(action.hidden));
     }
 
     case 'LOAD_PROJECTS_FAIL':
       return state
         .set('loading', false)
         .set('error', action.error);
+
+    case 'HIDE_PROJECTS':
+      return state
+        .set('visible', fromJS(action.visible))
+        .set('hidden', fromJS(action.hidden));
 
     default:
       return state;

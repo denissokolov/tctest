@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Map } from 'immutable';
-import { loadProjects } from '../../actions/ConfigureProjectsActions';
+import { loadProjects, hideProjects } from '../../actions/ConfigureProjectsActions';
 
-import ProjectsSelect from './visible-projects/ProjectsSelect';
+import ProjectsSelect from './project-select/ProjectsSelect';
 
 import './configure-projects.scss';
 
@@ -17,6 +17,34 @@ export class ConfigureProjects extends React.Component {
   componentDidMount() {
     this.props.dispatch(loadProjects());
   }
+
+  onVisibleSelectChange = (event) => {
+    this.visibleSelected = this.getSelectValues(event.target);
+  };
+
+  onHiddenSelectChange = (event) => {
+    this.hiddenSelected = this.getSelectValues(event.target);
+  };
+
+  onHideClick = () => {
+    this.props.dispatch(hideProjects(this.visibleSelected));
+  };
+
+  getSelectValues = (select) => {
+    const options = select.options;
+    const values = [];
+
+    for (let i = 0, l = options.length; i < l; i += 1) {
+      if (options[i].selected) {
+        values.push(options[i].value);
+      }
+    }
+
+    return values;
+  };
+
+  visibleSelected = [];
+  hiddenSelected = [];
 
   render() {
     const { configureProjects } = this.props;
@@ -38,13 +66,18 @@ export class ConfigureProjects extends React.Component {
           </div>
 
           <div className="configure-projects__items">
-            {!visibleProjects.isEmpty() && (
-              <ProjectsSelect items={visibleProjects} />
-            )}
+            <ProjectsSelect
+              items={visibleProjects}
+              onChange={this.onVisibleSelectChange}
+            />
           </div>
         </div>
 
-        <div className="configure-projects__buttons configure-projects__buttons_move" />
+        <div className="configure-projects__buttons configure-projects__buttons_move">
+          <button type="button" onClick={this.onHideClick}>
+            {'->'}
+          </button>
+        </div>
 
         <div className="configure-projects__items-wrapper">
           <div className="configure-projects__items-title">
@@ -52,9 +85,12 @@ export class ConfigureProjects extends React.Component {
           </div>
 
           <div className="configure-projects__items">
-            {!hiddenProjects.isEmpty() && (
-              <ProjectsSelect items={hiddenProjects} />
-            )}
+            <ProjectsSelect
+              items={hiddenProjects}
+              onChange={this.onHiddenSelectChange}
+              disableVisibleItems
+              showOriginalData
+            />
           </div>
         </div>
       </div>
