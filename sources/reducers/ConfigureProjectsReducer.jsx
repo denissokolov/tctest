@@ -26,6 +26,7 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         .set('loading', false)
         .set('error', action.error);
 
+    case 'SHOW_PROJECTS':
     case 'HIDE_PROJECTS':
       return state
         .set('visible', fromJS(action.visible))

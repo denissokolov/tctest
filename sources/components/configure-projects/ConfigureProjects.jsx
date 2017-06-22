@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Map } from 'immutable';
-import { loadProjects, hideProjects } from '../../actions/ConfigureProjectsActions';
+import { loadProjects, hideProjects, showProjects } from '../../actions/ConfigureProjectsActions';
 
 import ProjectsSelect from './project-select/ProjectsSelect';
 
@@ -28,6 +28,10 @@ export class ConfigureProjects extends React.Component {
 
   onHideClick = () => {
     this.props.dispatch(hideProjects(this.visibleSelected));
+  };
+
+  onShowClick = () => {
+    this.props.dispatch(showProjects(this.hiddenSelected));
   };
 
   getSelectValues = (select) => {
@@ -76,6 +80,10 @@ export class ConfigureProjects extends React.Component {
         <div className="configure-projects__buttons configure-projects__buttons_move">
           <button type="button" onClick={this.onHideClick}>
             {'->'}
+          </button>
+
+          <button type="button" onClick={this.onShowClick}>
+            {'<-'}
           </button>
         </div>
 

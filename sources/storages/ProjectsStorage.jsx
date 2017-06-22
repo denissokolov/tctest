@@ -114,6 +114,10 @@ class ProjectsStorage {
     });
   }
 
+  showItems(keys) {
+
+  }
+
   getVisible() {
     return this.visible;
   }

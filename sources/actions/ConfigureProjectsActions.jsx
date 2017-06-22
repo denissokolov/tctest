@@ -44,3 +44,13 @@ export function hideProjects(keys) {
     hidden: projectsStorage.getHidden(),
   };
 }
+
+export function showProjects(keys) {
+  projectsStorage.showItems(keys);
+
+  return {
+    type: 'SHOW_PROJECTS',
+    visible: projectsStorage.getVisible(),
+    hidden: projectsStorage.getHidden(),
+  };
+}
