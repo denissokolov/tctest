@@ -48,6 +48,7 @@ class ProjectsStorage {
       if (project.parentId) {
         const parent = this.map.get(project.parentId);
         if (parent.visible) {
+          project.name = project.originalName;
           project.depth = parent.depth + 1;
         } else {
           project.name = `${parent.name} :: ${project.originalName}`;
@@ -58,6 +59,8 @@ class ProjectsStorage {
       if (project.visible) {
         this.visible.push(project);
       }
+
+      project.isAnyChildHidden = undefined;
     });
 
     this.hidden = [];
