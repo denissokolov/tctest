@@ -19,36 +19,74 @@ export class ConfigureProjects extends React.Component {
   }
 
   onVisibleSelectChange = (event) => {
-    this.visibleSelected = this.getSelectValues(event.target);
+    this.visibleOptions = event.target.options;
   };
 
   onHiddenSelectChange = (event) => {
-    this.hiddenSelected = this.getSelectValues(event.target);
+    this.hiddenOptions = event.target.options;
   };
 
   onHideClick = () => {
-    this.props.dispatch(hideProjects(this.visibleSelected));
+    const selectedIds = this.getSelectedIds(this.visibleOptions, this.props.configureProjects.get('visible'));
+    this.props.dispatch(hideProjects(selectedIds));
   };
 
   onShowClick = () => {
-    this.props.dispatch(showProjects(this.hiddenSelected));
+    const selectedIds = this.getSelectedIds(this.hiddenOptions, this.props.configureProjects.get('hidden'));
+    this.props.dispatch(showProjects(selectedIds));
   };
 
-  getSelectValues = (select) => {
-    const options = select.options;
-    const values = [];
+  getSelectedIds = (options, items) => {
+    const reversedOptions = [...options].reverse();
+    const selectedInfo = {};
 
-    for (let i = 0, l = options.length; i < l; i += 1) {
-      if (options[i].selected) {
-        values.push(options[i].value);
+    const setSelectedInfo = ({ id, selected, isAnyChildSelected }) => {
+      let info = selectedInfo[id];
+      if (!info) {
+        info = {};
+        selectedInfo[id] = info;
       }
-    }
 
-    return values;
+      if (selected !== undefined) {
+        info.selected = selected;
+      }
+
+      if (isAnyChildSelected !== undefined) {
+        info.isAnyChildSelected = isAnyChildSelected;
+      }
+    };
+
+    items.reverse().forEach((item, index) => {
+      const id = item.get('id');
+      const selected = reversedOptions[index].selected;
+      setSelectedInfo({ id, selected });
+
+      if (selected || selectedInfo[id].isAnyChildSelected) {
+        setSelectedInfo({ id: item.get('parentId'), isAnyChildSelected: true });
+      }
+    });
+
+    const selectedIds = [];
+    items.forEach((item) => {
+      const id = item.get('id');
+
+      const info = selectedInfo[id];
+      if (info && info.selected) {
+        selectedIds.push(id);
+      } else {
+        const parentInfo = selectedInfo[item.get('parentId')];
+        if (parentInfo && parentInfo.selected && !parentInfo.isAnyChildSelected) {
+          selectedIds.push(item.get('id'));
+          setSelectedInfo({ id, selected: true });
+        }
+      }
+    });
+
+    return selectedIds;
   };
 
-  visibleSelected = [];
-  hiddenSelected = [];
+  visibleOptions = [];
+  hiddenOptions = [];
 
   render() {
     const { configureProjects } = this.props;

@@ -1,15 +1,10 @@
 /* eslint-disable no-param-reassign */
 
-import { generateKey, getParentKeyFromKey } from '../utils/keyUtils';
-
 class ProjectsStorage {
   constructor(items) {
     this.map = new Map();
     this.visible = [];
     this.hidden = [];
-
-    const projectsInfo = {};
-    const rootsCount = 0;
 
     items.forEach((project) => {
       const formattedProject = {};
@@ -20,73 +15,38 @@ class ProjectsStorage {
 
       const parent = project.parentProject;
       if (parent) {
-        const parentInfo = projectsInfo[parent.id];
-        formattedProject.depth = parentInfo.depth + 1;
-        formattedProject.originalDepth = parentInfo.depth + 1;
-        formattedProject.key = generateKey(parentInfo.childrenCount, parentInfo.key);
-
-        parentInfo.childrenCount += 1;
+        const parentFormatted = this.map.get(parent.id);
+        formattedProject.depth = parentFormatted.depth + 1;
+        formattedProject.originalDepth = parentFormatted.depth + 1;
+        formattedProject.parentId = project.parentProject.id;
       } else {
         formattedProject.depth = 0;
         formattedProject.originalDepth = 0;
-        formattedProject.key = generateKey(rootsCount);
       }
 
-      projectsInfo[project.id] = {
-        depth: formattedProject.depth,
-        key: formattedProject.key,
-        childrenCount: 0,
-      };
-
-      this.map.set(formattedProject.key, formattedProject);
+      this.map.set(project.id, formattedProject);
       this.visible.push(formattedProject);
     });
   }
 
-  hideItems(keys) {
-    const selectedInfo = {};
+  showItems(ids) {
+    this.toggleVisibility(true, ids);
+  }
 
-    keys.forEach((key) => {
-      const info = selectedInfo[key];
-      if (info) {
-        info.selected = true;
-      } else {
-        selectedInfo[key] = {
-          selected: true,
-          isAnyChildSelected: false,
-        };
-      }
+  hideItems(ids) {
+    this.toggleVisibility(false, ids);
+  }
 
-      const parentKey = getParentKeyFromKey(key);
-      const parentInfo = selectedInfo[parentKey];
-      if (parentInfo) {
-        parentInfo.isAnyChildSelected = true;
-      }
-    });
-
+  toggleVisibility(visible, ids) {
     this.visible = [];
     this.map.forEach((project) => {
-      const parentKey = getParentKeyFromKey(project.key);
-      const parentInfo = selectedInfo[parentKey];
-      const info = selectedInfo[project.key];
-
-      if (info && info.selected) {
-        project.visible = false;
-      } else if (parentInfo && parentInfo.selected && !parentInfo.isAnyChildSelected) {
-        project.visible = false;
-
-        if (info) {
-          info.selected = true;
-        } else {
-          selectedInfo[project.key] = {
-            selected: true,
-            isAnyChildSelected: false,
-          };
-        }
+      if (ids.length && ids[0] === project.id) {
+        project.visible = visible;
+        ids.shift();
       }
 
-      const parent = this.map.get(parentKey);
-      if (parent) {
+      if (project.parentId) {
+        const parent = this.map.get(project.parentId);
         if (parent.visible) {
           project.depth = parent.depth + 1;
         } else {
@@ -105,17 +65,12 @@ class ProjectsStorage {
       if (!project.visible || project.isAnyChildHidden) {
         this.hidden.unshift(project);
 
-        const parentKey = getParentKeyFromKey(project.key);
-        if (parentKey) {
-          const parent = this.map.get(parentKey);
+        if (project.parentId) {
+          const parent = this.map.get(project.parentId);
           parent.isAnyChildHidden = true;
         }
       }
     });
-  }
-
-  showItems(keys) {
-
   }
 
   getVisible() {
