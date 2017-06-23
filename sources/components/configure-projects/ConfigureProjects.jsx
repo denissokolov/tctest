@@ -14,16 +14,31 @@ export class ConfigureProjects extends React.Component {
     dispatch: PropTypes.func.isRequired,
   };
 
+  state = {
+    anyVisibleSelected: false,
+    anyHiddenSelected: false,
+  };
+
   componentDidMount() {
     this.props.dispatch(loadProjects());
   }
 
   onVisibleSelectChange = (event) => {
     this.visibleOptions = event.target.options;
+
+    const anyVisibleSelected = Boolean(event.target.options);
+    if (anyVisibleSelected !== this.state.anyVisibleSelected) {
+      this.setState({ anyVisibleSelected });
+    }
   };
 
   onHiddenSelectChange = (event) => {
     this.hiddenOptions = event.target.options;
+
+    const anyHiddenSelected = Boolean(event.target.options);
+    if (anyHiddenSelected !== this.state.anyHiddenSelected) {
+      this.setState({ anyHiddenSelected });
+    }
   };
 
   onHideClick = () => {
@@ -89,6 +104,7 @@ export class ConfigureProjects extends React.Component {
   hiddenOptions = [];
 
   render() {
+    const { anyHiddenSelected, anyVisibleSelected } = this.state;
     const { configureProjects } = this.props;
     const visibleProjects = configureProjects.get('visible');
     const hiddenProjects = configureProjects.get('hidden');
@@ -116,11 +132,19 @@ export class ConfigureProjects extends React.Component {
         </div>
 
         <div className="configure-projects__buttons configure-projects__buttons_move">
-          <button type="button" onClick={this.onHideClick}>
+          <button
+            type="button"
+            onClick={this.onHideClick}
+            disabled={!anyVisibleSelected}
+          >
             {'->'}
           </button>
 
-          <button type="button" onClick={this.onShowClick}>
+          <button
+            type="button"
+            onClick={this.onShowClick}
+            disabled={!anyHiddenSelected}
+          >
             {'<-'}
           </button>
         </div>
