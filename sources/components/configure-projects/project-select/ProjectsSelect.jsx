@@ -17,14 +17,17 @@ function ProjectsSelect({ items, onChange, disableVisibleItems, showOriginalData
           'projects-select__item',
           `projects-select__item_depth_${showOriginalData ? item.get('originalDepth') : item.get('depth')}`);
 
+        const name = showOriginalData ? item.get('originalName') : item.get('name');
+
         return (
           <option
             key={item.get('id')}
             className={classNames}
             value={item.get('id')}
             disabled={disableVisibleItems && item.get('visible')}
+            title={name}
           >
-            {showOriginalData ? item.get('originalName') : item.get('name')}
+            {name}
           </option>
         );
       })}

@@ -4,9 +4,11 @@ import { connect } from 'react-redux';
 import { Map } from 'immutable';
 import { loadProjects, hideProjects, showProjects } from '../../actions/ConfigureProjectsActions';
 
+import ArrowButton, { directions as arrowButtonDiractions } from '../arrow-button/ArrowButton';
 import ProjectsSelect from './project-select/ProjectsSelect';
 
 import './configure-projects.scss';
+import '../centered-block/centered-block.scss';
 
 export class ConfigureProjects extends React.Component {
   static propTypes = {
@@ -116,7 +118,25 @@ export class ConfigureProjects extends React.Component {
 
         {configureProjects.get('loading') && <span>Loading...</span>}
 
-        <div className="configure-projects__buttons" />
+        <div className="configure-projects__buttons centered-block">
+          <div className="centered-block__content">
+            <span className="configure-projects__button">
+              <ArrowButton
+                direction={arrowButtonDiractions.up}
+                onClick={() => {}}
+                disabled={!anyVisibleSelected}
+              />
+            </span>
+
+            <span className="configure-projects__button">
+              <ArrowButton
+                direction={arrowButtonDiractions.down}
+                onClick={() => {}}
+                disabled={!anyHiddenSelected}
+              />
+            </span>
+          </div>
+        </div>
 
         <div className="configure-projects__items-wrapper">
           <div className="configure-projects__items-title">
@@ -131,22 +151,24 @@ export class ConfigureProjects extends React.Component {
           </div>
         </div>
 
-        <div className="configure-projects__buttons configure-projects__buttons_move">
-          <button
-            type="button"
-            onClick={this.onHideClick}
-            disabled={!anyVisibleSelected}
-          >
-            {'->'}
-          </button>
+        <div className="configure-projects__buttons centered-block">
+          <div className="centered-block__content">
+            <span className="configure-projects__button">
+              <ArrowButton
+                direction={arrowButtonDiractions.right}
+                onClick={this.onHideClick}
+                disabled={!anyVisibleSelected}
+              />
+            </span>
 
-          <button
-            type="button"
-            onClick={this.onShowClick}
-            disabled={!anyHiddenSelected}
-          >
-            {'<-'}
-          </button>
+            <span className="configure-projects__button">
+              <ArrowButton
+                direction={arrowButtonDiractions.left}
+                onClick={this.onShowClick}
+                disabled={!anyHiddenSelected}
+              />
+            </span>
+          </div>
         </div>
 
         <div className="configure-projects__items-wrapper">
