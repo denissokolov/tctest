@@ -35,8 +35,8 @@ export function loadProjects() {
   };
 }
 
-export function hideProjects(keys) {
-  projectsStorage.hideItems(keys);
+export function hideProjects(ids) {
+  projectsStorage.hideItems(ids);
 
   return {
     type: 'HIDE_PROJECTS',
@@ -45,12 +45,30 @@ export function hideProjects(keys) {
   };
 }
 
-export function showProjects(keys) {
-  projectsStorage.showItems(keys);
+export function showProjects(ids) {
+  projectsStorage.showItems(ids);
 
   return {
     type: 'SHOW_PROJECTS',
     visible: projectsStorage.getVisible(),
     hidden: projectsStorage.getHidden(),
+  };
+}
+
+export function moveProjectsUp(ids) {
+  projectsStorage.sortUpVisible(ids);
+
+  return {
+    type: 'MOVE_PROJECTS_UP',
+    items: projectsStorage.getVisible(),
+  };
+}
+
+export function moveProjectsDown(ids) {
+  projectsStorage.sortDownVisible(ids);
+
+  return {
+    type: 'MOVE_PROJECTS_DOWN',
+    items: projectsStorage.getVisible(),
   };
 }

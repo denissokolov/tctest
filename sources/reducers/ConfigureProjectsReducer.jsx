@@ -32,6 +32,10 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         .set('visible', fromJS(action.visible))
         .set('hidden', fromJS(action.hidden));
 
+    case 'MOVE_PROJECTS_UP':
+    case 'MOVE_PROJECTS_DOWN':
+      return state.set('visible', fromJS(action.items));
+
     default:
       return state;
   }

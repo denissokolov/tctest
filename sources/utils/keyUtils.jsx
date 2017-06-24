@@ -1,19 +1,49 @@
 /* eslint-disable import/prefer-default-export */
 
-const INDEX_PART_LENGTH = 6;
+const KEY_LEVEL_LENGTH = 6;
 
-function numberToKeyPart(num, length) {
-  return String(`00000${num}`).slice(-length);
+function numberToKeyLevel(num) {
+  return String(`00000${num}`).slice(-KEY_LEVEL_LENGTH);
+}
+
+function getParentKeyAndCurrentLevelPosition(key) {
+  const lastDelimiterIndex = key.lastIndexOf('/');
+  if (lastDelimiterIndex === -1) {
+    return {
+      parentKey: '',
+      currentLevelPosition: parseInt(key, 10),
+    };
+  }
+
+  return {
+    parentKey: key.substring(0, lastDelimiterIndex + 1),
+    currentLevelPosition: parseInt(key.substring(lastDelimiterIndex + 1), 10),
+  };
 }
 
 export function generateKey(currentNumber, parentKey) {
-  const currentPart = numberToKeyPart(currentNumber, INDEX_PART_LENGTH);
+  const currentPart = numberToKeyLevel(currentNumber);
 
   if (parentKey) {
     return `${parentKey}/${currentPart}`;
   }
 
   return currentPart;
+}
+
+export function getNextKeyOnSameLevel(key) {
+  const { parentKey, currentLevelPosition } = getParentKeyAndCurrentLevelPosition(key);
+
+  const newPosition = currentLevelPosition + 1;
+  return `${parentKey}${numberToKeyLevel(newPosition)}`;
+}
+
+
+export function getPrevKeyOnSameLevel(key) {
+  const { parentKey, currentLevelPosition } = getParentKeyAndCurrentLevelPosition(key);
+
+  const newPosition = currentLevelPosition - 1;
+  return newPosition >= 0 ? `${parentKey}${numberToKeyLevel(newPosition)}` : null;
 }
 
 export function getParentKeyFromKey(key) {

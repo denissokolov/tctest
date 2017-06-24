@@ -2,7 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Map } from 'immutable';
-import { loadProjects, hideProjects, showProjects } from '../../actions/ConfigureProjectsActions';
+import {
+  loadProjects, hideProjects, showProjects, moveProjectsDown, moveProjectsUp,
+} from '../../actions/ConfigureProjectsActions';
 
 import ArrowButton, { directions as arrowButtonDiractions } from '../arrow-button/ArrowButton';
 import ProjectsSelect from './project-select/ProjectsSelect';
@@ -44,16 +46,26 @@ export class ConfigureProjects extends React.Component {
   };
 
   onHideClick = () => {
-    const selectedIds = this.getSelectedIds(this.visibleOptions, this.props.configureProjects.get('visible'));
+    const selectedIds = this.getSelectedIdsWithChildren(this.visibleOptions, this.props.configureProjects.get('visible'));
     this.props.dispatch(hideProjects(selectedIds));
   };
 
   onShowClick = () => {
-    const selectedIds = this.getSelectedIds(this.hiddenOptions, this.props.configureProjects.get('hidden'));
+    const selectedIds = this.getSelectedIdsWithChildren(this.hiddenOptions, this.props.configureProjects.get('hidden'));
     this.props.dispatch(showProjects(selectedIds));
   };
 
-  getSelectedIds = (options, items) => {
+  onMoveUpClick = () => {
+    const selectedIds = this.getSelectedIds(this.visibleOptions);
+    this.props.dispatch(moveProjectsUp(selectedIds));
+  };
+
+  onMoveDownClick = () => {
+    const selectedIds = this.getSelectedIds(this.visibleOptions);
+    this.props.dispatch(moveProjectsDown(selectedIds));
+  };
+
+  getSelectedIdsWithChildren = (options, items) => {
     const reversedOptions = [...options].reverse();
     const selectedInfo = {};
 
@@ -102,6 +114,18 @@ export class ConfigureProjects extends React.Component {
     return selectedIds;
   };
 
+  getSelectedIds(options) {
+    const selectedIds = [];
+
+    for (let i = 0; i < options.length; i += 1) {
+      if (options[i].selected) {
+        selectedIds.push(options[i].value);
+      }
+    }
+
+    return selectedIds;
+  }
+
   visibleOptions = [];
   hiddenOptions = [];
 
@@ -116,14 +140,14 @@ export class ConfigureProjects extends React.Component {
       <div className="configure-projects">
         {error && error.message}
 
-        {configureProjects.get('loading') && <span>Loading...</span>}
+        {configureProjects.get('loading') && <span className="configure-projects__loading">Loading...</span>}
 
         <div className="configure-projects__buttons centered-block">
           <div className="centered-block__content">
             <span className="configure-projects__button">
               <ArrowButton
                 direction={arrowButtonDiractions.up}
-                onClick={() => {}}
+                onClick={this.onMoveUpClick}
                 disabled={!anyVisibleSelected}
               />
             </span>
@@ -131,8 +155,8 @@ export class ConfigureProjects extends React.Component {
             <span className="configure-projects__button">
               <ArrowButton
                 direction={arrowButtonDiractions.down}
-                onClick={() => {}}
-                disabled={!anyHiddenSelected}
+                onClick={this.onMoveDownClick}
+                disabled={!anyVisibleSelected}
               />
             </span>
           </div>
