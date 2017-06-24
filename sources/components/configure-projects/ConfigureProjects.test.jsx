@@ -2,9 +2,7 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import { fromJS } from 'immutable';
 
-import formattedProjects from '../../__mocks__/formattedProjects';
 import { ConfigureProjects } from './ConfigureProjects';
-import Projects from './visible-projects/ProjectsSelect';
 
 function create({
                   visible = [],
@@ -34,16 +32,6 @@ describe('ConfigureProjects', () => {
     expect(wrapper.find('.configure-projects').length).toBe(1);
   });
 
-  it('should no render Projects for empty list', () => {
-    const wrapper = create({});
-    expect(wrapper.find(Projects).length).toBe(0);
-  });
-
-  it('should render Projects for filled list', () => {
-    const wrapper = create({ visible: formattedProjects });
-    expect(wrapper.find(Projects).length).toBe(1);
-  });
-
   it('dispatch should be called on componentDidMount', () => {
     const dispatch = jest.fn();
     create({ dispatch }, true);
@@ -52,14 +40,16 @@ describe('ConfigureProjects', () => {
 
   it('should no render loading for false configureProjects property', () => {
     const wrapper = create({ loading: false });
-    expect(wrapper.find('span').length).toBe(0);
+    const loadingBlock = wrapper.find('.configure-projects__loading');
+
+    expect(loadingBlock.length).toBe(0);
   });
 
   it('should render loading for true configureProjects property', () => {
     const wrapper = create({ loading: true });
-    const span = wrapper.find('span');
+    const loadingBlock = wrapper.find('.configure-projects__loading');
 
-    expect(span.length).toBe(1);
-    expect(span.text()).toBe('Loading...');
+    expect(loadingBlock.length).toBe(1);
+    expect(loadingBlock.text()).toBe('Loading...');
   });
 });
