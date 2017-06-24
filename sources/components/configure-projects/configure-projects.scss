@@ -1,10 +1,15 @@
 .configure-projects {
   $title-height: 30px;
+  $sort-message-height: 20px;
   $padding: 15px;
   $buttons-width: 40px + 2 * $padding;
 
   height: 100%;
-  padding-right: $padding;
+
+  &__main {
+    height: calc(100% - #{$sort-message-height});
+    padding-right: $padding;
+  }
 
   &__buttons {
     float: left;
@@ -36,5 +41,12 @@
     height: calc(100% - #{$title-height + $padding});
     overflow: auto;
     border: 1px solid #dedede;
+  }
+
+  &__sort-message {
+    height: $sort-message-height;
+    padding: 0 $padding;
+    color: #b9b9b9;
+    font-size: 12px;
   }
 }

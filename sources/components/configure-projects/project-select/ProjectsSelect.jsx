@@ -15,7 +15,9 @@ function ProjectsSelect({ items, onChange, disableVisibleItems, showOriginalData
       {items.map((item) => {
         const classNames = cn(
           'projects-select__item',
-          `projects-select__item_depth_${showOriginalData ? item.get('originalDepth') : item.get('depth')}`);
+          `projects-select__item_depth_${showOriginalData ? item.get('originalDepth') : item.get('depth')}`,
+          item.get('parentCustomSort') && 'projects-select__item_custom-sort',
+        );
 
         const name = showOriginalData ? item.get('originalName') : item.get('name');
 

@@ -11,6 +11,10 @@
     font-size: 14px;
     padding: 5px 10px;
 
+    &_custom-sort {
+      text-decoration: underline;
+    }
+
     &:nth-child(2n) {
       background-color: #f9f9f9;
     }

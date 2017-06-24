@@ -56,19 +56,21 @@ export function showProjects(ids) {
 }
 
 export function moveProjectsUp(ids) {
-  projectsStorage.sortUpVisible(ids);
+  const sortChanged = projectsStorage.sortUpVisible(ids);
 
   return {
     type: 'MOVE_PROJECTS_UP',
     items: projectsStorage.getVisible(),
+    sortChanged,
   };
 }
 
 export function moveProjectsDown(ids) {
-  projectsStorage.sortDownVisible(ids);
+  const sortChanged = projectsStorage.sortDownVisible(ids);
 
   return {
     type: 'MOVE_PROJECTS_DOWN',
     items: projectsStorage.getVisible(),
+    sortChanged,
   };
 }

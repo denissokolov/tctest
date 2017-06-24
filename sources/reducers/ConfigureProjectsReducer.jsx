@@ -5,6 +5,7 @@ const defaultState = fromJS({
   error: null,
   visible: [],
   hidden: [],
+  customSort: false,
 });
 
 function ConfigureProjectsReducer(state = defaultState, action = {}) {
@@ -34,7 +35,9 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
 
     case 'MOVE_PROJECTS_UP':
     case 'MOVE_PROJECTS_DOWN':
-      return state.set('visible', fromJS(action.items));
+      return state
+        .set('visible', fromJS(action.items))
+        .set('customSort', action.sortChanged);
 
     default:
       return state;

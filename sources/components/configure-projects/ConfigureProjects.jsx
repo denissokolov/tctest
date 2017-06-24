@@ -135,6 +135,7 @@ export class ConfigureProjects extends React.Component {
     const visibleProjects = configureProjects.get('visible');
     const hiddenProjects = configureProjects.get('hidden');
     const error = configureProjects.get('error');
+    const customSort = configureProjects.get('customSort');
 
     return (
       <div className="configure-projects">
@@ -142,72 +143,81 @@ export class ConfigureProjects extends React.Component {
 
         {configureProjects.get('loading') && <span className="configure-projects__loading">Loading...</span>}
 
-        <div className="configure-projects__buttons centered-block">
-          <div className="centered-block__content">
-            <span className="configure-projects__button">
-              <ArrowButton
-                direction={arrowButtonDiractions.up}
-                onClick={this.onMoveUpClick}
-                disabled={!anyVisibleSelected}
-              />
-            </span>
+        <div className="configure-projects__main">
+          <div className="configure-projects__buttons centered-block">
+            <div className="centered-block__content">
+              <span className="configure-projects__button">
+                <ArrowButton
+                  direction={arrowButtonDiractions.up}
+                  onClick={this.onMoveUpClick}
+                  disabled={!anyVisibleSelected}
+                />
+              </span>
 
-            <span className="configure-projects__button">
-              <ArrowButton
-                direction={arrowButtonDiractions.down}
-                onClick={this.onMoveDownClick}
-                disabled={!anyVisibleSelected}
+              <span className="configure-projects__button">
+                <ArrowButton
+                  direction={arrowButtonDiractions.down}
+                  onClick={this.onMoveDownClick}
+                  disabled={!anyVisibleSelected}
+                />
+              </span>
+            </div>
+          </div>
+
+          <div className="configure-projects__items-wrapper">
+            <div className="configure-projects__items-title">
+              Visible projects
+            </div>
+
+            <div className="configure-projects__items">
+              <ProjectsSelect
+                items={visibleProjects}
+                onChange={this.onVisibleSelectChange}
               />
-            </span>
+            </div>
+          </div>
+
+          <div className="configure-projects__buttons centered-block">
+            <div className="centered-block__content">
+              <span className="configure-projects__button">
+                <ArrowButton
+                  direction={arrowButtonDiractions.right}
+                  onClick={this.onHideClick}
+                  disabled={!anyVisibleSelected}
+                />
+              </span>
+
+                <span className="configure-projects__button">
+                <ArrowButton
+                  direction={arrowButtonDiractions.left}
+                  onClick={this.onShowClick}
+                  disabled={!anyHiddenSelected}
+                />
+              </span>
+            </div>
+          </div>
+
+          <div className="configure-projects__items-wrapper">
+            <div className="configure-projects__items-title">
+              Hidden projects
+            </div>
+
+            <div className="configure-projects__items">
+              <ProjectsSelect
+                items={hiddenProjects}
+                onChange={this.onHiddenSelectChange}
+                disableVisibleItems
+                showOriginalData
+              />
+            </div>
           </div>
         </div>
 
-        <div className="configure-projects__items-wrapper">
-          <div className="configure-projects__items-title">
-            Visible projects
-          </div>
-
-          <div className="configure-projects__items">
-            <ProjectsSelect
-              items={visibleProjects}
-              onChange={this.onVisibleSelectChange}
-            />
-          </div>
-        </div>
-
-        <div className="configure-projects__buttons centered-block">
-          <div className="centered-block__content">
-            <span className="configure-projects__button">
-              <ArrowButton
-                direction={arrowButtonDiractions.right}
-                onClick={this.onHideClick}
-                disabled={!anyVisibleSelected}
-              />
-            </span>
-
-            <span className="configure-projects__button">
-              <ArrowButton
-                direction={arrowButtonDiractions.left}
-                onClick={this.onShowClick}
-                disabled={!anyHiddenSelected}
-              />
-            </span>
-          </div>
-        </div>
-
-        <div className="configure-projects__items-wrapper">
-          <div className="configure-projects__items-title">
-            Hidden projects
-          </div>
-
-          <div className="configure-projects__items">
-            <ProjectsSelect
-              items={hiddenProjects}
-              onChange={this.onHiddenSelectChange}
-              disableVisibleItems
-              showOriginalData
-            />
-          </div>
+        <div className="configure-projects__sort-message">
+          {customSort
+            ? 'Some projects are reordered (underlined)'
+            : 'You can change projects order. This order will be applied to your personal Overview page.'
+          }
         </div>
       </div>
     );
