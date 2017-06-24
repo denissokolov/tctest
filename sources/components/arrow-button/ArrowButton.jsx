@@ -29,7 +29,7 @@ function ArrowButton({ direction, disabled, onClick }) {
 }
 
 ArrowButton.propTypes = {
-  direction: React.PropTypes.oneOf([
+  direction: PropTypes.oneOf([
     directions.left, directions.right, directions.up, directions.down,
   ]).isRequired,
   onClick: PropTypes.func.isRequired,
