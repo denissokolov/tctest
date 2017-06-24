@@ -93,56 +93,75 @@ class ProjectsStorage {
   }
 
   sortDownVisible(ids) {
+    let needRefreshSort = false;
+
     ids.reverse().forEach((id) => {
       const project = this.projects.get(id);
-      const nextKey = getNextKeyOnSameLevel(project.sortKey);
-      if (nextKey) {
-        const nextProject = this.projects.get(this.sortKeys.get(nextKey));
-        if (nextProject && !nextProject.sortered) {
-          this.swapProjects(project, nextProject);
-        } else {
-          project.sortered = true;
+      const nextProject = this.getNeighborVisibleProject(project.sortKey);
+      if (nextProject && !nextProject.sortered) {
+        this.swapProjects(project, nextProject);
+        if (!needRefreshSort) {
+          needRefreshSort = true;
         }
       } else {
         project.sortered = true;
       }
     });
 
-    this.refreshSort();
+    if (needRefreshSort) {
+      this.refreshSort();
+    }
   }
 
   sortUpVisible(ids) {
+    let needRefreshSort = false;
+
     ids.forEach((id) => {
       const project = this.projects.get(id);
-      const prevKey = getPrevKeyOnSameLevel(project.sortKey);
-      if (prevKey) {
-        const prevProject = this.projects.get(this.sortKeys.get(prevKey));
-        if (prevProject && !prevProject.sortered) {
-          this.swapProjects(prevProject, project);
-        } else {
-          project.sortered = true;
+      const prevProject = this.getNeighborVisibleProject(project.sortKey, true);
+      if (prevProject && !prevProject.sortered) {
+        this.swapProjects(prevProject, project);
+        if (!needRefreshSort) {
+          needRefreshSort = true;
         }
       } else {
         project.sortered = true;
       }
     });
 
-    this.refreshSort();
+    if (needRefreshSort) {
+      this.refreshSort();
+    }
+  }
+
+  getNeighborVisibleProject(sortKey, needPrev) {
+    const neighborKey = needPrev ? getPrevKeyOnSameLevel(sortKey) : getNextKeyOnSameLevel(sortKey);
+    if (!neighborKey) {
+      return null;
+    }
+
+    const neighborProject = this.projects.get(this.sortKeys.get(neighborKey));
+    if (!neighborProject) {
+      return null;
+    }
+
+    if (neighborProject.visible) {
+      return neighborProject;
+    }
+
+    return this.getNeighborVisibleProject(neighborProject.sortKey, needPrev);
   }
 
   swapProjects(prevProject, nextProject) {
-    let parentSortKey;
-    if (prevProject.parentId) {
-      const parent = this.projects.get(prevProject.parentId);
-      parentSortKey = parent.sortKey;
-    }
+    const prevLevelSort = prevProject.levelSort;
+    const prevSortKey = prevProject.sortKey;
 
-    prevProject.levelSort += 1;
-    prevProject.sortKey = generateKey(prevProject.levelSort, parentSortKey);
+    prevProject.levelSort = nextProject.levelSort;
+    prevProject.sortKey = nextProject.sortKey;
     this.sortKeys.set(prevProject.sortKey, prevProject.id);
 
-    nextProject.levelSort -= 1;
-    nextProject.sortKey = generateKey(nextProject.levelSort, parentSortKey);
+    nextProject.levelSort = prevLevelSort;
+    nextProject.sortKey = prevSortKey;
     this.sortKeys.set(nextProject.sortKey, nextProject.id);
   }
 
