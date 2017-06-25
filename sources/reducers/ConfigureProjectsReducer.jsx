@@ -37,7 +37,7 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
     case 'MOVE_PROJECTS_DOWN':
       return state
         .set('visible', fromJS(action.items))
-        .set('customSort', action.sortChanged);
+        .set('customSort', action.sortChanged ? true : state.get('customSort'));
 
     default:
       return state;
