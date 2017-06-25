@@ -20,11 +20,11 @@ function ProjectsSelect({ items, onChange, type }) {
       {items.map((item) => {
         const classNames = cn(
           'projects-select__item',
-          `projects-select__item_depth_${type === types.hidden ? item.get('originalDepth') : item.get('depth')}`,
+          `projects-select__item_depth_${type === types.hidden ? item.get('original').get('depth') : item.get('depth')}`,
           type === types.visible && item.get('parentCustomSort') && 'projects-select__item_custom-sort',
         );
 
-        const name = type === types.hidden ? item.get('originalName') : item.get('name');
+        const name = type === types.hidden ? item.get('original').get('name') : item.get('name');
 
         return (
           <option
@@ -34,7 +34,7 @@ function ProjectsSelect({ items, onChange, type }) {
             disabled={type === types.hidden && item.get('visible')}
             title={name}
           >
-            {name}
+            {item.get('sortKey')} {name}
           </option>
         );
       })}

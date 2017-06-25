@@ -23,7 +23,6 @@ class ProjectsStorage {
       const project = {};
       project.id = projectData.id;
       project.name = projectData.name;
-      project.originalName = projectData.name;
       project.visible = true;
       project.visibleChildrenCount = 0;
       project.invisibleChildrenCount = 0;
@@ -34,7 +33,6 @@ class ProjectsStorage {
       if (parentData) {
         const parent = this.projects.get(parentData.id);
         project.depth = parent.depth + 1;
-        project.originalDepth = project.depth;
         project.parentId = parent.id;
 
         project.levelSort = parent.visibleChildrenCount;
@@ -45,11 +43,15 @@ class ProjectsStorage {
         parent.visibleChildrenCount += 1;
       } else {
         project.depth = 0;
-        project.originalDepth = 0;
         project.levelSort = this.visibleRootsCount;
         project.sortKey = generateKey(project.levelSort);
         this.visibleRootsCount += 1;
       }
+
+      project.original = {
+        name: project.name,
+        depth: project.depth,
+      };
 
       this.projects.set(projectData.id, project);
       this.visible.push(project);
@@ -89,10 +91,10 @@ class ProjectsStorage {
 
       if (parent) {
         if (parent.visible) {
-          project.name = project.originalName;
+          project.name = project.original.name;
           project.depth = parent.depth + 1;
         } else {
-          project.name = `${parent.name} :: ${project.originalName}`;
+          project.name = `${parent.name} :: ${project.original.name}`;
           project.depth = parent.depth;
 
           // TODO: fix sort
