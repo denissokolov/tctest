@@ -277,28 +277,28 @@ class ProjectsStorage {
   }
 
   filterHidden(value) {
-    const words = value ? value.split(' ') : [];
-    let firstWord;
-    if (words.length) {
-      firstWord = words[0];
-    }
+    const words = value ? value.trim().split(' ') : [];
 
     this.hidden.forEach((project) => {
       project.filterMatch = false;
       project.childFilterMatch = false;
       project.parentFilterMatch = false;
 
-      if (firstWord) {
-        if (project.original.name.toLowerCase().indexOf(firstWord.toLowerCase()) !== -1) {
-          project.filterMatch = true;
-          this.setAllParentsFilterMatch(project.parentId);
-        } else if (project.parentId) {
-          const parent = this.projects.get(project.parentId);
-          if (parent && (parent.filterMatch || parent.parentFilterMatch)) {
-            project.parentFilterMatch = true;
+      words.forEach((word, index) => {
+        if (index === 0) {
+          if (project.original.name.toLowerCase().indexOf(word.toLowerCase()) !== -1) {
+            project.filterMatch = true;
+            this.setAllParentsFilterMatch(project.parentId);
+          }
+
+          if (project.parentId) {
+            const parent = this.projects.get(project.parentId);
+            if (parent && (parent.filterMatch || parent.parentFilterMatch)) {
+              project.parentFilterMatch = true;
+            }
           }
         }
-      }
+      });
     });
   }
 

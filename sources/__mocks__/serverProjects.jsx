@@ -90,6 +90,62 @@ export default [
     },
   },
   {
+    id: 'OpenSourceProjects_ImplicitNullability',
+    name: 'Implicit Nullability',
+    parentProject: {
+      id: 'OpenSourceProjects',
+    },
+  },
+  {
+    id: 'NUnit',
+    name: 'NUnit',
+    parentProject: {
+      id: 'OpenSourceProjects',
+    },
+  },
+  {
+    id: 'NUnit_NUnit2',
+    name: 'NUnit 2',
+    parentProject: {
+      id: 'NUnit',
+    },
+  },
+  {
+    id: 'NUnit_NUnit3',
+    name: 'NUnit 3',
+    parentProject: {
+      id: 'NUnit',
+    },
+  },
+  {
+    id: 'NUnit_NUnit3_BuildAndTest',
+    name: 'Build And Test',
+    parentProject: {
+      id: 'NUnit_NUnit3',
+    },
+  },
+  {
+    id: 'NUnit_NUnitLite',
+    name: 'NUnitLite',
+    parentProject: {
+      id: 'NUnit',
+    },
+  },
+  {
+    id: 'NUnit_Sandbox',
+    name: 'Sandbox',
+    parentProject: {
+      id: 'NUnit',
+    },
+  },
+  {
+    id: 'NUnit_Sandbox_MonoLinuxHang',
+    name: 'Mono Linux Hang',
+    parentProject: {
+      id: 'NUnit_Sandbox',
+    },
+  },
+  {
     id: 'cb_Root',
     name: 'teamcity.codebetter.com',
     parentProject: {
