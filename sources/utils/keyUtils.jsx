@@ -46,17 +46,32 @@ export function getPrevKeyOnSameLevel(key) {
   return newPosition >= 0 ? `${parentKey}${numberToKeyLevel(newPosition)}` : null;
 }
 
-let calculatedMaxLevel = 0;
-export function getMaxLevelPosition() {
-  if (calculatedMaxLevel) {
-    return calculatedMaxLevel;
+let oneThirdOfMaxLevelPosition = 0;
+export function getOneThirdOfMaxLevelPosition() {
+  if (oneThirdOfMaxLevelPosition) {
+    return oneThirdOfMaxLevelPosition;
   }
 
   for (let i = 0; i < KEY_LEVEL_LENGTH; i += 1) {
-    calculatedMaxLevel += 9 * (10 ** i);
+    oneThirdOfMaxLevelPosition += 9 * (10 ** i);
   }
 
-  return calculatedMaxLevel;
+  oneThirdOfMaxLevelPosition /= 3;
+  return oneThirdOfMaxLevelPosition;
+}
+
+let twoThirdOfMaxLevelPosition = 0;
+export function getTwoThirdOfMaxLevelPosition() {
+  if (twoThirdOfMaxLevelPosition) {
+    return twoThirdOfMaxLevelPosition;
+  }
+
+  for (let i = 0; i < KEY_LEVEL_LENGTH; i += 1) {
+    twoThirdOfMaxLevelPosition += 9 * (10 ** i);
+  }
+
+  twoThirdOfMaxLevelPosition = (twoThirdOfMaxLevelPosition * 2) / 3;
+  return twoThirdOfMaxLevelPosition;
 }
 
 export function getParentKeyFromKey(key) {

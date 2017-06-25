@@ -1,6 +1,12 @@
 /* eslint-disable no-param-reassign */
 
-import { generateKey, getNextKeyOnSameLevel, getPrevKeyOnSameLevel, getMaxLevelPosition } from '../utils/keyUtils';
+import {
+  generateKey,
+  getNextKeyOnSameLevel,
+  getPrevKeyOnSameLevel,
+  getOneThirdOfMaxLevelPosition,
+  getTwoThirdOfMaxLevelPosition,
+} from '../utils/keyUtils';
 
 class ProjectsStorage {
   constructor(items) {
@@ -9,7 +15,9 @@ class ProjectsStorage {
     this.visible = [];
     this.hidden = [];
 
+    this.rootsCustomSort = false;
     this.visibleRootsCount = 0;
+    this.invisibleRootsCount = 0;
 
     items.forEach((projectData) => {
       const project = {};
@@ -18,6 +26,7 @@ class ProjectsStorage {
       project.originalName = projectData.name;
       project.visible = true;
       project.visibleChildrenCount = 0;
+      project.invisibleChildrenCount = 0;
       project.customSort = false;
       project.parentCustomSort = false;
 
@@ -60,11 +69,16 @@ class ProjectsStorage {
 
     this.visible = [];
     this.visibleRootsCount = 0;
+    this.invisibleRootsCount = 0;
+
+    let selectedCount = 0;
 
     this.projects.forEach((project) => {
       const parent = project.parentId ? this.projects.get(project.parentId) : null;
+      let selected = false;
 
       if (ids.length && ids[0] === project.id) {
+        selected = true;
         project.visible = visible;
         ids.shift();
 
@@ -83,18 +97,20 @@ class ProjectsStorage {
 
           // TODO: fix sort
         }
+      }
 
-        if (project.parentCustomSort) {
-          if (project.visible) {
-            project.levelSort = parent.visibleChildrenCount;
-            project.sortKey = generateKey(project.levelSort, parent.sortKey);
-            this.sortKeys.set(project.sortKey, project.id);
-          } else {
-            project.levelSort = getMaxLevelPosition();
-            project.sortKey = generateKey(project.levelSort, parent.sortKey);
-            this.sortKeys.delete(project.sortKey);
-          }
+      if (project.parentCustomSort) {
+        if (project.visible) {
+          project.levelSort = parent ? parent.visibleChildrenCount : this.visibleRootsCount;
+        } else if (selected) {
+          project.levelSort = getTwoThirdOfMaxLevelPosition() + selectedCount;
+        } else {
+          const number = parent ? parent.invisibleChildrenCount : this.invisibleRootsCount;
+          project.levelSort = getOneThirdOfMaxLevelPosition() + number;
         }
+
+        project.sortKey = generateKey(project.levelSort, parent && parent.sortKey);
+        this.sortKeys.set(project.sortKey, project.id);
       }
 
       if (project.visible) {
@@ -105,9 +121,18 @@ class ProjectsStorage {
         } else {
           this.visibleRootsCount += 1;
         }
+      } else if (parent) {
+        parent.invisibleChildrenCount += 1;
+      } else {
+        this.invisibleRootsCount += 1;
+      }
+
+      if (selected) {
+        selectedCount += 1;
       }
 
       project.visibleChildrenCount = 0;
+      project.invisibleChildrenCount = 0;
       project.isAnyChildHidden = undefined;
     });
 
@@ -141,7 +166,7 @@ class ProjectsStorage {
         if (parent) {
           parent.customSort = true;
         } else {
-          this.globalCustomSort = true;
+          this.rootsCustomSort = true;
         }
 
         if (!needRefreshSort) {
@@ -172,7 +197,7 @@ class ProjectsStorage {
         if (parent) {
           parent.customSort = true;
         } else {
-          this.globalCustomSort = true;
+          this.rootsCustomSort = true;
         }
 
         if (!needRefreshSort) {
@@ -232,7 +257,7 @@ class ProjectsStorage {
         parentSortKey = parent.sortKey;
         project.parentCustomSort = parent.customSort;
       } else {
-        project.parentCustomSort = this.globalCustomSort;
+        project.parentCustomSort = this.rootsCustomSort;
       }
 
       project.sortKey = generateKey(project.levelSort, parentSortKey);
@@ -240,6 +265,7 @@ class ProjectsStorage {
     });
 
     this.visible.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    this.hidden.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
     this.projects = new Map([...this.projects.entries()]
       .sort((a, b) => a[1].sortKey.localeCompare(b[1].sortKey)));
   }

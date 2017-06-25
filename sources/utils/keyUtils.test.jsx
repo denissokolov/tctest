@@ -4,7 +4,8 @@ import {
   getPrevKeyOnSameLevel,
   getParentKeyFromKey,
   getAllParentsKeysFromKey,
-  getMaxLevelPosition,
+  getOneThirdOfMaxLevelPosition,
+  getTwoThirdOfMaxLevelPosition,
 } from './keyUtils';
 
 describe('keyUtils', () => {
@@ -59,9 +60,15 @@ describe('keyUtils', () => {
     });
   });
 
-  describe('getMaxLevelPosition', () => {
-    it('should return 999999', () => {
-      expect(getMaxLevelPosition()).toEqual(999999);
+  describe('getOneThirdOfMaxLevelPosition', () => {
+    it('should return 333333', () => {
+      expect(getOneThirdOfMaxLevelPosition()).toEqual(333333);
+    });
+  });
+
+  describe('getTwoThirdOfMaxLevelPosition', () => {
+    it('should return 666666', () => {
+      expect(getTwoThirdOfMaxLevelPosition()).toEqual(666666);
     });
   });
 
