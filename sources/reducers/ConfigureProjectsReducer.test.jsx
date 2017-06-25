@@ -12,6 +12,7 @@ describe('ConfigureProjectsReducer', () => {
       error: null,
       visible: [],
       hidden: [],
+      customSort: false,
     }));
   });
 

@@ -4,6 +4,7 @@ import {
   getPrevKeyOnSameLevel,
   getParentKeyFromKey,
   getAllParentsKeysFromKey,
+  getMaxLevelPosition,
 } from './keyUtils';
 
 describe('keyUtils', () => {
@@ -55,6 +56,12 @@ describe('keyUtils', () => {
     it('should return null for first key in current level', () => {
       expect(getPrevKeyOnSameLevel('000000')).toBeNull();
       expect(getPrevKeyOnSameLevel('121212/848900/901238/000000')).toBeNull();
+    });
+  });
+
+  describe('getMaxLevelPosition', () => {
+    it('should return 999999', () => {
+      expect(getMaxLevelPosition()).toEqual(999999);
     });
   });
 

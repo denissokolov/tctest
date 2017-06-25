@@ -46,6 +46,19 @@ export function getPrevKeyOnSameLevel(key) {
   return newPosition >= 0 ? `${parentKey}${numberToKeyLevel(newPosition)}` : null;
 }
 
+let calculatedMaxLevel = 0;
+export function getMaxLevelPosition() {
+  if (calculatedMaxLevel) {
+    return calculatedMaxLevel;
+  }
+
+  for (let i = 0; i < KEY_LEVEL_LENGTH; i += 1) {
+    calculatedMaxLevel += 9 * (10 ** i);
+  }
+
+  return calculatedMaxLevel;
+}
+
 export function getParentKeyFromKey(key) {
   const lastDelimiterIndex = key.lastIndexOf('/');
   if (lastDelimiterIndex === -1) {
