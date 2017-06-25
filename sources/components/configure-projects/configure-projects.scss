@@ -1,18 +1,18 @@
 .configure-projects {
   $title-height: 30px;
   $filter-height: 24px;
-  $sort-message-height: 20px;
+  $form-buttons-height: 54px;
   $padding: 15px;
   $buttons-width: 40px + 2 * $padding;
 
   height: 100%;
 
   &__main {
-    height: calc(100% - #{$sort-message-height});
+    height: calc(100% - #{$form-buttons-height});
     padding-right: $padding;
   }
 
-  &__buttons {
+  &__controls {
     float: left;
     width: $buttons-width;
     height: 100%;
@@ -20,7 +20,7 @@
     text-align: center;
   }
 
-  &__button {
+  &__control {
     display: inline-block;
     margin: ($padding / 2) 0;
   }
@@ -55,12 +55,5 @@
     border: 1px solid #dedede;
     font-size: 14px;
     padding: 0 5px;
-  }
-
-  &__sort-message {
-    height: $sort-message-height;
-    padding: 0 $padding;
-    color: #b9b9b9;
-    font-size: 12px;
   }
 }

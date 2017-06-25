@@ -35,7 +35,7 @@ class Layout extends React.Component {
           visible={this.state.showConfigureProjects}
           onClose={this.onConfigureProjectsPopupClose}
         >
-          <ConnectedConfigureProjects />
+          <ConnectedConfigureProjects onCancel={this.onConfigureProjectsPopupClose} />
         </Popup>
       </div>
     );

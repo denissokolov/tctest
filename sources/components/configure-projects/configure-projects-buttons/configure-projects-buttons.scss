@@ -1,0 +1,17 @@
+.configure-projects-buttons {
+  border-top: 1px dotted #ccc;
+  margin-top: 5px;
+  padding: 10px 15px;
+
+  &__button {
+    display: inline-block;
+    margin-right: 15px;
+  }
+
+  &__sort-message {
+    padding-top: 7px;
+    float: right;
+    color: #b9b9b9;
+    font-size: 13px;
+  }
+}

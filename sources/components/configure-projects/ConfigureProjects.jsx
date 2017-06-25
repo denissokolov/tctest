@@ -8,6 +8,7 @@ import {
 
 import ArrowButton, { directions as arrowButtonDiractions } from '../arrow-button/ArrowButton';
 import ProjectsSelect, { types as projectsSelectTypes } from './project-select/ProjectsSelect';
+import ConfigureProjectsButtons from './configure-projects-buttons/ConfigureProjectsButtons';
 
 import './configure-projects.scss';
 import '../centered-block/centered-block.scss';
@@ -16,6 +17,7 @@ export class ConfigureProjects extends React.Component {
   static propTypes = {
     configureProjects: PropTypes.instanceOf(Map).isRequired,
     dispatch: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
   };
 
   state = {
@@ -67,6 +69,10 @@ export class ConfigureProjects extends React.Component {
 
   onHiddenFilterChange = (event) => {
     this.props.dispatch(changeHiddenFilter(event.target.value));
+  };
+
+  onCancelClick = () => {
+    this.props.onCancel();
   };
 
   getSelectedIdsWithChildren = (options, items) => {
@@ -149,9 +155,9 @@ export class ConfigureProjects extends React.Component {
         {configureProjects.get('loading') && <span className="configure-projects__loading">Loading...</span>}
 
         <div className="configure-projects__main">
-          <div className="configure-projects__buttons centered-block">
+          <div className="configure-projects__controls centered-block">
             <div className="centered-block__content">
-              <span className="configure-projects__button">
+              <span className="configure-projects__control">
                 <ArrowButton
                   direction={arrowButtonDiractions.up}
                   onClick={this.onMoveUpClick}
@@ -159,7 +165,7 @@ export class ConfigureProjects extends React.Component {
                 />
               </span>
 
-              <span className="configure-projects__button">
+              <span className="configure-projects__control">
                 <ArrowButton
                   direction={arrowButtonDiractions.down}
                   onClick={this.onMoveDownClick}
@@ -183,9 +189,9 @@ export class ConfigureProjects extends React.Component {
             </div>
           </div>
 
-          <div className="configure-projects__buttons centered-block">
+          <div className="configure-projects__controls centered-block">
             <div className="centered-block__content">
-              <span className="configure-projects__button">
+              <span className="configure-projects__control">
                 <ArrowButton
                   direction={arrowButtonDiractions.right}
                   onClick={this.onHideClick}
@@ -193,7 +199,7 @@ export class ConfigureProjects extends React.Component {
                 />
               </span>
 
-              <span className="configure-projects__button">
+              <span className="configure-projects__control">
                 <ArrowButton
                   direction={arrowButtonDiractions.left}
                   onClick={this.onShowClick}
@@ -226,12 +232,10 @@ export class ConfigureProjects extends React.Component {
           </div>
         </div>
 
-        <div className="configure-projects__sort-message">
-          {customSort
-            ? 'Some projects are reordered (underlined)'
-            : 'You can change projects order. This order will be applied to your personal Overview page.'
-          }
-        </div>
+        <ConfigureProjectsButtons
+          onCancelClick={this.onCancelClick}
+          customSort={customSort}
+        />
       </div>
     );
   }
