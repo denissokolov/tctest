@@ -6,6 +6,7 @@ const defaultState = fromJS({
   visible: [],
   hidden: [],
   customSort: false,
+  hiddenFilterActive: false,
 });
 
 function ConfigureProjectsReducer(state = defaultState, action = {}) {
@@ -38,6 +39,14 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
       return state
         .set('visible', fromJS(action.items))
         .set('customSort', action.sortChanged ? true : state.get('customSort'));
+
+    case 'CHANGE_HIDDEN_PROJECTS_FILTER': {
+      const hiddenFilterActive = Boolean(action.value);
+
+      return state
+        .set('hidden', fromJS(action.items))
+        .set('hiddenFilterActive', hiddenFilterActive);
+    }
 
     default:
       return state;

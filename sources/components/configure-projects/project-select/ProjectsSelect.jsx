@@ -10,7 +10,7 @@ export const types = {
   hidden: 'hidden',
 };
 
-function ProjectsSelect({ items, onChange, type }) {
+function ProjectsSelect({ items, onChange, type, filterActive }) {
   return (
     <select
       className="projects-select"
@@ -18,10 +18,21 @@ function ProjectsSelect({ items, onChange, type }) {
       multiple
     >
       {items.map((item) => {
+        let filterClassName;
+
+        if (filterActive) {
+          if (item.get('filterMatch')) {
+            filterClassName = 'projects-select__item_filter-match';
+          } else if (!item.get('childFilterMatch') && !item.get('parentFilterMatch')) {
+            return null;
+          }
+        }
+
         const classNames = cn(
           'projects-select__item',
           `projects-select__item_depth_${type === types.hidden ? item.get('original').get('depth') : item.get('depth')}`,
           type === types.visible && item.get('parentCustomSort') && 'projects-select__item_custom-sort',
+          filterClassName,
         );
 
         const name = type === types.hidden ? item.get('original').get('name') : item.get('name');
@@ -34,7 +45,7 @@ function ProjectsSelect({ items, onChange, type }) {
             disabled={type === types.hidden && item.get('visible')}
             title={name}
           >
-            {item.get('sortKey')} {name}
+            {name}
           </option>
         );
       })}
@@ -46,6 +57,11 @@ ProjectsSelect.propTypes = {
   type: PropTypes.oneOf([types.visible, types.hidden]).isRequired,
   items: PropTypes.instanceOf(List).isRequired,
   onChange: PropTypes.func.isRequired,
+  filterActive: PropTypes.bool,
+};
+
+ProjectsSelect.defaultProps = {
+  filterActive: false,
 };
 
 export default ProjectsSelect;

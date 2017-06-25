@@ -29,6 +29,10 @@ class ProjectsStorage {
       project.customSort = false;
       project.parentCustomSort = false;
 
+      project.filterMatch = false;
+      project.childFilterMatch = false;
+      project.parentFilterMatch = false;
+
       const parentData = projectData.parentProject;
       if (parentData) {
         const parent = this.projects.get(parentData.id);
@@ -270,6 +274,42 @@ class ProjectsStorage {
     this.hidden.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
     this.projects = new Map([...this.projects.entries()]
       .sort((a, b) => a[1].sortKey.localeCompare(b[1].sortKey)));
+  }
+
+  filterHidden(value) {
+    const words = value ? value.split(' ') : [];
+    let firstWord;
+    if (words.length) {
+      firstWord = words[0];
+    }
+
+    this.hidden.forEach((project) => {
+      project.filterMatch = false;
+      project.childFilterMatch = false;
+      project.parentFilterMatch = false;
+
+      if (firstWord) {
+        if (project.original.name.toLowerCase().indexOf(firstWord.toLowerCase()) !== -1) {
+          project.filterMatch = true;
+          this.setAllParentsFilterMatch(project.parentId);
+        } else if (project.parentId) {
+          const parent = this.projects.get(project.parentId);
+          if (parent && (parent.filterMatch || parent.parentFilterMatch)) {
+            project.parentFilterMatch = true;
+          }
+        }
+      }
+    });
+  }
+
+  setAllParentsFilterMatch(parentId) {
+    if (parentId) {
+      const parent = this.projects.get(parentId);
+      if (parent) {
+        parent.childFilterMatch = true;
+        this.setAllParentsFilterMatch(parent.parentId);
+      }
+    }
   }
 
   getVisible() {

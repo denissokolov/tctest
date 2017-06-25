@@ -74,3 +74,13 @@ export function moveProjectsDown(ids) {
     sortChanged,
   };
 }
+
+export function changeHiddenFilter(value) {
+  projectsStorage.filterHidden(value);
+
+  return {
+    type: 'CHANGE_HIDDEN_PROJECTS_FILTER',
+    items: projectsStorage.getHidden(),
+    value,
+  };
+}

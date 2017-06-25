@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Map } from 'immutable';
 import {
-  loadProjects, hideProjects, showProjects, moveProjectsDown, moveProjectsUp,
+  loadProjects, hideProjects, showProjects, moveProjectsDown, moveProjectsUp, changeHiddenFilter,
 } from '../../actions/ConfigureProjectsActions';
 
 import ArrowButton, { directions as arrowButtonDiractions } from '../arrow-button/ArrowButton';
@@ -63,6 +63,10 @@ export class ConfigureProjects extends React.Component {
   onMoveDownClick = () => {
     const selectedIds = this.getSelectedIds(this.visibleOptions);
     this.props.dispatch(moveProjectsDown(selectedIds));
+  };
+
+  onHiddenFilterChange = (event) => {
+    this.props.dispatch(changeHiddenFilter(event.target.value));
   };
 
   getSelectedIdsWithChildren = (options, items) => {
@@ -136,6 +140,7 @@ export class ConfigureProjects extends React.Component {
     const hiddenProjects = configureProjects.get('hidden');
     const error = configureProjects.get('error');
     const customSort = configureProjects.get('customSort');
+    const hiddenFilterActive = configureProjects.get('hiddenFilterActive');
 
     return (
       <div className="configure-projects">
@@ -203,11 +208,19 @@ export class ConfigureProjects extends React.Component {
               Hidden projects
             </div>
 
-            <div className="configure-projects__items">
+            <input
+              type="text"
+              onChange={this.onHiddenFilterChange}
+              className="configure-projects__filter"
+              placeholder="<filter projects>"
+            />
+
+            <div className="configure-projects__items configure-projects__items_with-filter">
               <ProjectsSelect
                 items={hiddenProjects}
                 onChange={this.onHiddenSelectChange}
                 type={projectsSelectTypes.hidden}
+                filterActive={hiddenFilterActive}
               />
             </div>
           </div>

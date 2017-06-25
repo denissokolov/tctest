@@ -1,5 +1,6 @@
 .configure-projects {
   $title-height: 30px;
+  $filter-height: 24px;
   $sort-message-height: 20px;
   $padding: 15px;
   $buttons-width: 40px + 2 * $padding;
@@ -41,6 +42,19 @@
     height: calc(100% - #{$title-height + $padding});
     overflow: auto;
     border: 1px solid #dedede;
+
+    &_with-filter {
+      margin-top: 5px;
+      height: calc(100% - #{$title-height + $padding + $filter-height + 5px});
+    }
+  }
+
+  &__filter {
+    width: 100%;
+    height: $filter-height;
+    border: 1px solid #dedede;
+    font-size: 14px;
+    padding: 0 5px;
   }
 
   &__sort-message {
