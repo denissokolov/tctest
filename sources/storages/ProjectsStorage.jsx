@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 
-import { generateKey, getNextKeyOnSameLevel, getPrevKeyOnSameLevel } from '../utils/keyUtils';
+import { generateKey, getNextKeyOnSameLevel, getPrevKeyOnSameLevel, getMaxLevelPosition } from '../utils/keyUtils';
 
 class ProjectsStorage {
   constructor(items) {
@@ -9,7 +9,7 @@ class ProjectsStorage {
     this.visible = [];
     this.hidden = [];
 
-    let rootsCount = 0;
+    this.visibleRootsCount = 0;
 
     items.forEach((projectData) => {
       const project = {};
@@ -17,7 +17,7 @@ class ProjectsStorage {
       project.name = projectData.name;
       project.originalName = projectData.name;
       project.visible = true;
-      project.childrenCount = 0;
+      project.visibleChildrenCount = 0;
       project.customSort = false;
       project.parentCustomSort = false;
 
@@ -28,18 +28,18 @@ class ProjectsStorage {
         project.originalDepth = project.depth;
         project.parentId = parent.id;
 
-        project.levelSort = parent.childrenCount;
+        project.levelSort = parent.visibleChildrenCount;
 
         project.sortKey = generateKey(project.levelSort, parent.sortKey);
         this.sortKeys.set(project.sortKey, project.id);
 
-        parent.childrenCount += 1;
+        parent.visibleChildrenCount += 1;
       } else {
         project.depth = 0;
         project.originalDepth = 0;
-        project.levelSort = rootsCount;
+        project.levelSort = this.visibleRootsCount;
         project.sortKey = generateKey(project.levelSort);
-        rootsCount += 1;
+        this.visibleRootsCount += 1;
       }
 
       this.projects.set(projectData.id, project);
@@ -56,28 +56,58 @@ class ProjectsStorage {
   }
 
   toggleVisibility(visible, ids) {
+    let needRefreshSort = false;
+
     this.visible = [];
+    this.visibleRootsCount = 0;
+
     this.projects.forEach((project) => {
+      const parent = project.parentId ? this.projects.get(project.parentId) : null;
+
       if (ids.length && ids[0] === project.id) {
         project.visible = visible;
         ids.shift();
+
+        if (!needRefreshSort && project.parentCustomSort) {
+          needRefreshSort = true;
+        }
       }
 
-      if (project.parentId) {
-        const parent = this.projects.get(project.parentId);
+      if (parent) {
         if (parent.visible) {
           project.name = project.originalName;
           project.depth = parent.depth + 1;
         } else {
           project.name = `${parent.name} :: ${project.originalName}`;
           project.depth = parent.depth;
+
+          // TODO: fix sort
+        }
+
+        if (project.parentCustomSort) {
+          if (project.visible) {
+            project.levelSort = parent.visibleChildrenCount;
+            project.sortKey = generateKey(project.levelSort, parent.sortKey);
+            this.sortKeys.set(project.sortKey, project.id);
+          } else {
+            project.levelSort = getMaxLevelPosition();
+            project.sortKey = generateKey(project.levelSort, parent.sortKey);
+            this.sortKeys.delete(project.sortKey);
+          }
         }
       }
 
       if (project.visible) {
         this.visible.push(project);
+
+        if (parent) {
+          parent.visibleChildrenCount += 1;
+        } else {
+          this.visibleRootsCount += 1;
+        }
       }
 
+      project.visibleChildrenCount = 0;
       project.isAnyChildHidden = undefined;
     });
 
@@ -92,6 +122,10 @@ class ProjectsStorage {
         }
       }
     });
+
+    if (needRefreshSort) {
+      this.refreshSort();
+    }
   }
 
   sortDownVisible(ids) {
@@ -104,8 +138,10 @@ class ProjectsStorage {
         this.swapProjects(project, nextProject);
 
         const parent = this.projects.get(project.parentId);
-        if (parent && !parent.customSort) {
+        if (parent) {
           parent.customSort = true;
+        } else {
+          this.globalCustomSort = true;
         }
 
         if (!needRefreshSort) {
@@ -133,8 +169,10 @@ class ProjectsStorage {
         this.swapProjects(prevProject, project);
 
         const parent = this.projects.get(project.parentId);
-        if (parent && !parent.customSort) {
+        if (parent) {
           parent.customSort = true;
+        } else {
+          this.globalCustomSort = true;
         }
 
         if (!needRefreshSort) {
@@ -193,6 +231,8 @@ class ProjectsStorage {
         const parent = this.projects.get(project.parentId);
         parentSortKey = parent.sortKey;
         project.parentCustomSort = parent.customSort;
+      } else {
+        project.parentCustomSort = this.globalCustomSort;
       }
 
       project.sortKey = generateKey(project.levelSort, parentSortKey);
