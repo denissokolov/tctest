@@ -7,7 +7,7 @@ import {
 } from '../../actions/ConfigureProjectsActions';
 
 import ArrowButton, { directions as arrowButtonDiractions } from '../arrow-button/ArrowButton';
-import ProjectsSelect from './project-select/ProjectsSelect';
+import ProjectsSelect, { types as projectsSelectTypes } from './project-select/ProjectsSelect';
 
 import './configure-projects.scss';
 import '../centered-block/centered-block.scss';
@@ -173,6 +173,7 @@ export class ConfigureProjects extends React.Component {
               <ProjectsSelect
                 items={visibleProjects}
                 onChange={this.onVisibleSelectChange}
+                type={projectsSelectTypes.visible}
               />
             </div>
           </div>
@@ -187,7 +188,7 @@ export class ConfigureProjects extends React.Component {
                 />
               </span>
 
-                <span className="configure-projects__button">
+              <span className="configure-projects__button">
                 <ArrowButton
                   direction={arrowButtonDiractions.left}
                   onClick={this.onShowClick}
@@ -206,8 +207,7 @@ export class ConfigureProjects extends React.Component {
               <ProjectsSelect
                 items={hiddenProjects}
                 onChange={this.onHiddenSelectChange}
-                disableVisibleItems
-                showOriginalData
+                type={projectsSelectTypes.hidden}
               />
             </div>
           </div>
