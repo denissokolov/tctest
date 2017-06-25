@@ -279,37 +279,68 @@ class ProjectsStorage {
   filterHidden(value) {
     const words = value ? value.trim().split(' ') : [];
 
-    this.hidden.forEach((project) => {
-      project.filterMatch = false;
-      project.childFilterMatch = false;
-      project.parentFilterMatch = false;
+    const matches = {};
 
-      words.forEach((word, index) => {
-        if (index === 0) {
-          if (project.original.name.toLowerCase().indexOf(word.toLowerCase()) !== -1) {
-            project.filterMatch = true;
-            this.setAllParentsFilterMatch(project.parentId);
+    const setAllParentsFilterMatch = (parentId) => {
+      if (parentId) {
+        const parent = this.projects.get(parentId);
+        if (parent) {
+          let scanParents = false;
+
+          if (matches[parent.id].wordMatches) {
+            if (!parent.filterMatch) {
+              parent.filterMatch = true;
+              scanParents = true;
+            }
+          } else if (!parent.filterTreeMatch) {
+            parent.filterTreeMatch = true;
+            scanParents = true;
           }
 
-          if (project.parentId) {
-            const parent = this.projects.get(project.parentId);
-            if (parent && (parent.filterMatch || parent.parentFilterMatch)) {
-              project.parentFilterMatch = true;
-            }
+          if (scanParents) {
+            setAllParentsFilterMatch(parent.parentId);
           }
         }
-      });
-    });
-  }
-
-  setAllParentsFilterMatch(parentId) {
-    if (parentId) {
-      const parent = this.projects.get(parentId);
-      if (parent) {
-        parent.childFilterMatch = true;
-        this.setAllParentsFilterMatch(parent.parentId);
       }
-    }
+    };
+
+    this.hidden.forEach((project) => {
+      project.filterMatch = false;
+      project.filterTreeMatch = false;
+
+      matches[project.id] = {
+        wordMatches: 0,
+        withParentMatches: 0,
+      };
+
+      const parent = project.parentId ? this.projects.get(project.parentId) : null;
+
+      words.forEach((word, index) => {
+        if (project.original.name.toLowerCase().indexOf(word.toLowerCase()) !== -1) {
+          matches[project.id][`word_${index}`] = true;
+          matches[project.id].wordMatches += 1;
+          matches[project.id].withParentMatches += 1;
+        } else if (parent && matches[parent.id][`word_${index}`]) {
+          matches[project.id][`word_${index}`] = true;
+          matches[project.id].withParentMatches += 1;
+        }
+      });
+
+      if (matches[project.id].withParentMatches === words.length) {
+        if (matches[project.id].wordMatches) {
+          project.filterMatch = true;
+          setAllParentsFilterMatch(project.parentId);
+        } else if (matches[project.id].withParentMatches) {
+          project.filterTreeMatch = true;
+        }
+      } else {
+        project.filterMatch = false;
+        project.filterTreeMatch = false;
+      }
+
+      project.wordMatches = matches[project.id].wordMatches;
+      project.withParentMatches = matches[project.id].withParentMatches;
+    });
   }
 
   getVisible() {

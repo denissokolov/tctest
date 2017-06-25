@@ -23,7 +23,7 @@ function ProjectsSelect({ items, onChange, type, filterActive }) {
         if (filterActive) {
           if (item.get('filterMatch')) {
             filterClassName = 'projects-select__item_filter-match';
-          } else if (!item.get('childFilterMatch') && !item.get('parentFilterMatch')) {
+          } else if (!item.get('filterTreeMatch')) {
             return null;
           }
         }

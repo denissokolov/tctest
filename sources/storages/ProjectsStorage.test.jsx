@@ -27,37 +27,54 @@ describe('ProjectsStorage', () => {
   });
 
   describe('filterHidden', () => {
+    const checkProjectFilterParams = (storage, filterMatchNames, filterTreeMatchNames) => {
+      storage.getHidden().forEach((project) => {
+        if (filterMatchNames.indexOf(project.original.name) !== -1) {
+          expect(project.filterMatch).toBeTruthy();
+        } else {
+          expect(project.filterMatch).toBeFalsy();
+        }
+
+        if (filterTreeMatchNames.indexOf(project.original.name) !== -1) {
+          expect(project.filterTreeMatch).toBeTruthy();
+        } else {
+          expect(project.filterTreeMatch).toBeFalsy();
+        }
+      });
+    };
+
     it('should return matches for one word', () => {
       const storage = new ProjectsStorage(serverProjects);
       storage.hideItems(serverProjects.map(project => project.id));
 
       storage.filterHidden('nu');
 
-      const filterMatchIds = [
-        'OpenSourceProjects_ImplicitNullability', 'NUnit', 'NUnit_NUnit2', 'NUnit_NUnit3',
-        'NUnit_NUnitLite', 'NUnit_Sandbox_MonoLinuxHang',
+      const filterMatchNames = [
+        'Implicit Nullability', 'NUnit', 'NUnit 2', 'NUnit 3', 'NUnitLite', 'Mono Linux Hang',
       ];
 
-      const childFilterMatchIds = ['_Root', 'OpenSourceProjects', 'NUnit', 'NUnit_Sandbox'];
-
-      const parentFilterMatchIds = [
-        'NUnit_NUnit2', 'NUnit_NUnit3', 'NUnit_NUnit3_BuildAndTest', 'NUnit_NUnitLite',
-        'NUnit_Sandbox', 'NUnit_Sandbox_MonoLinuxHang',
+      const filterTreeMatchNames = [
+        '<Root project>', 'Open-source projects', 'Sandbox', 'Build And Test',
       ];
 
-      storage.getHidden().forEach((project) => {
-        if (filterMatchIds.indexOf(project.id) !== -1) {
-          expect(project.filterMatch).toBeTruthy();
-        }
+      checkProjectFilterParams(storage, filterMatchNames, filterTreeMatchNames);
+    });
 
-        if (childFilterMatchIds.indexOf(project.id) !== -1) {
-          expect(project.childFilterMatch).toBeTruthy();
-        }
+    it('should return matches for two words', () => {
+      const storage = new ProjectsStorage(serverProjects);
+      storage.hideItems(serverProjects.map(project => project.id));
 
-        if (parentFilterMatchIds.indexOf(project.id) !== -1) {
-          expect(project.parentFilterMatch).toBeTruthy();
-        }
-      });
+      storage.filterHidden('nu li');
+
+      const filterMatchNames = [
+        'Implicit Nullability', 'NUnit', 'Mono Linux Hang', 'NUnitLite',
+      ];
+
+      const filterTreeMatchNames = [
+        '<Root project>', 'Open-source projects', 'Sandbox',
+      ];
+
+      checkProjectFilterParams(storage, filterMatchNames, filterTreeMatchNames);
     });
   });
 });
