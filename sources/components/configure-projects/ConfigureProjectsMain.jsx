@@ -1,3 +1,4 @@
+// TODO: try to divide into two components
 import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
@@ -6,6 +7,7 @@ import { getSelectedIds, getSelectedIdsWithChildren } from '../../utils/projectS
 import ProjectsSelect, { types as projectsSelectTypes } from './project-select/ProjectsSelect';
 import ConfigureProjectsSortControls from './ConfigureProjectsSortControls';
 import ConfigureProjectsVisibleControls from './ConfigureProjectsVisibleControls';
+import FilterProjects from './FilterProjects';
 
 class ConfigureProjectsMain extends React.Component {
   static propTypes = {
@@ -111,11 +113,8 @@ class ConfigureProjectsMain extends React.Component {
             Hidden projects
           </div>
 
-          <input
-            type="text"
+          <FilterProjects
             onChange={this.onHiddenFilterChange}
-            className="configure-projects__filter"
-            placeholder="filter projects"
             value={hiddenFilterValue}
           />
 
