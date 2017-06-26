@@ -4,18 +4,17 @@ import { fromJS } from 'immutable';
 
 import { ConfigureProjects } from './ConfigureProjects';
 
-function create({
-                  visible = [],
-                  hidden = [],
-                  loading = false,
-                  dispatch = jest.fn(),
-                  close = jest.fn(),
-                }, needMount = false) {
-  const configureProjects = fromJS({
-    loading,
-    visible,
-    hidden,
-  });
+function create(props, needMount = false) {
+  const {
+    visible = [],
+    hidden = [],
+    loading = false,
+    hiddenFilterIsActive = false,
+    dispatch = jest.fn(),
+    close = jest.fn(),
+  } = props;
+
+  const configureProjects = fromJS({ loading, visible, hidden, hiddenFilterIsActive });
 
   const render = needMount ? mount : shallow;
 

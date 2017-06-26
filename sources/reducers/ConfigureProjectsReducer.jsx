@@ -6,7 +6,7 @@ const defaultState = fromJS({
   visible: [],
   hidden: [],
   customSort: false,
-  hiddenFilterActive: false,
+  hiddenFilterIsActive: false,
 });
 
 function ConfigureProjectsReducer(state = defaultState, action = {}) {

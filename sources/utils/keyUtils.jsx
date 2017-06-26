@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 const KEY_LEVEL_LENGTH = 6;
 
 function numberToKeyLevel(num) {

@@ -1,3 +1,4 @@
+// TODO: extract option to component with SCU
 import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
