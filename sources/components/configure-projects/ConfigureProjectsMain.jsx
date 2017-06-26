@@ -11,7 +11,8 @@ class ConfigureProjectsMain extends React.Component {
   static propTypes = {
     visible: PropTypes.instanceOf(List).isRequired,
     hidden: PropTypes.instanceOf(List).isRequired,
-    hiddenFilterIsActive: PropTypes.bool.isRequired,
+    hiddenFilterValue: PropTypes.string.isRequired,
+    formVisible: PropTypes.bool.isRequired,
     hideProjects: PropTypes.func.isRequired,
     showProjects: PropTypes.func.isRequired,
     moveProjectsUp: PropTypes.func.isRequired,
@@ -73,7 +74,7 @@ class ConfigureProjectsMain extends React.Component {
 
   render() {
     const { anyHiddenSelected, anyVisibleSelected } = this.state;
-    const { visible, hidden, hiddenFilterIsActive } = this.props;
+    const { visible, hidden, hiddenFilterValue, formVisible } = this.props;
 
     return (
       <div className="configure-projects__main">
@@ -93,6 +94,7 @@ class ConfigureProjectsMain extends React.Component {
               items={visible}
               onChange={this.onVisibleSelectChange}
               type={projectsSelectTypes.visible}
+              formVisible={formVisible}
             />
           </div>
         </div>
@@ -113,7 +115,8 @@ class ConfigureProjectsMain extends React.Component {
             type="text"
             onChange={this.onHiddenFilterChange}
             className="configure-projects__filter"
-            placeholder="<filter projects>"
+            placeholder="filter projects"
+            value={hiddenFilterValue}
           />
 
           <div className="configure-projects__items configure-projects__items_with-filter">
@@ -121,7 +124,8 @@ class ConfigureProjectsMain extends React.Component {
               items={hidden}
               onChange={this.onHiddenSelectChange}
               type={projectsSelectTypes.hidden}
-              filterActive={hiddenFilterIsActive}
+              filterActive={Boolean(hiddenFilterValue)}
+              formVisible={formVisible}
             />
           </div>
         </div>

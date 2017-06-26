@@ -11,53 +11,71 @@ export const types = {
   hidden: 'hidden',
 };
 
-function ProjectsSelect({ items, onChange, type, filterActive }) {
-  return (
-    <select
-      className="projects-select"
-      onChange={onChange}
-      multiple
-    >
-      {items.map((item) => {
-        let filterClassName;
+class ProjectsSelect extends React.Component {
+  componentWillReceiveProps(nextProps) {
+    if (this.props.formVisible && !nextProps.formVisible) {
+      if (this.selectEl && this.selectEl.scrollTo) {
+        this.selectEl.scrollTo(0, 0);
+      }
+    }
+  }
 
-        if (filterActive) {
-          if (item.get('filterMatch')) {
-            filterClassName = 'projects-select__item_filter-match';
-          } else if (!item.get('filterTreeMatch')) {
-            return null;
+  shouldComponentUpdate(nextProps) {
+    return !(this.props.formVisible && !nextProps.formVisible);
+  }
+
+  render() {
+    const { items, onChange, type, filterActive } = this.props;
+
+    return (
+      <select
+        className="projects-select"
+        onChange={onChange}
+        multiple
+        ref={(el) => { this.selectEl = el; }}
+      >
+        {items.map((item) => {
+          let filterClassName;
+
+          if (filterActive) {
+            if (item.get('filterMatch')) {
+              filterClassName = 'projects-select__item_filter-match';
+            } else if (!item.get('filterTreeMatch')) {
+              return null;
+            }
           }
-        }
 
-        const classNames = cn(
-          'projects-select__item',
-          `projects-select__item_depth_${type === types.hidden ? item.get('original').get('depth') : item.get('depth')}`,
-          type === types.visible && item.get('parentCustomSort') && 'projects-select__item_custom-sort',
-          filterClassName,
-        );
+          const classNames = cn(
+            'projects-select__item',
+            `projects-select__item_depth_${type === types.hidden ? item.get('original').get('depth') : item.get('depth')}`,
+            type === types.visible && item.get('parentCustomSort') && 'projects-select__item_custom-sort',
+            filterClassName,
+          );
 
-        const name = type === types.hidden ? item.get('original').get('name') : item.get('name');
+          const name = type === types.hidden ? item.get('original').get('name') : item.get('name');
 
-        return (
-          <option
-            key={item.get('id')}
-            className={classNames}
-            value={item.get('id')}
-            disabled={type === types.hidden && item.get('visible')}
-            title={name}
-          >
-            {name}
-          </option>
-        );
-      })}
-    </select>
-  );
+          return (
+            <option
+              key={item.get('id')}
+              className={classNames}
+              value={item.get('id')}
+              disabled={type === types.hidden && item.get('visible')}
+              title={name}
+            >
+              {name}
+            </option>
+          );
+        })}
+      </select>
+    );
+  }
 }
 
 ProjectsSelect.propTypes = {
   type: PropTypes.oneOf([types.visible, types.hidden]).isRequired,
   items: PropTypes.instanceOf(List).isRequired,
   onChange: PropTypes.func.isRequired,
+  formVisible: PropTypes.bool.isRequired,
   filterActive: PropTypes.bool,
 };
 
@@ -66,4 +84,3 @@ ProjectsSelect.defaultProps = {
 };
 
 export default ProjectsSelect;
-

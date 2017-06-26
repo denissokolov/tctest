@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Map } from 'immutable';
 import * as ConfigureProjectsActions from '../../actions/ConfigureProjectsActions';
@@ -10,30 +9,26 @@ import ConfigureProjectsMain from './ConfigureProjectsMain';
 import './configure-projects.scss';
 import '../centered-block/centered-block.scss';
 
-export class ConfigureProjects extends React.Component {
+class ConfigureProjects extends React.Component {
   static propTypes = {
     configureProjects: PropTypes.instanceOf(Map).isRequired,
     dispatch: PropTypes.func.isRequired,
-    close: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    formVisible: PropTypes.bool.isRequired,
   };
 
-  componentDidMount() {
-    this.props.dispatch(ConfigureProjectsActions.loadProjects());
-  }
-
   onCancelClick = () => {
-    this.props.close();
-    this.props.dispatch(ConfigureProjectsActions.refreshProjectsConfiguration());
+    this.props.onCancel();
   };
 
   onSubmit = (event) => {
     event.preventDefault();
-    this.props.close();
-    this.props.dispatch(ConfigureProjectsActions.saveProjectsConfiguration());
+    this.props.onSubmit();
   };
 
   render() {
-    const { configureProjects, dispatch } = this.props;
+    const { configureProjects, formVisible, dispatch } = this.props;
     const error = configureProjects.get('error');
 
     return (
@@ -45,7 +40,8 @@ export class ConfigureProjects extends React.Component {
         <ConfigureProjectsMain
           visible={configureProjects.get('visible')}
           hidden={configureProjects.get('hidden')}
-          hiddenFilterIsActive={configureProjects.get('hiddenFilterIsActive')}
+          hiddenFilterValue={configureProjects.get('hiddenFilterValue')}
+          formVisible={formVisible}
           {...bindActionCreators(ConfigureProjectsActions, dispatch)}
         />
 
@@ -58,6 +54,4 @@ export class ConfigureProjects extends React.Component {
   }
 }
 
-export default connect(state => ({
-  configureProjects: state.configureProjects,
-}))(ConfigureProjects);
+export default ConfigureProjects;

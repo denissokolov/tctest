@@ -1,6 +1,5 @@
 import React from 'react';
-import ConnectedConfigureProjects from '../configure-projects/ConfigureProjects';
-import Popup from '../popup/Popup';
+import ConnectedConfigureProjectsPopup from '../configure-projects/ConfigureProjectsPopup';
 
 import './layout.scss';
 
@@ -14,7 +13,7 @@ class Layout extends React.Component {
     this.setState({ showConfigureProjects: true });
   };
 
-  onConfigureProjectsPopupClose = () => {
+  onConfigureProjectsClose = () => {
     this.setState({ showConfigureProjects: false });
   };
 
@@ -30,13 +29,10 @@ class Layout extends React.Component {
           Configure Visible Projects
         </a>
 
-        <Popup
-          title="Configure visible projects"
+        <ConnectedConfigureProjectsPopup
+          onClose={this.onConfigureProjectsClose}
           visible={this.state.showConfigureProjects}
-          onClose={this.onConfigureProjectsPopupClose}
-        >
-          <ConnectedConfigureProjects close={this.onConfigureProjectsPopupClose} />
-        </Popup>
+        />
       </div>
     );
   }
