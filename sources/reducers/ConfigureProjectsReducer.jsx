@@ -40,13 +40,20 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         .set('visible', fromJS(action.items))
         .set('customSort', action.sortChanged ? true : state.get('customSort'));
 
-    case 'CHANGE_HIDDEN_PROJECTS_FILTER': {
-      const hiddenFilterActive = Boolean(action.value);
-
+    case 'CHANGE_HIDDEN_PROJECTS_FILTER':
       return state
         .set('hidden', fromJS(action.items))
-        .set('hiddenFilterActive', hiddenFilterActive);
-    }
+        .set('hiddenFilterActive', Boolean(action.value));
+
+    case 'SAVE_PROJECTS_CONFIGURATION':
+      return state.set('hiddenFilterActive', false);
+
+    case 'REFRESH_PROJECTS_CONFIGURATION':
+      return state
+        .set('visible', fromJS(action.visible))
+        .set('hidden', fromJS(action.hidden))
+        .set('hiddenFilterActive', false)
+        .set('customSort', false);
 
     default:
       return state;

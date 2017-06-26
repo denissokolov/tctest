@@ -9,6 +9,7 @@ function create({
                   hidden = [],
                   loading = false,
                   dispatch = jest.fn(),
+                  close = jest.fn(),
                 }, needMount = false) {
   const configureProjects = fromJS({
     loading,
@@ -22,6 +23,7 @@ function create({
     <ConfigureProjects
       configureProjects={configureProjects}
       dispatch={dispatch}
+      close={close}
     />,
   );
 }

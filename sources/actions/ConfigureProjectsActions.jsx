@@ -84,3 +84,21 @@ export function changeHiddenFilter(value) {
     value,
   };
 }
+
+export function saveProjectsConfiguration() {
+  projectsStorage.saveState();
+
+  return {
+    type: 'SAVE_PROJECTS_CONFIGURATION',
+  };
+}
+
+export function refreshProjectsConfiguration() {
+  projectsStorage.refreshToSavedState();
+
+  return {
+    type: 'REFRESH_PROJECTS_CONFIGURATION',
+    visible: projectsStorage.getVisible(),
+    hidden: projectsStorage.getHidden(),
+  };
+}

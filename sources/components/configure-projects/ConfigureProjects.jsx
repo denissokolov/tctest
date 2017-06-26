@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Map } from 'immutable';
 import {
   loadProjects, hideProjects, showProjects, moveProjectsDown, moveProjectsUp, changeHiddenFilter,
+  saveProjectsConfiguration, refreshProjectsConfiguration,
 } from '../../actions/ConfigureProjectsActions';
 
 import ArrowButton, { directions as arrowButtonDiractions } from '../arrow-button/ArrowButton';
@@ -17,7 +18,7 @@ export class ConfigureProjects extends React.Component {
   static propTypes = {
     configureProjects: PropTypes.instanceOf(Map).isRequired,
     dispatch: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired,
+    close: PropTypes.func.isRequired,
   };
 
   state = {
@@ -72,7 +73,14 @@ export class ConfigureProjects extends React.Component {
   };
 
   onCancelClick = () => {
-    this.props.onCancel();
+    this.props.close();
+    this.props.dispatch(refreshProjectsConfiguration());
+  };
+
+  onSubmit = (event) => {
+    event.preventDefault();
+    this.props.close();
+    this.props.dispatch(saveProjectsConfiguration());
   };
 
   getSelectedIdsWithChildren = (options, items) => {
@@ -149,7 +157,7 @@ export class ConfigureProjects extends React.Component {
     const hiddenFilterActive = configureProjects.get('hiddenFilterActive');
 
     return (
-      <div className="configure-projects">
+      <form className="configure-projects" onSubmit={this.onSubmit}>
         {error && error.message}
 
         {configureProjects.get('loading') && <span className="configure-projects__loading">Loading...</span>}
@@ -236,7 +244,7 @@ export class ConfigureProjects extends React.Component {
           onCancelClick={this.onCancelClick}
           customSort={customSort}
         />
-      </div>
+      </form>
     );
   }
 }

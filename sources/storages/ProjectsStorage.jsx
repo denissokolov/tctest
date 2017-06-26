@@ -25,13 +25,13 @@ class ProjectsStorage {
       project.name = projectData.name;
       project.visible = true;
       project.visibleChildrenCount = 0;
+      project.isAnyChildHidden = 0;
       project.invisibleChildrenCount = 0;
       project.customSort = false;
       project.parentCustomSort = false;
 
       project.filterMatch = false;
-      project.childFilterMatch = false;
-      project.parentFilterMatch = false;
+      project.filterTreeMatch = false;
 
       const parentData = projectData.parentProject;
       if (parentData) {
@@ -57,9 +57,55 @@ class ProjectsStorage {
         depth: project.depth,
       };
 
+      project.saved = {
+        visible: true,
+        customSort: false,
+        parentCustomSort: false,
+        levelSort: project.levelSort,
+      };
+
+      this.savedRootsCustomSort = false;
+
       this.projects.set(projectData.id, project);
       this.visible.push(project);
     });
+  }
+
+  saveState() {
+    this.savedRootsCustomSort = this.rootsCustomSort;
+
+    this.projects.forEach((project) => {
+      project.saved = {
+        visible: project.visible,
+        customSort: project.customSort,
+        parentCustomSort: project.parentCustomSort,
+        levelSort: project.levelSort,
+      };
+
+      project.filterMatch = false;
+      project.filterTreeMatch = false;
+    });
+  }
+
+  refreshToSavedState() {
+    this.clearVisible();
+    this.rootsCustomSort = this.savedRootsCustomSort;
+
+    this.projects.forEach((project) => {
+      project.visible = project.saved.visible;
+      project.customSort = project.saved.customSort;
+      project.parentCustomSort = project.saved.parentCustomSort;
+      project.levelSort = project.saved.levelSort;
+
+      project.filterMatch = false;
+      project.filterTreeMatch = false;
+
+      const parent = project.parentId ? this.projects.get(project.parentId) : null;
+      this.refreshVisibleProject(project, parent);
+    });
+
+    this.refreshHidden();
+    this.refreshSort();
   }
 
   showItems(ids) {
@@ -73,9 +119,7 @@ class ProjectsStorage {
   toggleVisibility(visible, ids) {
     let needRefreshSort = false;
 
-    this.visible = [];
-    this.visibleRootsCount = 0;
-    this.invisibleRootsCount = 0;
+    this.clearVisible();
 
     let selectedCount = 0;
 
@@ -93,18 +137,6 @@ class ProjectsStorage {
         }
       }
 
-      if (parent) {
-        if (parent.visible) {
-          project.name = project.original.name;
-          project.depth = parent.depth + 1;
-        } else {
-          project.name = `${parent.name} :: ${project.original.name}`;
-          project.depth = parent.depth;
-
-          // TODO: fix sort
-        }
-      }
-
       if (project.parentCustomSort) {
         if (project.visible) {
           project.levelSort = parent ? parent.visibleChildrenCount : this.visibleRootsCount;
@@ -119,29 +151,62 @@ class ProjectsStorage {
         this.sortKeys.set(project.sortKey, project.id);
       }
 
-      if (project.visible) {
-        this.visible.push(project);
-
-        if (parent) {
-          parent.visibleChildrenCount += 1;
-        } else {
-          this.visibleRootsCount += 1;
-        }
-      } else if (parent) {
-        parent.invisibleChildrenCount += 1;
-      } else {
-        this.invisibleRootsCount += 1;
-      }
-
       if (selected) {
         selectedCount += 1;
       }
 
-      project.visibleChildrenCount = 0;
-      project.invisibleChildrenCount = 0;
-      project.isAnyChildHidden = undefined;
+      this.refreshVisibleProject(project, parent);
     });
 
+    this.refreshHidden();
+
+    if (needRefreshSort) {
+      this.refreshSort();
+    }
+  }
+
+  clearVisible() {
+    this.visible = [];
+    this.visibleRootsCount = 0;
+    this.invisibleRootsCount = 0;
+  }
+
+  refreshVisibleProject(project, parent) {
+    if (parent) {
+      if (parent.visible) {
+        project.name = project.original.name;
+        project.depth = parent.depth + 1;
+      } else {
+        project.name = `${parent.name} :: ${project.original.name}`;
+        project.depth = parent.depth;
+
+        // TODO: fix sort
+      }
+    }
+
+    if (project.visible) {
+      this.visible.push(project);
+
+      project.filterMatch = false;
+      project.filterTreeMatch = false;
+
+      if (parent) {
+        parent.visibleChildrenCount += 1;
+      } else {
+        this.visibleRootsCount += 1;
+      }
+    } else if (parent) {
+      parent.invisibleChildrenCount += 1;
+    } else {
+      this.invisibleRootsCount += 1;
+    }
+
+    project.visibleChildrenCount = 0;
+    project.invisibleChildrenCount = 0;
+    project.isAnyChildHidden = undefined;
+  }
+
+  refreshHidden() {
     this.hidden = [];
     [...this.projects.values()].reverse().forEach((project) => {
       if (!project.visible || project.isAnyChildHidden) {
@@ -153,10 +218,6 @@ class ProjectsStorage {
         }
       }
     });
-
-    if (needRefreshSort) {
-      this.refreshSort();
-    }
   }
 
   sortDownVisible(ids) {
@@ -279,6 +340,11 @@ class ProjectsStorage {
   filterHidden(value) {
     const words = value ? value.trim().split(' ') : [];
 
+    if (!words.length) {
+      this.clearFilter();
+      return;
+    }
+
     const matches = {};
 
     const setAllParentsFilterMatch = (parentId) => {
@@ -337,9 +403,13 @@ class ProjectsStorage {
         project.filterMatch = false;
         project.filterTreeMatch = false;
       }
+    });
+  }
 
-      project.wordMatches = matches[project.id].wordMatches;
-      project.withParentMatches = matches[project.id].withParentMatches;
+  clearFilter() {
+    this.hidden.forEach((project) => {
+      project.filterMatch = false;
+      project.filterTreeMatch = false;
     });
   }
 
