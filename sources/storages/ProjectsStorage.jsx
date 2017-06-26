@@ -130,6 +130,9 @@ class ProjectsStorage {
       if (ids.length && ids[0] === project.id) {
         selected = true;
         project.visible = visible;
+        project.filterMatch = false;
+        project.filterTreeMatch = false;
+
         ids.shift();
 
         if (!needRefreshSort && project.parentCustomSort) {
@@ -186,9 +189,6 @@ class ProjectsStorage {
 
     if (project.visible) {
       this.visible.push(project);
-
-      project.filterMatch = false;
-      project.filterTreeMatch = false;
 
       if (parent) {
         parent.visibleChildrenCount += 1;

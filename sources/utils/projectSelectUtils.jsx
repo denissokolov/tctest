@@ -22,11 +22,15 @@ export function getSelectedIdsWithChildren(options, items) {
 
   items.reverse().forEach((item, index) => {
     const id = item.get('id');
-    const selected = reversedOptions[index].selected;
-    setSelectedInfo({ id, selected });
+    const option = reversedOptions[index];
 
-    if (selected || selectedInfo[id].isAnyChildSelected) {
-      setSelectedInfo({ id: item.get('parentId'), isAnyChildSelected: true });
+    if (option) {
+      const selected = option.selected;
+      setSelectedInfo({ id, selected });
+
+      if (selected || selectedInfo[id].isAnyChildSelected) {
+        setSelectedInfo({ id: item.get('parentId'), isAnyChildSelected: true });
+      }
     }
   });
 
