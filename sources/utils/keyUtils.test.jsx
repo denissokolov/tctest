@@ -6,6 +6,7 @@ import {
   getAllParentsKeysFromKey,
   getOneThirdOfMaxLevelPosition,
   getTwoThirdOfMaxLevelPosition,
+  swapFirstUncommonLevelsInKeys,
 } from './keyUtils';
 
 describe('keyUtils', () => {
@@ -108,6 +109,74 @@ describe('keyUtils', () => {
         '121212/848900',
         '121212/848900/901238',
       ]);
+    });
+  });
+
+  describe('swapFirstUncommonLevelsInKeys', () => {
+    it('should return keys with swapped first uncommon levels', () => {
+      expect(swapFirstUncommonLevelsInKeys({
+        key1: '100022',
+        key2: '289139',
+      })).toEqual({
+        key1: '289139',
+        key2: '100022',
+      });
+
+      expect(swapFirstUncommonLevelsInKeys({
+        key1: '121212/848900/901238/000101',
+        key2: '121999/848900/901238/000101',
+      })).toEqual({
+        key1: '121999/848900/901238/000101',
+        key2: '121212/848900/901238/000101',
+      });
+
+      expect(swapFirstUncommonLevelsInKeys({
+        key1: '000000/000738',
+        key2: '000000/001990',
+      })).toEqual({
+        key1: '000000/001990',
+        key2: '000000/000738',
+      });
+
+      expect(swapFirstUncommonLevelsInKeys({
+        key1: '000000/000000/000008',
+        key2: '000000/000000/000009/000000',
+      })).toEqual({
+        key1: '000000/000000/000009',
+        key2: '000000/000000/000008/000000',
+      });
+
+      expect(swapFirstUncommonLevelsInKeys({
+        key1: '000000/000000/000008/000001',
+        key2: '000000/000000/000009/000000',
+      })).toEqual({
+        key1: '000000/000000/000009/000001',
+        key2: '000000/000000/000008/000000',
+      });
+
+      expect(swapFirstUncommonLevelsInKeys({
+        key1: '100022/000000/213889',
+        key2: '289139/000000',
+      })).toEqual({
+        key1: '289139/000000/213889',
+        key2: '100022/000000',
+      });
+
+      expect(swapFirstUncommonLevelsInKeys({
+        key1: '000000/000000',
+        key2: '000000/000000/000000',
+      })).toEqual({
+        key1: '000000/000000',
+        key2: '000000/000000/000000',
+      });
+
+      expect(swapFirstUncommonLevelsInKeys({
+        key1: '129098/000000',
+        key2: '129098/000000/213660',
+      })).toEqual({
+        key1: '129098/000000',
+        key2: '129098/000000/213660',
+      });
     });
   });
 });
