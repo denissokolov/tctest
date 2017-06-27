@@ -25,7 +25,7 @@ class ProjectsStorage {
       project.name = projectData.name;
       project.visible = true;
       project.visibleChildrenCount = 0;
-      project.isAnyChildHidden = 0;
+      project.isAnyChildHidden = false;
       project.invisibleChildrenCount = 0;
       project.customSort = false;
       project.parentCustomSort = false;
@@ -203,7 +203,7 @@ class ProjectsStorage {
 
     project.visibleChildrenCount = 0;
     project.invisibleChildrenCount = 0;
-    project.isAnyChildHidden = undefined;
+    project.isAnyChildHidden = false;
   }
 
   refreshHidden() {
