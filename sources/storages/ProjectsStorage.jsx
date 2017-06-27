@@ -234,33 +234,6 @@ class ProjectsStorage {
       return { nextProject: null, nextIndex };
     };
 
-    const swapWithNextIfNeed = (project, index) => {
-      // const nextProject = this.visible[index + 1];
-      // if (!nextProject || nextProject.depth < project.depth) {
-      //   project.sorted = true;
-      //   return;
-      // }
-      //
-      // if (nextProject.depth > project.depth && nextProject.visibleParentId !== project.id) {
-      //   const { key1, key2 } = swapFirstUncommonLevelsInKeys({
-      //     key1: project.sortKey,
-      //     key2: nextProject.sortKey,
-      //   });
-      //
-      //   this.visible[index + 1] = project;
-      //   project.sortKey = key1;
-      //
-      //   this.visible[index] = nextProject;
-      //   nextProject.sortKey = key2;
-      // }
-      //
-
-
-
-      // nextProject.sorted
-
-    };
-
     for (let i = this.visible.length - 1; i > -1; i -= 1) {
       if (!ids.length) {
         break;
@@ -301,138 +274,94 @@ class ProjectsStorage {
     }
 
     if (needRefreshSort) {
-      this.visible.forEach((project) => {
-        project.sorted = false;
-
-        if (project.visibleParentId) {
-          const parent = this.projects.get(project.visibleParentId);
-
-          const { key1 } = swapFirstUncommonLevelsInKeys({
-            key1: project.sortKey,
-            key2: parent.sortKey,
-          });
-
-          project.sortKey = key1;
-
-          project.parentCustomSort = parent.customSort;
-        } else {
-          project.parentCustomSort = this.rootsCustomSort;
-        }
-      });
-
+      this.recalculateVisibleSortKeys();
       this.refreshSort();
     }
-
-    // let needRefreshSort = false;
-    //
-    // ids.reverse().forEach((id) => {
-    //   const project = this.projects.get(id);
-    //   const nextProject = this.getNeighborVisibleProject(project.sortKey);
-    //   if (nextProject && !nextProject.sorted) {
-    //     this.swapProjects(project, nextProject);
-    //
-    //     const parent = this.projects.get(project.parentId);
-    //     if (parent) {
-    //       parent.customSort = true;
-    //     } else {
-    //       this.rootsCustomSort = true;
-    //     }
-    //
-    //     if (!needRefreshSort) {
-    //       needRefreshSort = true;
-    //     }
-    //   } else {
-    //     project.sorted = true;
-    //   }
-    // });
-    //
-    // if (needRefreshSort) {
-    //   this.refreshSort();
-    // }
-    //
-    // return needRefreshSort;
   }
 
   sortUpVisible(ids) {
-    // let needRefreshSort = false;
-    //
-    // ids.forEach((id) => {
-    //   const project = this.projects.get(id);
-    //   const prevProject = this.getNeighborVisibleProject(project.sortKey, true);
-    //   if (prevProject && !prevProject.sorted) {
-    //     this.swapProjects(prevProject, project);
-    //
-    //     const parent = this.projects.get(project.parentId);
-    //     if (parent) {
-    //       parent.customSort = true;
-    //     } else {
-    //       this.rootsCustomSort = true;
-    //     }
-    //
-    //     if (!needRefreshSort) {
-    //       needRefreshSort = true;
-    //     }
-    //   } else {
-    //     project.sorted = true;
-    //   }
-    // });
-    //
-    // if (needRefreshSort) {
-    //   this.refreshSort();
-    // }
-    //
-    // return needRefreshSort;
+    let needRefreshSort = false;
+
+    const getPreviousVisibleProject = (depth, prevIndex) => {
+      const prevProject = prevIndex > -1 ? this.visible[prevIndex] : null;
+      if (!prevProject || prevProject.depth === depth) {
+        return { prevProject, prevIndex };
+      }
+
+      if (prevProject.depth > depth) {
+        return getPreviousVisibleProject(depth, prevIndex - 1);
+      }
+
+      return { prevProject: null, nextIndex: prevIndex };
+    };
+
+    for (let i = 0; i < this.visible.length; i += 1) {
+      if (!ids.length) {
+        break;
+      }
+
+      const project = this.visible[i];
+      if (ids[0] === project.id) {
+        ids.shift();
+
+        const { prevProject, prevIndex } = getPreviousVisibleProject(project.depth, i - 1);
+
+        if (prevProject && !prevProject.sorted) {
+          const { key1, key2 } = swapFirstUncommonLevelsInKeys({
+            key1: project.sortKey,
+            key2: prevProject.sortKey,
+          });
+
+          this.visible[i] = prevProject;
+          prevProject.sortKey = key2;
+
+          this.visible[prevIndex] = project;
+          project.sortKey = key1;
+
+          const parent = this.projects.get(project.parentId);
+          if (parent) {
+            parent.customSort = true;
+          } else {
+            this.rootsCustomSort = true;
+          }
+
+          if (!needRefreshSort) {
+            needRefreshSort = true;
+          }
+        }
+
+        project.sorted = true;
+      }
+    }
+
+    if (needRefreshSort) {
+      this.recalculateVisibleSortKeys();
+      this.refreshSort();
+    }
   }
 
-  // getNeighborVisibleProject(sortKey, needPrev) {
-  //   const neighborKey = needPrev ? getPrevKeyOnSameLevel(sortKey) : getNextKeyOnSameLevel(sortKey);
-  //   if (!neighborKey) {
-  //     return null;
-  //   }
-  //
-  //   const neighborProject = this.projects.get(this.sortKeys.get(neighborKey));
-  //   if (!neighborProject) {
-  //     return null;
-  //   }
-  //
-  //   if (neighborProject.visible) {
-  //     return neighborProject;
-  //   }
-  //
-  //   return this.getNeighborVisibleProject(neighborProject.sortKey, needPrev);
-  // }
-  //
-  // swapProjects(prevProject, nextProject) {
-  //   const prevLevelSort = prevProject.levelSort;
-  //   const prevSortKey = prevProject.sortKey;
-  //
-  //   prevProject.levelSort = nextProject.levelSort;
-  //   prevProject.sortKey = nextProject.sortKey;
-  //   this.sortKeys.set(prevProject.sortKey, prevProject.id);
-  //
-  //   nextProject.levelSort = prevLevelSort;
-  //   nextProject.sortKey = prevSortKey;
-  //   this.sortKeys.set(nextProject.sortKey, nextProject.id);
-  // }
+  recalculateVisibleSortKeys() {
+    this.visible.forEach((project) => {
+      project.sorted = false;
+
+      if (project.visibleParentId) {
+        const parent = this.projects.get(project.visibleParentId);
+
+        const { key1 } = swapFirstUncommonLevelsInKeys({
+          key1: project.sortKey,
+          key2: parent.sortKey,
+        });
+
+        project.sortKey = key1;
+
+        project.parentCustomSort = parent.customSort;
+      } else {
+        project.parentCustomSort = this.rootsCustomSort;
+      }
+    });
+  }
 
   refreshSort() {
-    // this.sortKeys = new Map();
-    // this.projects.forEach((project) => {
-    //   project.sorted = false;
-    //
-    //   let parentSortKey;
-    //   if (project.parentId) {
-    //     const parent = this.projects.get(project.parentId);
-    //     parentSortKey = parent.sortKey;
-    //     project.parentCustomSort = parent.customSort;
-    //   } else {
-    //     project.parentCustomSort = this.rootsCustomSort;
-    //   }
-    //
-    //   project.sortKey = generateKey(project.levelSort, parentSortKey);
-    //   this.sortKeys.set(project.sortKey, project.id);
-    // });
-
     this.visible.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
     this.hidden.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
     // this.projects = new Map([...this.projects.entries()]
