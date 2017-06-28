@@ -12,7 +12,6 @@ import {
 class ProjectsStorage {
   constructor(items) {
     this.projects = new Map();
-    // this.sortKeys = new Map();
     this.visible = [];
     this.hidden = [];
 
@@ -44,7 +43,6 @@ class ProjectsStorage {
         project.levelSort = parent.visibleChildrenCount;
 
         project.sortKey = generateKey(project.levelSort, parent.sortKey);
-        // this.sortKeys.set(project.sortKey, project.id);
 
         parent.visibleChildrenCount += 1;
       } else {
@@ -166,8 +164,6 @@ class ProjectsStorage {
 
   clearVisible() {
     this.visible = [];
-    // this.visibleRootsCount = 0;
-    // this.invisibleRootsCount = 0;
   }
 
   refreshVisibleProject(project, parent) {
@@ -343,18 +339,24 @@ class ProjectsStorage {
   recalculateVisibleSortKeys() {
     this.visible.forEach((project) => {
       project.sorted = false;
+      project.visibleChildrenCount = 0;
 
       if (project.visibleParentId) {
         const parent = this.projects.get(project.visibleParentId);
-
-        const { key1 } = swapFirstUncommonLevelsInKeys({
-          key1: project.sortKey,
-          key2: parent.sortKey,
-        });
-
-        project.sortKey = key1;
-
         project.parentCustomSort = parent.customSort;
+
+        if (project.parentCustomSort) {
+          project.sortKey = generateKey(parent.visibleChildrenCount, parent.sortKey);
+        } else {
+          const { key1 } = swapFirstUncommonLevelsInKeys({
+            key1: project.sortKey,
+            key2: parent.sortKey,
+          });
+
+          project.sortKey = key1;
+        }
+
+        parent.visibleChildrenCount += 1;
       } else {
         project.parentCustomSort = this.rootsCustomSort;
       }
