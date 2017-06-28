@@ -1,3 +1,5 @@
+/* global document */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
@@ -21,13 +23,17 @@ class Popup extends React.Component {
       this.handleShadowClickTimer = setTimeout(() => {
         this.handleShadowClick = true;
       }, HANDLE_SHADOW_CLICK_TIMEOUT);
+
+      document.addEventListener('keydown', this.onDocumentKeyDown, true);
     } else if (!nextProps.visible && this.props.visible) {
       this.resetTimer();
+      document.removeEventListener('keydown', this.onDocumentKeyDown, true);
     }
   }
 
   componentWillUnmount() {
     this.resetTimer();
+    document.removeEventListener('keydown', this.onDocumentKeyDown, true);
   }
 
   onShadowClick = () => {
@@ -38,6 +44,13 @@ class Popup extends React.Component {
 
   onCloseClick = () => {
     this.props.onClose();
+  };
+
+  onDocumentKeyDown = (event) => {
+    const escapeCode = 27;
+    if (event.keyCode === escapeCode) {
+      this.props.onClose();
+    }
   };
 
   resetTimer() {
