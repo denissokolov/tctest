@@ -7,7 +7,13 @@ import {
 } from '../utils/keyUtils';
 
 class ProjectsStorage {
-  constructor(items) {
+  constructor() {
+    this.projects = new Map();
+    this.visible = [];
+    this.hidden = [];
+  }
+
+  fillFromServerData(items) {
     this.projects = new Map();
     this.visible = [];
     this.hidden = [];

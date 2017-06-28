@@ -2,7 +2,7 @@
 
 import ProjectsStorage from '../storages/ProjectsStorage';
 
-let projectsStorage;
+const projectsStorage = new ProjectsStorage();
 
 export function loadProjects() {
   return (dispatch) => {
@@ -15,22 +15,24 @@ export function loadProjects() {
           return response.json();
         }
 
-        throw new Error('Network response was not ok.');
-      })
-      .then((data) => {
-        projectsStorage = new ProjectsStorage(data.project);
-
-        dispatch({
-          type: 'LOAD_PROJECTS_SUCCESS',
-          visible: projectsStorage.getVisible(),
-          hidden: projectsStorage.getHidden(),
-        });
+        throw new Error('Error while loading projects list.');
       })
       .catch((error) => {
         dispatch({
           type: 'LOAD_PROJECTS_FAIL',
           error,
         });
+      })
+      .then((data) => {
+        if (data) {
+          projectsStorage.fillFromServerData(data.project);
+
+          dispatch({
+            type: 'LOAD_PROJECTS_SUCCESS',
+            visible: projectsStorage.getVisible(),
+            hidden: projectsStorage.getHidden(),
+          });
+        }
       });
   };
 }

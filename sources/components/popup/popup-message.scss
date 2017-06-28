@@ -1,0 +1,35 @@
+.popup-message {
+  padding: 100px;
+  text-align: center;
+  font-size: 18px;
+
+  &_error {
+    color: #ff5141;
+  }
+
+  &_loading {
+    &::after {
+      position: absolute;
+      content: '.';
+      animation: dots 1s infinite linear;
+    }
+  }
+}
+
+@keyframes dots {
+  0% {
+    content: '.';
+  }
+
+  30% {
+    content: '..';
+  }
+
+  60% {
+    content: '...';
+  }
+
+  90% {
+    content: '';
+  }
+}

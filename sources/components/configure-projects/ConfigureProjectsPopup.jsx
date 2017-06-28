@@ -9,6 +9,7 @@ import {
 } from '../../actions/ConfigureProjectsActions';
 
 import Popup from '../popup/Popup';
+import '../popup/popup-message.scss';
 
 class ConfigureProjectsPopup extends React.Component {
   static propTypes = {
@@ -34,13 +35,15 @@ class ConfigureProjectsPopup extends React.Component {
 
   render() {
     const { dispatch, visible, configureProjects } = this.props;
+    const error = configureProjects.get('error');
 
-    return (
-      <Popup
-        title="Configure visible projects"
-        onClose={this.onCancel}
-        visible={visible}
-      >
+    let content;
+    if (error) {
+      content = <div className="popup-message popup-message_error">{error.message}</div>;
+    } else if (configureProjects.get('loading')) {
+      content = (<div className="popup-message popup-message_loading">Loading</div>);
+    } else {
+      content = (
         <ConfigureProjects
           configureProjects={configureProjects}
           dispatch={dispatch}
@@ -48,6 +51,16 @@ class ConfigureProjectsPopup extends React.Component {
           onCancel={this.onCancel}
           formVisible={visible}
         />
+      );
+    }
+
+    return (
+      <Popup
+        title="Configure visible projects"
+        onClose={this.onCancel}
+        visible={visible}
+      >
+        {content}
       </Popup>
     );
   }

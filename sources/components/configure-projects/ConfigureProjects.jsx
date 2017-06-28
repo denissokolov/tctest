@@ -29,14 +29,9 @@ class ConfigureProjects extends React.Component {
 
   render() {
     const { configureProjects, formVisible, dispatch } = this.props;
-    const error = configureProjects.get('error');
 
     return (
       <form className="configure-projects" onSubmit={this.onSubmit}>
-        {error && error.message}
-
-        {configureProjects.get('loading') && <span className="configure-projects__loading">Loading...</span>}
-
         <ConfigureProjectsMain
           visible={configureProjects.get('visible')}
           hidden={configureProjects.get('hidden')}
