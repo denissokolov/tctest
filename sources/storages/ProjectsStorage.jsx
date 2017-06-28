@@ -123,12 +123,13 @@ class ProjectsStorage {
 
       let needMove = false;
 
-      if (ids.length && ids[0] === project.id) {
+      const idsIndex = ids.indexOf(project.id);
+      if (ids.length && idsIndex !== -1) {
         project.visible = visible;
         project.filterMatch = false;
         project.filterTreeMatch = false;
 
-        ids.shift();
+        ids.splice(idsIndex, 1);
 
         needMove = true;
       }

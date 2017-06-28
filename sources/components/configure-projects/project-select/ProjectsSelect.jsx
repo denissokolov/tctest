@@ -62,7 +62,7 @@ class ProjectsSelect extends React.Component {
               disabled={type === types.hidden && item.get('visible')}
               title={name}
             >
-              {item.get('sortKey')} = {name}
+              {name}
             </option>
           );
         })}
