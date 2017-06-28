@@ -4,10 +4,6 @@ import {
   generateKey,
   swapFirstUncommonLevelsInKeys,
   regenerateKeyFromParent,
-  getNextKeyOnSameLevel,
-  getPrevKeyOnSameLevel,
-  getOneThirdOfMaxLevelPosition,
-  getTwoThirdOfMaxLevelPosition,
 } from '../utils/keyUtils';
 
 class ProjectsStorage {
@@ -26,7 +22,6 @@ class ProjectsStorage {
       project.name = projectData.name;
       project.visible = true;
       project.visibleChildrenCount = 0;
-      project.hiddenChildrenCount = 0;
       project.isAnyChildHidden = false;
       project.customSort = false;
       project.parentCustomSort = false;
@@ -60,57 +55,62 @@ class ProjectsStorage {
         sortNumber: project.sortNumber,
       };
 
-      // project.saved = {
-      //   visible: true,
-      //   customSort: false,
-      //   parentCustomSort: false,
-      // };
-
-      this.savedRootsCustomSort = false;
+      project.saved = {
+        visible: true,
+        name: project.name,
+        customSort: false,
+        parentCustomSort: false,
+        sortKey: project.sortKey,
+        depth: project.depth,
+        visibleChildrenCount: project.depth,
+        visibleParentId: project.visibleParentId,
+      };
 
       this.projects.set(projectData.id, project);
       this.visible.push(project);
     });
   }
 
-  // saveState() {
-  //   this.savedRootsCustomSort = this.rootsCustomSort;
-  //
-  //   this.projects.forEach((project) => {
-  //     project.saved = {
-  //       visible: project.visible,
-  //       customSort: project.customSort,
-  //       parentCustomSort: project.parentCustomSort,
-  //       sortKey: project.sortKey,
-  //       visibleChildrenCount: project.visibleChildrenCount,
-  //     };
-  //
-  //     project.filterMatch = false;
-  //     project.filterTreeMatch = false;
-  //   });
-  // }
-  //
-  // refreshToSavedState() {
-  //   this.clearVisible();
-  //   this.rootsCustomSort = this.savedRootsCustomSort;
-  //
-  //   this.projects.forEach((project) => {
-  //     project.visible = project.saved.visible;
-  //     project.customSort = project.saved.customSort;
-  //     project.parentCustomSort = project.saved.parentCustomSort;
-  //     project.sortKey = project.saved.sortKey;
-  //     project.visibleChildrenCount = project.saved.visibleChildrenCount;
-  //
-  //     project.filterMatch = false;
-  //     project.filterTreeMatch = false;
-  //
-  //     const parent = project.parentId ? this.projects.get(project.parentId) : null;
-  //     this.refreshVisibleProject(project, parent);
-  //   });
-  //
-  //   this.refreshHidden();
-  //   this.refreshSort();
-  // }
+  saveState() {
+    this.projects.forEach((project) => {
+      project.saved = {
+        visible: project.visible,
+        name: project.name,
+        customSort: project.customSort,
+        parentCustomSort: project.parentCustomSort,
+        sortKey: project.sortKey,
+        depth: project.depth,
+        visibleChildrenCount: project.visibleChildrenCount,
+        visibleParentId: project.visibleParentId,
+        isAnyChildHidden: project.isAnyChildHidden,
+      };
+
+      project.filterMatch = false;
+      project.filterTreeMatch = false;
+    });
+  }
+
+  refreshToSavedState() {
+    this.visible = [];
+    this.hidden = [];
+
+    this.projects.forEach((project) => {
+      Object.assign(project, project.saved);
+
+      project.filterMatch = false;
+      project.filterTreeMatch = false;
+
+      if (project.visible) {
+        this.visible.push(project);
+      } else {
+        this.hidden.push(project);
+      }
+    });
+
+    this.refreshVisibleSort();
+    this.refreshHiddenSort();
+    this.refreshHidden();
+  }
 
   showItems(ids) {
     this.toggleVisibility(true, ids);
@@ -187,7 +187,7 @@ class ProjectsStorage {
 
     this.refreshHidden();
     this.recalculateVisibleSortKeys();
-    this.refreshSort();
+    this.refreshVisibleSort();
   }
 
   refreshHidden() {
@@ -261,7 +261,7 @@ class ProjectsStorage {
 
     if (needRefreshSort) {
       this.recalculateVisibleSortKeys();
-      this.refreshSort();
+      this.refreshVisibleSort();
     }
   }
 
@@ -317,7 +317,7 @@ class ProjectsStorage {
 
     if (needRefreshSort) {
       this.recalculateVisibleSortKeys();
-      this.refreshSort();
+      this.refreshVisibleSort();
     }
   }
 
@@ -341,8 +341,12 @@ class ProjectsStorage {
     });
   }
 
-  refreshSort() {
+  refreshVisibleSort() {
     this.visible.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+  }
+
+  refreshHiddenSort() {
+    this.hidden.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
   }
 
   filterHidden(value) {
