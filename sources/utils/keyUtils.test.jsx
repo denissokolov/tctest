@@ -7,6 +7,7 @@ import {
   getOneThirdOfMaxLevelPosition,
   getTwoThirdOfMaxLevelPosition,
   swapFirstUncommonLevelsInKeys,
+  regenerateKeyFromParent,
 } from './keyUtils';
 
 describe('keyUtils', () => {
@@ -177,6 +178,13 @@ describe('keyUtils', () => {
         key1: '129098/000000',
         key2: '129098/000000/213660',
       });
+    });
+  });
+
+  describe('regenerateKeyFromParent', () => {
+    it('should return key with first part from parent key', () => {
+      const newKey = regenerateKeyFromParent('000000/000001/213660', '000000/000012');
+      expect(newKey).toEqual('000000/000012/213660');
     });
   });
 });

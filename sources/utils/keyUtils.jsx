@@ -131,3 +131,7 @@ export function swapFirstUncommonLevelsInKeys({ key1, key2 }) {
     key2: newKey2Levels.join('/'),
   };
 }
+
+export function regenerateKeyFromParent(childKey, parentKey) {
+  return parentKey + childKey.substring(parentKey.length);
+}

@@ -3,6 +3,7 @@
 import {
   generateKey,
   swapFirstUncommonLevelsInKeys,
+  regenerateKeyFromParent,
   getNextKeyOnSameLevel,
   getPrevKeyOnSameLevel,
   getOneThirdOfMaxLevelPosition,
@@ -33,6 +34,7 @@ class ProjectsStorage {
       project.filterMatch = false;
       project.filterTreeMatch = false;
 
+      let sortNumber;
       const parentData = projectData.parentProject;
       if (parentData) {
         const parent = this.projects.get(parentData.id);
@@ -40,7 +42,9 @@ class ProjectsStorage {
         project.parentId = parent.id;
         project.visibleParentId = project.parentId;
 
-        project.sortKey = generateKey(parent.visibleChildrenCount, parent.sortKey);
+        sortNumber = parent.visibleChildrenCount;
+        project.sortNumber = sortNumber;
+        project.sortKey = generateKey(sortNumber, parent.sortKey);
 
         parent.visibleChildrenCount += 1;
       } else {
@@ -53,6 +57,7 @@ class ProjectsStorage {
         name: project.name,
         depth: project.depth,
         sortKey: project.sortKey,
+        sortNumber: project.sortNumber,
       };
 
       // project.saved = {
@@ -140,6 +145,10 @@ class ProjectsStorage {
           project.depth = parent.depth + 1;
           project.visibleParentId = parent.id;
           project.parentCustomSort = parent.customSort;
+
+          if (!parent.customSort && project.visible) {
+            project.sortKey = generateKey(project.original.sortNumber, parent.sortKey);
+          }
         } else {
           project.name = `${parent.name} :: ${project.original.name}`;
           project.depth = parent.depth;
@@ -234,7 +243,7 @@ class ProjectsStorage {
           this.visible[nextIndex] = project;
           project.sortKey = key1;
 
-          const parent = this.projects.get(project.parentId);
+          const parent = this.projects.get(project.visibleParentId);
           if (parent) {
             parent.customSort = true;
           } else {
@@ -261,7 +270,8 @@ class ProjectsStorage {
 
     const swapWithPreviousProject = (project, prevIndex) => {
       const prevProject = prevIndex > -1 ? this.visible[prevIndex] : null;
-      if (!prevProject || (prevProject.sorted && prevProject.depth === project.depth)) {
+      if (!prevProject || prevProject.depth < project.depth
+        || (prevProject.sorted && prevProject.depth === project.depth)) {
         return;
       }
 
@@ -276,7 +286,7 @@ class ProjectsStorage {
       this.visible[prevIndex] = project;
       project.sortKey = key1;
 
-      const parent = this.projects.get(project.parentId);
+      const parent = this.projects.get(project.visibleParentId);
       if (parent) {
         parent.customSort = true;
       } else {
@@ -323,12 +333,7 @@ class ProjectsStorage {
         if (project.parentCustomSort) {
           project.sortKey = generateKey(parent.visibleChildrenCount, parent.sortKey);
         } else {
-          const { key1 } = swapFirstUncommonLevelsInKeys({
-            key1: project.sortKey,
-            key2: parent.sortKey,
-          });
-
-          project.sortKey = key1;
+          project.sortKey = regenerateKeyFromParent(project.sortKey, parent.sortKey);
         }
 
         parent.visibleChildrenCount += 1;
