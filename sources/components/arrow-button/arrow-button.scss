@@ -1,9 +1,13 @@
 .arrow-button {
+  $block: &;
+
   position: relative;
   width: 40px;
   height: 30px;
   cursor: pointer;
   background-color: #f6f6f6;
+  background-position: center;
+  background-repeat: no-repeat;
   border: 1px solid #ccc;
   border-bottom-color: #bbb;
   border-radius: 3px;
@@ -40,34 +44,38 @@
   }
 
   &_right {
-    padding-top: 2px;
+    background-size: 14px;
+    background-image: url("../../../public/images/arrow-right.png");
 
-    &::before {
-      content: "→";
+    &#{$block}_disabled {
+      background-image: url("../../../public/images/arrow-right_disabled.png");
     }
   }
 
   &_left {
-    padding-top: 2px;
+    background-size: 14px;
+    background-image: url("../../../public/images/arrow-left.png");
 
-    &::before {
-      content: "←";
+    &#{$block}_disabled {
+      background-image: url("../../../public/images/arrow-left_disabled.png");
     }
   }
 
   &_up {
-    padding-top: 3px;
+    background-size: 12px;
+    background-image: url("../../../public/images/arrow-up.png");
 
-    &::before {
-      content: "↑";
+    &#{$block}_disabled {
+      background-image: url("../../../public/images/arrow-up_disabled.png");
     }
   }
 
   &_down {
-    padding-top: 2px;
+    background-size: 12px;
+    background-image: url("../../../public/images/arrow-down.png");
 
-    &::before {
-      content: "↓";
+    &#{$block}_disabled {
+      background-image: url("../../../public/images/arrow-down_disabled.png");
     }
   }
 }
