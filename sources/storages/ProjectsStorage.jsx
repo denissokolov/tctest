@@ -2,7 +2,6 @@
 
 import {
   generateKey,
-  swapFirstUncommonLevelsInKeys,
   regenerateKeyFromParent,
 } from '../utils/keyUtils';
 
@@ -237,29 +236,10 @@ class ProjectsStorage {
         ids.pop();
 
         const { nextProject, nextIndex } = getNextSameLevelProject(project.depth, i + 1);
+        this.swapWithPreviousVisibleProject(nextProject, nextIndex - 1);
 
-        if (nextProject && !nextProject.sorted) {
-          const { key1, key2 } = swapFirstUncommonLevelsInKeys({
-            key1: project.sortKey,
-            key2: nextProject.sortKey,
-          });
-
-          this.visible[i] = nextProject;
-          nextProject.sortKey = key2;
-
-          this.visible[nextIndex] = project;
-          project.sortKey = key1;
-
-          const parent = this.projects.get(project.visibleParentId);
-          if (parent) {
-            parent.customSort = true;
-          } else {
-            this.rootsCustomSort = true;
-          }
-
-          if (!needRefreshSort) {
-            needRefreshSort = true;
-          }
+        if (!needRefreshSort && project.id !== this.visible[i]) {
+          needRefreshSort = true;
         }
 
         project.sorted = true;
@@ -272,42 +252,30 @@ class ProjectsStorage {
     }
   }
 
+  swapWithPreviousVisibleProject = (project, prevIndex) => {
+    const prevProject = prevIndex > -1 ? this.visible[prevIndex] : null;
+    if (!prevProject || !project || prevProject.depth < project.depth
+      || (prevProject.sorted && prevProject.depth === project.depth)) {
+      return;
+    }
+
+    this.visible[prevIndex + 1] = prevProject;
+    this.visible[prevIndex] = project;
+
+    const parent = this.projects.get(project.visibleParentId);
+    if (parent) {
+      parent.customSort = true;
+    } else {
+      this.rootsCustomSort = true;
+    }
+
+    if (prevProject.depth > project.depth) {
+      this.swapWithPreviousVisibleProject(project, prevIndex - 1);
+    }
+  };
+
   sortUpVisible(ids) {
     let needRefreshSort = false;
-
-    const swapWithPreviousProject = (project, prevIndex) => {
-      const prevProject = prevIndex > -1 ? this.visible[prevIndex] : null;
-      if (!prevProject || prevProject.depth < project.depth
-        || (prevProject.sorted && prevProject.depth === project.depth)) {
-        return;
-      }
-
-      const { key1, key2 } = swapFirstUncommonLevelsInKeys({
-        key1: project.sortKey,
-        key2: prevProject.sortKey,
-      });
-
-      this.visible[prevIndex + 1] = prevProject;
-      prevProject.sortKey = key2;
-
-      this.visible[prevIndex] = project;
-      project.sortKey = key1;
-
-      const parent = this.projects.get(project.visibleParentId);
-      if (parent) {
-        parent.customSort = true;
-      } else {
-        this.rootsCustomSort = true;
-      }
-
-      if (!needRefreshSort) {
-        needRefreshSort = true;
-      }
-
-      if (prevProject.depth > project.depth) {
-        swapWithPreviousProject(project, prevIndex - 1);
-      }
-    };
 
     for (let i = 0; i < this.visible.length; i += 1) {
       if (!ids.length) {
@@ -317,7 +285,12 @@ class ProjectsStorage {
       const project = this.visible[i];
       if (ids[0] === project.id) {
         ids.shift();
-        swapWithPreviousProject(project, i - 1);
+        this.swapWithPreviousVisibleProject(project, i - 1);
+
+        if (!needRefreshSort && project.id !== this.visible[i]) {
+          needRefreshSort = true;
+        }
+
         project.sorted = true;
       }
     }
