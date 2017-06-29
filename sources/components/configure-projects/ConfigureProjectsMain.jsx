@@ -29,13 +29,13 @@ class ConfigureProjectsMain extends React.Component {
 
   onHideClick = () => {
     const { hideProjects, visible } = this.props;
-    const selectedIds = getSelectedIdsWithChildren(this.visibleOptions, visible);
+    const selectedIds = getSelectedIdsWithChildren(this.visibleOptions, visible, 'visibleParentId');
     hideProjects(selectedIds);
   };
 
   onShowClick = () => {
     const { showProjects, hidden } = this.props;
-    const selectedIds = getSelectedIdsWithChildren(this.hiddenOptions, hidden);
+    const selectedIds = getSelectedIdsWithChildren(this.hiddenOptions, hidden, 'parentId');
     showProjects(selectedIds);
   };
 

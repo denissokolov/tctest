@@ -1,8 +1,12 @@
 # tctest
 
-Realization of TeamCity "Configure visible projects" popup. Powered by React and Redux.
+Realization of TC "Configure visible projects" popup. Powered by React and Redux.
 
-## run
+## Demo
+
+https://testdenis.github.io/tctest/public/
+
+## Run
 
 Run `npm install && npm run build` in console.
 
