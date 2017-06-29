@@ -1,5 +1,5 @@
 /* global fetch */
-
+import 'whatwg-fetch';
 import ProjectsStorage from '../storages/ProjectsStorage';
 
 const projectsStorage = new ProjectsStorage();

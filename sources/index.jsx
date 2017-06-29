@@ -7,6 +7,8 @@ import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 
+import 'babel-polyfill';
+
 import 'normalize.css';
 import './base.scss';
 
