@@ -248,6 +248,8 @@ class ProjectsStorage {
       this.recalculateVisibleSortKeys();
       this.refreshVisibleSort();
     }
+
+    return needRefreshSort;
   }
 
   swapWithPreviousVisibleProject = (project, prevIndex) => {
@@ -295,6 +297,8 @@ class ProjectsStorage {
       this.recalculateVisibleSortKeys();
       this.refreshVisibleSort();
     }
+
+    return needRefreshSort;
   }
 
   recalculateVisibleSortKeys() {

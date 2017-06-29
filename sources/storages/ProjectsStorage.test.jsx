@@ -5,25 +5,29 @@ import serverProjects from '../__mocks__/serverProjects';
 describe('ProjectsStorage', () => {
   describe('constructor', () => {
     it('getVisible should return all formatted items', () => {
-      const storage = new ProjectsStorage(serverProjects);
+      const storage = new ProjectsStorage();
+      storage.fillFromServerData(serverProjects);
       expect(storage.getVisible().length).toEqual(serverProjects.length);
     });
 
     it('getHidden should return empty array', () => {
-      const storage = new ProjectsStorage(serverProjects);
+      const storage = new ProjectsStorage();
+      storage.fillFromServerData(serverProjects);
       expect(storage.getHidden().length).toEqual(0);
     });
   });
 
   it('hideItems should change project visible property to false', () => {
-    const storage = new ProjectsStorage(serverProjects);
+    const storage = new ProjectsStorage();
+    storage.fillFromServerData(serverProjects);
 
     expect(storage.getHidden().length).toEqual(0);
 
     const ids = serverProjects.map(project => project.id);
     storage.hideItems(ids);
 
-    expect(storage.getHidden().length).toEqual(serverProjects.length);
+    expect(storage.getHidden().length).toEqual(serverProjects.length - 1);
+    expect(storage.getVisible().length).toEqual(1);
   });
 
   describe('filterHidden', () => {
@@ -44,7 +48,8 @@ describe('ProjectsStorage', () => {
     };
 
     it('should return matches for one word', () => {
-      const storage = new ProjectsStorage(serverProjects);
+      const storage = new ProjectsStorage();
+      storage.fillFromServerData(serverProjects);
       storage.hideItems(serverProjects.map(project => project.id));
 
       storage.filterHidden('nu');
@@ -61,7 +66,8 @@ describe('ProjectsStorage', () => {
     });
 
     it('should return matches for two words', () => {
-      const storage = new ProjectsStorage(serverProjects);
+      const storage = new ProjectsStorage();
+      storage.fillFromServerData(serverProjects);
       storage.hideItems(serverProjects.map(project => project.id));
 
       storage.filterHidden('nu li');

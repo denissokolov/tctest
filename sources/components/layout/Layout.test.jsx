@@ -2,8 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 
 import Layout from './Layout';
-import ConnectedConfigureProjects from '../configure-projects/ConfigureProjects';
-import Popup from '../popup/Popup';
+import ConnectedConfigureProjectsPopup from '../configure-projects/ConfigureProjectsPopup';
 
 describe('Layout', () => {
   it('should has .layout class', () => {
@@ -11,14 +10,14 @@ describe('Layout', () => {
     expect(wrapper.find('.layout').length).toBe(1);
   });
 
-  it('should render ConfigureProjects', () => {
+  it('should render ConfigureProjectsPopup', () => {
     const wrapper = shallow(<Layout />);
-    expect(wrapper.find(ConnectedConfigureProjects).length).toBe(1);
+    expect(wrapper.find(ConnectedConfigureProjectsPopup).length).toBe(1);
   });
 
-  it('ConfigureProjects popup should be hidden', () => {
+  it('ConfigureProjectsPopup popup should be hidden', () => {
     const wrapper = shallow(<Layout />);
-    expect(wrapper.find(Popup).prop('visible')).toBeFalsy();
+    expect(wrapper.find(ConnectedConfigureProjectsPopup).prop('visible')).toBeFalsy();
   });
 
   it('click on ConfigureProjects link should make popup visible', () => {
@@ -27,18 +26,18 @@ describe('Layout', () => {
     const preventDefault = jest.fn();
     wrapper.find('.layout__configure-projects-link').simulate('click', { preventDefault });
 
-    expect(wrapper.find(Popup).prop('visible')).toBeTruthy();
+    expect(wrapper.find(ConnectedConfigureProjectsPopup).prop('visible')).toBeTruthy();
     expect(preventDefault).toBeCalled();
   });
 
-  it('calling Popup onClose should make popup hidden', () => {
+  it('calling ConfigureProjectsPopup onClose should make popup hidden', () => {
     const wrapper = shallow(<Layout />);
 
     const preventDefault = jest.fn();
     wrapper.find('.layout__configure-projects-link').simulate('click', { preventDefault });
 
-    wrapper.find(Popup).prop('onClose')();
+    wrapper.find(ConnectedConfigureProjectsPopup).prop('onClose')();
 
-    expect(wrapper.find(Popup).prop('visible')).toBeFalsy();
+    expect(wrapper.find(ConnectedConfigureProjectsPopup).prop('visible')).toBeFalsy();
   });
 });
