@@ -30,7 +30,7 @@ class ProjectsSelect extends React.Component {
         ref={(el) => { this.selectEl = el; }}
       >
         {items.toArray().map((item) => {
-          if (filterActive && !item.get('filterTreeMatch')) {
+          if (filterActive && !item.get('filterTreeMatch') && !item.get('filterMatch')) {
             return null;
           }
 
