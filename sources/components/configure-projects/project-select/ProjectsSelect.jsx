@@ -27,6 +27,9 @@ class ProjectsSelect extends React.Component {
   render() {
     const { items, onChange, type, filterActive } = this.props;
 
+    // TODO: extract this
+    const isIE = navigator.appName === 'Microsoft Internet Explorer';
+
     return (
       <select
         className="projects-select"
@@ -34,7 +37,7 @@ class ProjectsSelect extends React.Component {
         multiple
         ref={(el) => { this.selectEl = el; }}
       >
-        {items.map((item) => {
+        {items.toArray().map((item) => {
           let filterClassName;
 
           if (filterActive) {
@@ -45,9 +48,16 @@ class ProjectsSelect extends React.Component {
             }
           }
 
+          const depth = type === types.hidden ? item.get('original').get('depth') : item.get('depth');
+
+          let iePadding = '';
+          if (isIE) {
+            iePadding = '\u00a0'.repeat(depth * 4);
+          }
+
           const classNames = cn(
             'projects-select__item',
-            `projects-select__item_depth_${type === types.hidden ? item.get('original').get('depth') : item.get('depth')}`,
+            `projects-select__item_depth_${depth}`,
             type === types.visible && item.get('parentCustomSort') && 'projects-select__item_custom-sort',
             filterClassName,
           );
@@ -62,7 +72,7 @@ class ProjectsSelect extends React.Component {
               disabled={type === types.hidden && item.get('visible')}
               title={name}
             >
-              {name}
+              {iePadding}{name}
             </option>
           );
         })}
