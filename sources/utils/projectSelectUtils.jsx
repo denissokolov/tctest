@@ -1,6 +1,6 @@
 // TODO: tests, refactoring
 
-export function getSelectedIdsWithChildren(options, items) {
+export function getSelectedIdsWithChildren(options, items, parentProp) {
   const reversedOptions = [...options].reverse();
   const selectedInfo = {};
 
@@ -29,7 +29,7 @@ export function getSelectedIdsWithChildren(options, items) {
       setSelectedInfo({ id, selected });
 
       if (selected || selectedInfo[id].isAnyChildSelected) {
-        setSelectedInfo({ id: item.get('parentId'), isAnyChildSelected: true });
+        setSelectedInfo({ id: item.get(parentProp), isAnyChildSelected: true });
       }
     }
   });
@@ -42,7 +42,7 @@ export function getSelectedIdsWithChildren(options, items) {
     if (info && info.selected) {
       selectedIds.push(id);
     } else {
-      const parentInfo = selectedInfo[item.get('parentId')];
+      const parentInfo = selectedInfo[item.get(parentProp)];
       if (parentInfo && parentInfo.selected && !parentInfo.isAnyChildSelected) {
         selectedIds.push(item.get('id'));
         setSelectedInfo({ id, selected: true });

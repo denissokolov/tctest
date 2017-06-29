@@ -17,10 +17,6 @@ class ProjectsStorage {
     this.visible = [];
     this.hidden = [];
 
-    this.rootsCustomSort = false;
-    this.visibleRootsCount = 0;
-    this.invisibleRootsCount = 0;
-
     items.forEach((projectData) => {
       const project = {};
       project.id = projectData.id;
@@ -49,8 +45,7 @@ class ProjectsStorage {
         parent.visibleChildrenCount += 1;
       } else {
         project.depth = 0;
-        project.sortKey = generateKey(this.visibleRootsCount);
-        this.visibleRootsCount += 1;
+        project.sortKey = generateKey(0);
       }
 
       project.original = {
@@ -130,7 +125,13 @@ class ProjectsStorage {
     const removeFromVisible = [];
 
     this.projects.forEach((project) => {
-      const parent = project.parentId ? this.projects.get(project.parentId) : null;
+      project.isAnyChildHidden = false;
+
+      if (!project.parentId) {
+        return;
+      }
+
+      const parent = this.projects.get(project.parentId);
 
       let needMove = false;
 
@@ -166,7 +167,7 @@ class ProjectsStorage {
       if (needMove && project.parentCustomSort && project.visible) {
         const visibleParent = this.projects.get(project.visibleParentId);
         if (visibleParent) {
-          const level = visibleParent ? visibleParent.visibleChildrenCount : this.visibleRootsCount;
+          const level = visibleParent.visibleChildrenCount;
           project.sortKey = generateKey(level, visibleParent && visibleParent.sortKey);
 
           visibleParent.visibleChildrenCount += 1;
@@ -183,8 +184,6 @@ class ProjectsStorage {
           removeFromVisible.push(project.id);
         }
       }
-
-      project.isAnyChildHidden = false;
     });
 
     if (removeFromVisible.length) {
@@ -199,13 +198,11 @@ class ProjectsStorage {
   refreshHidden() {
     this.hidden = [];
     [...this.projects.values()].reverse().forEach((project) => {
-      if (!project.visible || project.isAnyChildHidden) {
+      if (project.parentId && (!project.visible || project.isAnyChildHidden)) {
         this.hidden.unshift(project);
 
-        if (project.parentId) {
-          const parent = this.projects.get(project.parentId);
-          parent.isAnyChildHidden = true;
-        }
+        const parent = this.projects.get(project.parentId);
+        parent.isAnyChildHidden = true;
       }
     });
   }
@@ -265,8 +262,6 @@ class ProjectsStorage {
     const parent = this.projects.get(project.visibleParentId);
     if (parent) {
       parent.customSort = true;
-    } else {
-      this.rootsCustomSort = true;
     }
 
     if (prevProject.depth > project.depth) {
