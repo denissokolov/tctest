@@ -4,11 +4,13 @@ import { fromJS } from 'immutable';
 
 import formattedProjects from '../../../__mocks__/formattedProjects';
 import ProjectsSelect, { types as projectsSelectTypes } from './ProjectsSelect';
+import ProjectsSelectOption from './ProjectsSelectOption';
 
 function create({ items = [] }) {
   return shallow(
     <ProjectsSelect
       items={fromJS(items)}
+      formVisible
       onChange={jest.fn()}
       type={projectsSelectTypes.visible}
     />,
@@ -23,15 +25,11 @@ describe('Projects', () => {
 
   it('should no render items for empty list', () => {
     const wrapper = create({});
-    expect(wrapper.find('.projects-select__item').length).toBe(0);
+    expect(wrapper.find(ProjectsSelectOption).length).toBe(0);
   });
 
-  it('should render all items with correct depths', () => {
+  it('should render all items', () => {
     const wrapper = create({ items: formattedProjects });
-    expect(wrapper.find('.projects-select__item').length).toBe(formattedProjects.length);
-
-    wrapper.find('.projects-select__item').forEach((node, index) => {
-      expect(node.hasClass(`projects-select__item_depth_${formattedProjects[index].depth}`)).toBeTruthy();
-    });
+    expect(wrapper.find(ProjectsSelectOption).length).toBe(formattedProjects.length);
   });
 });
