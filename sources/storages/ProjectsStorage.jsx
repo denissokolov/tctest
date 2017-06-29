@@ -88,7 +88,6 @@ class ProjectsStorage {
         depth: project.depth,
         visibleChildrenCount: project.visibleChildrenCount,
         visibleParentId: project.visibleParentId,
-        isAnyChildHidden: project.isAnyChildHidden,
       };
 
       project.filterMatch = false;
@@ -111,6 +110,8 @@ class ProjectsStorage {
       } else {
         this.hidden.push(project);
       }
+
+      project.isAnyChildHidden = false;
     });
 
     this.refreshVisibleSort();
