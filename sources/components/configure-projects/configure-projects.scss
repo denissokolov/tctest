@@ -40,7 +40,6 @@
 
   &__items {
     height: calc(100% - #{$title-height + $padding});
-    overflow: auto;
     border: 1px solid #dedede;
 
     &_with-filter {
