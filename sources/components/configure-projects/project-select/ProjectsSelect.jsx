@@ -1,9 +1,8 @@
-// TODO: extract option to component with SCU
 import React from 'react';
 import PropTypes from 'prop-types';
-import cn from 'classnames';
 import { List } from 'immutable';
 
+import ProjectsSelectOption from './ProjectsSelectOption';
 import './projects-select.scss';
 
 export const types = {
@@ -20,15 +19,8 @@ class ProjectsSelect extends React.Component {
     }
   }
 
-  shouldComponentUpdate(nextProps) {
-    return !(this.props.formVisible && !nextProps.formVisible);
-  }
-
   render() {
     const { items, onChange, type, filterActive } = this.props;
-
-    // TODO: extract this
-    const isIE = navigator.appName === 'Microsoft Internet Explorer';
 
     return (
       <select
@@ -38,42 +30,20 @@ class ProjectsSelect extends React.Component {
         ref={(el) => { this.selectEl = el; }}
       >
         {items.toArray().map((item) => {
-          let filterClassName;
-
-          if (filterActive) {
-            if (item.get('filterMatch')) {
-              filterClassName = 'projects-select__item_filter-match';
-            } else if (!item.get('filterTreeMatch')) {
-              return null;
-            }
+          if (filterActive && !item.get('filterTreeMatch')) {
+            return null;
           }
-
-          const depth = type === types.hidden ? item.get('original').get('depth') : item.get('depth');
-
-          let iePadding = '';
-          if (isIE) {
-            iePadding = '\u00a0'.repeat(depth * 4);
-          }
-
-          const classNames = cn(
-            'projects-select__item',
-            `projects-select__item_depth_${depth}`,
-            type === types.visible && item.get('parentCustomSort') && 'projects-select__item_custom-sort',
-            filterClassName,
-          );
-
-          const name = type === types.hidden ? item.get('original').get('name') : item.get('name');
 
           return (
-            <option
+            <ProjectsSelectOption
               key={item.get('id')}
-              className={classNames}
-              value={item.get('id')}
+              id={item.get('id')}
+              name={type === types.hidden ? item.get('original').get('name') : item.get('name')}
+              depth={type === types.hidden ? item.get('original').get('depth') : item.get('depth')}
+              parentCustomSort={type === types.visible && item.get('parentCustomSort')}
               disabled={type === types.hidden && item.get('visible')}
-              title={name}
-            >
-              {iePadding}{name}
-            </option>
+              filterMatch={filterActive && item.get('filterMatch')}
+            />
           );
         })}
       </select>

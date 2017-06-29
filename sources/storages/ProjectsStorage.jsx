@@ -46,6 +46,7 @@ class ProjectsStorage {
       } else {
         project.depth = 0;
         project.sortKey = generateKey(0);
+        this.rootId = project.id;
       }
 
       project.original = {
@@ -333,6 +334,10 @@ class ProjectsStorage {
     }
 
     const matches = {};
+    matches[this.rootId] = {
+      wordMatches: 0,
+      withParentMatches: 0,
+    };
 
     const setAllParentsFilterMatch = (parentId) => {
       if (parentId) {

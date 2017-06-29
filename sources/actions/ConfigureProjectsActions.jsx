@@ -8,7 +8,6 @@ export function loadProjects() {
   return (dispatch) => {
     dispatch({ type: 'LOAD_PROJECTS_PROGRESS' });
 
-    // TODO: add polyfill
     fetch('data.json')
       .then((response) => {
         if (response.ok) {
