@@ -1,3 +1,5 @@
+/* global document */
+
 import React from 'react';
 import { shallow } from 'enzyme';
 
@@ -77,5 +79,70 @@ describe('Popup', () => {
       expect(onClose).toBeCalled();
       done();
     }, 300);
+  });
+
+  it('should not call document keydown event listener for invisible popup', () => {
+    const onClose = jest.fn();
+
+    const map = {};
+    document.addEventListener = jest.fn((event, cb) => {
+      map[event] = cb;
+    });
+
+    create({ onClose });
+
+    expect(map.keydown).toBeUndefined();
+  });
+
+  it('should call onClose on ESC press for visible popup', () => {
+    const onClose = jest.fn();
+
+    const map = {};
+    document.addEventListener = jest.fn((event, cb) => {
+      map[event] = cb;
+    });
+
+    const wrapper = create({ onClose });
+    wrapper.setProps({ visible: true });
+
+    expect(map.keydown).not.toBeUndefined();
+
+    map.keydown({ keyCode: 27 });
+
+    expect(onClose).toBeCalled();
+  });
+
+  it('should remove document keydown event listener on unmount', () => {
+    const onClose = jest.fn();
+
+    let keyDownRemoved = false;
+    document.removeEventListener = jest.fn((event) => {
+      if (event === 'keydown') {
+        keyDownRemoved = true;
+      }
+    });
+
+    const wrapper = create({ onClose });
+    wrapper.setProps({ visible: true });
+    wrapper.unmount();
+
+    expect(keyDownRemoved).toBeTruthy();
+  });
+
+  it('should remove document keydown event listener on close popup', () => {
+    const onClose = jest.fn();
+
+    let keyDownRemoved = false;
+    document.removeEventListener = jest.fn((event) => {
+      if (event === 'keydown') {
+        keyDownRemoved = true;
+      }
+    });
+
+    const wrapper = create({ onClose });
+    wrapper.setProps({ visible: true });
+    wrapper.setProps({ visible: false });
+
+    expect(keyDownRemoved).toBeTruthy();
   });
 });
