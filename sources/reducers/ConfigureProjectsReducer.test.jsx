@@ -149,4 +149,47 @@ describe('ConfigureProjectsReducer', () => {
     expect(state.get('visible')).toEqual(fromJS([]));
     expect(state.get('customSort')).toBeFalsy();
   });
+
+  it('should handle CHANGE_HIDDEN_PROJECTS_FILTER', () => {
+    const action = {
+      type: 'CHANGE_HIDDEN_PROJECTS_FILTER',
+      items: formattedProjects.reverse(),
+      value: 'test',
+    };
+
+    const state = ConfigureProjectsReducer(undefined, action);
+
+    expect(state.get('hidden')).toEqual(fromJS(action.items));
+    expect(state.get('hiddenFilterValue')).toEqual(action.value);
+  });
+
+  it('should handle SAVE_PROJECTS_CONFIGURATION', () => {
+    const action = {
+      type: 'SAVE_PROJECTS_CONFIGURATION',
+    };
+
+    const state = ConfigureProjectsReducer(undefined, action);
+
+    expect(state.get('hiddenFilterValue')).toEqual('');
+  });
+
+  it('should handle REFRESH_PROJECTS_CONFIGURATION', () => {
+    const action = {
+      type: 'REFRESH_PROJECTS_CONFIGURATION',
+      visible: formattedProjects,
+      hidden: formattedProjects.reverse(),
+    };
+
+    const state = ConfigureProjectsReducer(fromJS({
+      visible: [],
+      hidden: [],
+      customSort: true,
+      hiddenFilterValue: 'test',
+    }), action);
+
+    expect(state.get('visible')).toEqual(fromJS(action.visible));
+    expect(state.get('hidden')).toEqual(fromJS(action.hidden));
+    expect(state.get('hiddenFilterValue')).toEqual('');
+    expect(state.get('customSort')).toBeFalsy();
+  });
 });
