@@ -4,6 +4,6 @@ module.exports = {
   },
   automock: false,
   setupFiles: [
-    './setupJest.js',
+    './setupJest.jsx',
   ],
 };
