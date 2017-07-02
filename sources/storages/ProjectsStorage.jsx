@@ -213,7 +213,7 @@ class ProjectsStorage {
 
     const getNextSameLevelProject = (depth, nextIndex) => {
       const nextProject = this.visible[nextIndex];
-      if (!nextProject || nextProject.depth === depth) {
+      if (!nextProject || (nextProject.depth === depth && !nextProject.sorted)) {
         return { nextProject, nextIndex };
       }
 
@@ -230,6 +230,8 @@ class ProjectsStorage {
       }
 
       const project = this.visible[i];
+      project.sorted = false;
+
       if (ids[ids.length - 1] === project.id) {
         ids.pop();
 
@@ -237,14 +239,12 @@ class ProjectsStorage {
         if (nextProject) {
           this.swapWithPreviousVisibleProject(nextProject, nextIndex - 1);
 
-          if (project.id !== this.visible[i].id) {
-            project.sorted = true;
-
-            if (!needRefreshSort) {
-              needRefreshSort = true;
-            }
+          if (!needRefreshSort && project.id !== this.visible[i].id) {
+            needRefreshSort = true;
           }
         }
+
+        project.sorted = true;
       }
     }
 
@@ -285,17 +285,17 @@ class ProjectsStorage {
       }
 
       const project = this.visible[i];
+      project.sorted = false;
+
       if (ids[0] === project.id) {
         ids.shift();
         this.swapWithPreviousVisibleProject(project, i - 1);
 
-        if (project.id !== this.visible[i].id) {
-          project.sorted = true;
-
-          if (!needRefreshSort) {
-            needRefreshSort = true;
-          }
+        if (!needRefreshSort && project.id !== this.visible[i].id) {
+          needRefreshSort = true;
         }
+
+        project.sorted = true;
       }
     }
 
