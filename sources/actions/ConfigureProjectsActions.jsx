@@ -8,7 +8,7 @@ export function loadProjects() {
   return (dispatch) => {
     dispatch({ type: 'LOAD_PROJECTS_PROGRESS' });
 
-    fetch('data.json')
+    return fetch('data.json')
       .then((response) => {
         if (response.ok) {
           return response.json();
