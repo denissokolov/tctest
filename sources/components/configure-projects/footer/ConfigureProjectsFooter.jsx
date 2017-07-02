@@ -2,12 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import FormButton, { types as formButtonTypes, modifiers as formButtonModifiers } from '../../form-button/FormButton';
 
-import './configure-projects-buttons.scss';
+import './configure-projects-footer.scss';
 
-function ConfigureProjectsButtons({ onCancelClick, customSort }) {
+function ConfigureProjectsFooter({ onCancelClick, customSort }) {
   return (
-    <div className="configure-projects-buttons">
-      <div className="configure-projects-buttons__button">
+    <div className="configure-projects-footer">
+      <div className="configure-projects-footer__button">
         <FormButton
           text="Save"
           type={formButtonTypes.submit}
@@ -15,7 +15,7 @@ function ConfigureProjectsButtons({ onCancelClick, customSort }) {
         />
       </div>
 
-      <div className="configure-projects-buttons__button">
+      <div className="configure-projects-footer__button">
         <FormButton
           text="Cancel"
           onClick={onCancelClick}
@@ -23,7 +23,7 @@ function ConfigureProjectsButtons({ onCancelClick, customSort }) {
       </div>
 
       {customSort &&
-        <div className="configure-projects-buttons__sort-message">
+        <div className="configure-projects-footer__sort-message">
           Some projects are reordered (underlined)
         </div>
       }
@@ -31,13 +31,13 @@ function ConfigureProjectsButtons({ onCancelClick, customSort }) {
   );
 }
 
-ConfigureProjectsButtons.propTypes = {
+ConfigureProjectsFooter.propTypes = {
   onCancelClick: PropTypes.func.isRequired,
   customSort: PropTypes.bool,
 };
 
-ConfigureProjectsButtons.defaultProps = {
+ConfigureProjectsFooter.defaultProps = {
   customSort: false,
 };
 
-export default ConfigureProjectsButtons;
+export default ConfigureProjectsFooter;

@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { Map } from 'immutable';
 import * as ConfigureProjectsActions from '../../actions/ConfigureProjectsActions';
-import ConfigureProjectsButtons from './configure-projects-buttons/ConfigureProjectsButtons';
+
+import ConfigureProjectsFooter from './footer/ConfigureProjectsFooter';
 import ConfigureProjectsMain from './ConfigureProjectsMain';
 
 import './configure-projects.scss';
@@ -40,7 +41,7 @@ class ConfigureProjects extends React.Component {
           {...bindActionCreators(ConfigureProjectsActions, dispatch)}
         />
 
-        <ConfigureProjectsButtons
+        <ConfigureProjectsFooter
           onCancelClick={this.onCancelClick}
           customSort={configureProjects.get('customSort')}
         />
