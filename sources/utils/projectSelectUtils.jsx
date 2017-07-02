@@ -1,39 +1,42 @@
-// TODO: tests, refactoring
+/* eslint-disable no-param-reassign */
 
-export function getSelectedIdsWithChildren(options, items, parentProp) {
-  const selectedInfo = {};
+function setItemSelectedInfo(selectedInfo, { id, selected, isAnyChildSelected }) {
+  let info = selectedInfo[id];
+  if (!info) {
+    info = {};
+    selectedInfo[id] = info;
+  }
 
-  const setSelectedInfo = ({ id, selected, isAnyChildSelected }) => {
-    let info = selectedInfo[id];
-    if (!info) {
-      info = {};
-      selectedInfo[id] = info;
-    }
+  if (selected !== undefined) {
+    info.selected = selected;
+  }
 
-    if (selected !== undefined) {
-      info.selected = selected;
-    }
+  if (isAnyChildSelected !== undefined) {
+    info.isAnyChildSelected = isAnyChildSelected;
+  }
+}
 
-    if (isAnyChildSelected !== undefined) {
-      info.isAnyChildSelected = isAnyChildSelected;
-    }
-  };
-
+function setSelectedInfoFromOptions(selectedInfo, options) {
   [...options].forEach((option) => {
-    setSelectedInfo({ id: option.value, selected: option.selected });
+    setItemSelectedInfo(selectedInfo, { id: option.value, selected: option.selected });
   });
+}
 
+function setIsAnyChildSelected(selectedInfo, items, parentProp) {
   items.reverse().forEach((item) => {
     const id = item.get('id');
 
     const info = selectedInfo[id];
 
     if (info && (info.selected || info.isAnyChildSelected)) {
-      setSelectedInfo({ id: item.get(parentProp), isAnyChildSelected: true });
+      setItemSelectedInfo(selectedInfo, { id: item.get(parentProp), isAnyChildSelected: true });
     }
   });
+}
 
+function getSelectedIdsFromSelectedInfo(selectedInfo, items, parentProp) {
   const selectedIds = [];
+
   items.forEach((item) => {
     const id = item.get('id');
 
@@ -44,12 +47,20 @@ export function getSelectedIdsWithChildren(options, items, parentProp) {
       const parentInfo = selectedInfo[item.get(parentProp)];
       if (parentInfo && parentInfo.selected && !parentInfo.isAnyChildSelected) {
         selectedIds.push(item.get('id'));
-        setSelectedInfo({ id, selected: true });
+        setItemSelectedInfo(selectedInfo, { id, selected: true });
       }
     }
   });
 
   return selectedIds;
+}
+
+export function getSelectedIdsWithChildren(options, items, parentProp) {
+  const selectedInfo = {};
+
+  setSelectedInfoFromOptions(selectedInfo, options);
+  setIsAnyChildSelected(selectedInfo, items, parentProp);
+  return getSelectedIdsFromSelectedInfo(selectedInfo, items, parentProp);
 }
 
 export function getSelectedIds(options) {
