@@ -98,25 +98,55 @@ describe('ConfigureProjectsReducer', () => {
     expect(state.get('hidden')).toEqual(fromJS(action.hidden));
   });
 
-  it('should handle MOVE_PROJECTS_UP', () => {
+  it('should handle MOVE_PROJECTS_UP if action.sortChanged is true', () => {
     const action = {
       type: 'MOVE_PROJECTS_UP',
       items: formattedProjects,
+      sortChanged: true,
     };
 
     const state = ConfigureProjectsReducer(undefined, action);
 
     expect(state.get('visible')).toEqual(fromJS(action.items));
+    expect(state.get('customSort')).toBeTruthy();
   });
 
-  it('should handle MOVE_PROJECTS_DOWN', () => {
+  it('should return previous state for action MOVE_PROJECTS_UP if action.sortChanged is false', () => {
+    const action = {
+      type: 'MOVE_PROJECTS_UP',
+      items: formattedProjects,
+      sortChanged: false,
+    };
+
+    const state = ConfigureProjectsReducer(undefined, action);
+
+    expect(state.get('visible')).toEqual(fromJS([]));
+    expect(state.get('customSort')).toBeFalsy();
+  });
+
+  it('should handle MOVE_PROJECTS_DOWN if action.sortChanged is true', () => {
     const action = {
       type: 'MOVE_PROJECTS_DOWN',
       items: formattedProjects.reverse(),
+      sortChanged: true,
     };
 
     const state = ConfigureProjectsReducer(undefined, action);
 
     expect(state.get('visible')).toEqual(fromJS(action.items));
+    expect(state.get('customSort')).toBeTruthy();
+  });
+
+  it('should return previous state for action MOVE_PROJECTS_DOWN if action.sortChanged is false', () => {
+    const action = {
+      type: 'MOVE_PROJECTS_DOWN',
+      items: formattedProjects.reverse(),
+      sortChanged: false,
+    };
+
+    const state = ConfigureProjectsReducer(undefined, action);
+
+    expect(state.get('visible')).toEqual(fromJS([]));
+    expect(state.get('customSort')).toBeFalsy();
   });
 });

@@ -234,13 +234,17 @@ class ProjectsStorage {
         ids.pop();
 
         const { nextProject, nextIndex } = getNextSameLevelProject(project.depth, i + 1);
-        this.swapWithPreviousVisibleProject(nextProject, nextIndex - 1);
+        if (nextProject) {
+          this.swapWithPreviousVisibleProject(nextProject, nextIndex - 1);
 
-        if (!needRefreshSort && project.id !== this.visible[i]) {
-          needRefreshSort = true;
+          if (project.id !== this.visible[i].id) {
+            project.sorted = true;
+
+            if (!needRefreshSort) {
+              needRefreshSort = true;
+            }
+          }
         }
-
-        project.sorted = true;
       }
     }
 
@@ -285,11 +289,13 @@ class ProjectsStorage {
         ids.shift();
         this.swapWithPreviousVisibleProject(project, i - 1);
 
-        if (!needRefreshSort && project.id !== this.visible[i]) {
-          needRefreshSort = true;
-        }
+        if (project.id !== this.visible[i].id) {
+          project.sorted = true;
 
-        project.sorted = true;
+          if (!needRefreshSort) {
+            needRefreshSort = true;
+          }
+        }
       }
     }
 
