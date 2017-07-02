@@ -2,12 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
 
-import { isIE } from '../../../utils/browserDetectUtils';
-
 function ProjectsSelectOption(props) {
-  const { id, name, depth, disabled, parentCustomSort, filterMatch } = props;
+  const { id, name, depth, disabled, parentCustomSort, filterMatch, browserIsIE } = props;
 
-  const iePadding = isIE() && '\u00a0'.repeat(depth * 4);
+  const iePadding = browserIsIE && '\u00a0'.repeat(depth * 4);
 
   const classNames = cn(
     'projects-select__item',
@@ -32,6 +30,7 @@ ProjectsSelectOption.propTypes = {
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   depth: PropTypes.number.isRequired,
+  browserIsIE: PropTypes.bool.isRequired,
   disabled: PropTypes.bool,
   parentCustomSort: PropTypes.bool,
   filterMatch: PropTypes.bool,

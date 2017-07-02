@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { List } from 'immutable';
 
+import { isIE } from '../../../utils/browserDetectUtils';
 import ProjectsSelectOption from './ProjectsSelectOption';
 import './projects-select.scss';
 
@@ -11,6 +12,10 @@ export const types = {
 };
 
 class ProjectsSelect extends React.Component {
+  componentWillMount() {
+    this.browserIsIE = isIE();
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.formVisible && !nextProps.formVisible) {
       if (this.selectEl && this.selectEl.scrollTo) {
@@ -43,6 +48,7 @@ class ProjectsSelect extends React.Component {
               parentCustomSort={type === types.visible && item.get('parentCustomSort')}
               disabled={type === types.hidden && item.get('visible')}
               filterMatch={filterActive && item.get('filterMatch')}
+              browserIsIE={this.browserIsIE}
             />
           );
         })}
