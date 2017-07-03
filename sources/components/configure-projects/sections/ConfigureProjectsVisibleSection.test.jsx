@@ -47,7 +47,7 @@ const selectedOptions = [{
   value: 'Less',
 }];
 
-describe('ConfigureProjectsHiddenSection', () => {
+describe('ConfigureProjectsVisibleSection', () => {
   it('should has .configure-projects__section class', () => {
     const wrapper = create({});
     expect(wrapper.find('.configure-projects__section').length).toBe(1);
@@ -230,6 +230,7 @@ describe('ConfigureProjectsHiddenSection', () => {
 
       expect(hideProjects).toBeCalled();
       expect(hideProjects.mock.calls[0][0]).toEqual(['ApacheAnt', 'Hibernate', 'Hibernate_HibernateOrm']);
+      expect(wrapper.state('anyVisibleSelected')).toBeFalsy();
     });
   });
 });

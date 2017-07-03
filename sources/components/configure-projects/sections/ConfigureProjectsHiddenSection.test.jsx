@@ -156,6 +156,7 @@ describe('ConfigureProjectsHiddenSection', () => {
 
       expect(showProjects).toBeCalled();
       expect(showProjects.mock.calls[0][0]).toEqual(['ApacheAnt', 'Hibernate', 'Hibernate_HibernateOrm']);
+      expect(wrapper.state('anyHiddenSelected')).toBeFalsy();
     });
   });
 });

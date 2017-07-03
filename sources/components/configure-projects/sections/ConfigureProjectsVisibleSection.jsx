@@ -21,6 +21,7 @@ class ConfigureProjectsVisibleSection extends React.Component {
 
   onHideClick = () => {
     const { hideProjects, visible } = this.props;
+    this.setState({ anyVisibleSelected: false });
     const selectedIds = getSelectedIdsWithChildren(this.visibleOptions, visible, 'visibleParentId');
     hideProjects(selectedIds);
   };

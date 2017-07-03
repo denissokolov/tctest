@@ -22,6 +22,7 @@ class ConfigureProjectsHiddenSection extends React.Component {
 
   onShowClick = () => {
     const { showProjects, hidden } = this.props;
+    this.setState({ anyHiddenSelected: false });
     const selectedIds = getSelectedIdsWithChildren(this.hiddenOptions, hidden, 'parentId');
     showProjects(selectedIds);
   };
