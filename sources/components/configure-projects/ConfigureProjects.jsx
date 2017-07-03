@@ -9,7 +9,6 @@ import ConfigureProjectsVisibleSection from './sections/ConfigureProjectsVisible
 import ConfigureProjectsHiddenSection from './sections/ConfigureProjectsHiddenSection';
 
 import './configure-projects.scss';
-import '../centered-block/centered-block.scss';
 
 class ConfigureProjects extends React.Component {
   static propTypes = {
