@@ -11,7 +11,7 @@ import {
 import Popup from '../popup/Popup';
 import '../popup/popup-message.scss';
 
-class ConfigureProjectsPopup extends React.Component {
+export class ConfigureProjectsPopup extends React.Component {
   static propTypes = {
     configureProjects: PropTypes.instanceOf(Map).isRequired,
     dispatch: PropTypes.func.isRequired,
@@ -39,7 +39,7 @@ class ConfigureProjectsPopup extends React.Component {
 
     let content;
     if (error) {
-      content = <div className="popup-message popup-message_error">{error.message}</div>;
+      content = <div className="popup-message popup-message_error">{error}</div>;
     } else if (configureProjects.get('loading')) {
       content = (<div className="popup-message popup-message_loading">Loading</div>);
     } else {

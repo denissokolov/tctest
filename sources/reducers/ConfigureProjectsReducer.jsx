@@ -26,7 +26,7 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
     case 'LOAD_PROJECTS_FAIL':
       return state
         .set('loading', false)
-        .set('error', action.error);
+        .set('error', action.error ? action.error.message : '');
 
     case 'SHOW_PROJECTS':
     case 'HIDE_PROJECTS':

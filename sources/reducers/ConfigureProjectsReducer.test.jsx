@@ -52,7 +52,7 @@ describe('ConfigureProjectsReducer', () => {
     const state = ConfigureProjectsReducer(undefined, action);
 
     expect(state.get('loading')).toBeFalsy();
-    expect(state.get('error')).toEqual(action.error);
+    expect(state.get('error')).toEqual(action.error.message);
   });
 
   it('LOAD_PROJECTS_PROGRESS should reset error', () => {
@@ -62,7 +62,7 @@ describe('ConfigureProjectsReducer', () => {
     };
     let state = ConfigureProjectsReducer(undefined, action);
 
-    expect(state.get('error')).toEqual(action.error);
+    expect(state.get('error')).toEqual(action.error.message);
 
     action = {
       type: 'LOAD_PROJECTS_PROGRESS',
