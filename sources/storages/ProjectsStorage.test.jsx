@@ -30,6 +30,49 @@ describe('ProjectsStorage', () => {
     expect(storage.getVisible().length).toEqual(1);
   });
 
+  describe('swapWithPreviousVisibleProject', () => {
+    it('should do nothing if prevProject does not exist', () => {
+      const storage = new ProjectsStorage();
+      storage.fillFromServerData(serverProjects);
+
+      const openSourceProjects = storage.getVisible()[1];
+      const rootProject = storage.getVisible()[0];
+      storage.swapWithPreviousVisibleProject(openSourceProjects, 0);
+
+      expect(storage.getVisible()[0].customSort).toBeFalsy();
+      expect(storage.getVisible()[0]).toEqual(rootProject);
+      expect(storage.getVisible()[1]).toEqual(openSourceProjects);
+    });
+
+    it('should swap projects if prevProject is exist', () => {
+      const storage = new ProjectsStorage();
+      storage.fillFromServerData(serverProjects);
+
+      const hibernateProject = storage.getVisible()[3];
+      const apacheAntProject = storage.getVisible()[2];
+      storage.swapWithPreviousVisibleProject(hibernateProject, 2);
+
+      expect(storage.getVisible()[1].customSort).toBeTruthy();
+      expect(storage.getVisible()[2]).toEqual(hibernateProject);
+      expect(storage.getVisible()[3]).toEqual(apacheAntProject);
+    });
+
+    it('should swap target project with prevProject with all children', () => {
+      const storage = new ProjectsStorage();
+      storage.fillFromServerData(serverProjects);
+
+      const implicitNullabilityProject = storage.getVisible()[5];
+      const hibernateProject = storage.getVisible()[3];
+      const hibernateOrmProject = storage.getVisible()[4];
+      storage.swapWithPreviousVisibleProject(implicitNullabilityProject, 4);
+
+      expect(storage.getVisible()[1].customSort).toBeTruthy();
+      expect(storage.getVisible()[3]).toEqual(implicitNullabilityProject);
+      expect(storage.getVisible()[4]).toEqual(hibernateProject);
+      expect(storage.getVisible()[5]).toEqual(hibernateOrmProject);
+    });
+  });
+
   it('recalculateVisibleSortKeys should update visible projects', () => {
     const storage = new ProjectsStorage();
     storage.visible = [{
