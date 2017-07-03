@@ -3,7 +3,7 @@ import { shallow } from 'enzyme';
 
 import FormButton, { modifiers, types } from './FormButton';
 
-function create({ text = '', modifier = modifiers.default, type = types.button, onClick = jest.fn() }) {
+function create({ text = '', modifier = modifiers.default, type = types.button, onClick }) {
   return shallow(
     <FormButton
       text={text}
@@ -26,7 +26,16 @@ describe('FormButton', () => {
     expect(wrapper.prop('type')).toEqual('submit');
   });
 
-  it('should call onClick', () => {
+  it('should no call event.preventDefault if property is not onClick defined', () => {
+    const wrapper = create({ });
+
+    const preventDefault = jest.fn();
+    wrapper.simulate('click', { preventDefault });
+
+    expect(preventDefault).not.toBeCalled();
+  });
+
+  it('should call onClick and event.preventDefault if property onClick is defined', () => {
     const onClick = jest.fn();
     const wrapper = create({ onClick });
 
