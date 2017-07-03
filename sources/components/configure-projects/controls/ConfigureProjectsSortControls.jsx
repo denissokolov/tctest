@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import ArrowButton, { directions as arrowButtonDiractions } from '../arrow-button/ArrowButton';
+import ArrowButton, { directions as arrowButtonDiractions } from '../../arrow-button/ArrowButton';
 
 function ConfigureProjectsSortControls(props) {
   const { isDisabled, onMoveUpClick, onMoveDownClick } = props;

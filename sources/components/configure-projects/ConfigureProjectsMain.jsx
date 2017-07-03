@@ -5,8 +5,8 @@ import { List } from 'immutable';
 
 import { getSelectedIds, getSelectedIdsWithChildren } from '../../utils/projectSelectUtils';
 import ProjectsSelect, { types as projectsSelectTypes } from './project-select/ProjectsSelect';
-import ConfigureProjectsSortControls from './ConfigureProjectsSortControls';
-import ConfigureProjectsVisibleControls from './ConfigureProjectsVisibleControls';
+import ConfigureProjectsSortControls from './controls/ConfigureProjectsSortControls';
+import ConfigureProjectsVisibleControls from './controls/ConfigureProjectsVisibleControls';
 import FilterProjects from './controls/FilterProjects';
 
 class ConfigureProjectsMain extends React.Component {

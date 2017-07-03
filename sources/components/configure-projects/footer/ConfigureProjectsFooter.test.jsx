@@ -13,7 +13,7 @@ function create({ customSort = false, onCancelClick = jest.fn() }) {
   );
 }
 
-describe('Projects', () => {
+describe('ConfigureProjectsFooter', () => {
   it('should has .configure-projects-footer class', () => {
     const wrapper = create({});
     expect(wrapper.find('.configure-projects-footer').length).toBe(1);
