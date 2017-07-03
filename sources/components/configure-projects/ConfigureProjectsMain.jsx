@@ -7,7 +7,7 @@ import { getSelectedIds, getSelectedIdsWithChildren } from '../../utils/projectS
 import ProjectsSelect, { types as projectsSelectTypes } from './project-select/ProjectsSelect';
 import ConfigureProjectsSortControls from './ConfigureProjectsSortControls';
 import ConfigureProjectsVisibleControls from './ConfigureProjectsVisibleControls';
-import FilterProjects from './FilterProjects';
+import FilterProjects from './controls/FilterProjects';
 
 class ConfigureProjectsMain extends React.Component {
   static propTypes = {
