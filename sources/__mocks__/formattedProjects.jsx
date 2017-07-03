@@ -3,12 +3,14 @@ export default [
     id: '_Root',
     name: '<Root project>',
     depth: 0,
+    filterTreeMatch: true,
   },
   {
     id: 'OpenSourceProjects',
     name: 'Open-source projects',
     depth: 1,
     parentProjectId: '_Root',
+    filterTreeMatch: true,
   },
   {
     id: 'ApacheAnt',
@@ -21,12 +23,14 @@ export default [
     name: 'Hibernate',
     depth: 2,
     parentProjectId: 'OpenSourceProjects',
+    filterTreeMatch: true,
   },
   {
     id: 'Hibernate_HibernateOrm',
     name: 'Hibernate Orm',
     depth: 3,
     parentProjectId: 'Hibernate',
+    filterMatch: true,
   },
   {
     id: 'cb_Root',

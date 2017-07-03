@@ -2,16 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
 
+import './projects-select-option.scss';
+
 function ProjectsSelectOption(props) {
   const { id, name, depth, disabled, parentCustomSort, filterMatch, browserIsIE } = props;
 
   const iePadding = browserIsIE && '\u00a0'.repeat(depth * 4);
 
   const classNames = cn(
-    'projects-select__item',
-    `projects-select__item_depth_${depth}`,
-    parentCustomSort && 'projects-select__item_custom-sort',
-    filterMatch && 'projects-select__item_filter-match',
+    'projects-select-option',
+    `projects-select-option_depth_${depth}`,
+    parentCustomSort && 'projects-select-option_custom-sort',
+    filterMatch && 'projects-select-option_filter-match',
   );
 
   return (
