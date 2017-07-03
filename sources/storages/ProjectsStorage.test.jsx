@@ -30,6 +30,136 @@ describe('ProjectsStorage', () => {
     expect(storage.getVisible().length).toEqual(1);
   });
 
+  it('recalculateVisibleSortKeys should update visible projects', () => {
+    const storage = new ProjectsStorage();
+    storage.visible = [{
+      id: '_Root',
+      name: '<Root project>',
+      sortKey: '000001',
+      customSort: true,
+    }, {
+      id: 'OpenSourceProjects',
+      name: 'Open-source projects',
+      sortKey: '000001/000003',
+      visibleParentId: '_Root',
+    }, {
+      id: 'cb_Root',
+      name: 'teamcity.codebetter.com',
+      sortKey: '000001/000004',
+      visibleParentId: '_Root',
+    }, {
+      id: 'Hibernate',
+      name: 'Hibernate',
+      sortKey: '000001/000004/123123',
+      visibleParentId: 'cb_Root',
+    }];
+
+    storage.projects.set(storage.visible[0].id, storage.visible[0]);
+    storage.projects.set(storage.visible[1].id, storage.visible[1]);
+    storage.projects.set(storage.visible[2].id, storage.visible[2]);
+    storage.projects.set(storage.visible[3].id, storage.visible[3]);
+
+    storage.recalculateVisibleSortKeys();
+
+    expect(storage.getVisible()).toEqual([{
+      id: '_Root',
+      name: '<Root project>',
+      sortKey: '000001',
+      customSort: true,
+      sorted: false,
+      visibleChildrenCount: 2,
+    }, {
+      id: 'OpenSourceProjects',
+      name: 'Open-source projects',
+      sortKey: '000001/000000',
+      sorted: false,
+      visibleChildrenCount: 0,
+      visibleParentId: '_Root',
+      parentCustomSort: true,
+    }, {
+      id: 'cb_Root',
+      name: 'teamcity.codebetter.com',
+      sortKey: '000001/000001',
+      sorted: false,
+      visibleChildrenCount: 1,
+      visibleParentId: '_Root',
+      parentCustomSort: true,
+    }, {
+      id: 'Hibernate',
+      name: 'Hibernate',
+      sorted: false,
+      visibleChildrenCount: 0,
+      sortKey: '000001/000001/123123',
+      visibleParentId: 'cb_Root',
+    }]);
+  });
+
+  it('refreshHiddenSort', () => {
+    const storage = new ProjectsStorage();
+    storage.hidden = [{
+      id: 'cb_Root',
+      name: 'teamcity.codebetter.com',
+      sortKey: '000000/000001/000001',
+    }, {
+      id: 'OpenSourceProjects',
+      name: 'Open-source projects',
+      sortKey: '000000/000001/000000',
+    }, {
+      id: 'Hibernate_HibernateOrm',
+      name: 'Open-source projects',
+      sortKey: '000000/000001/000000/123123',
+    }];
+
+    storage.refreshHiddenSort();
+
+    expect(storage.getHidden()).toEqual([{
+      id: 'OpenSourceProjects',
+      name: 'Open-source projects',
+      sortKey: '000000/000001/000000',
+    }, {
+      id: 'Hibernate_HibernateOrm',
+      name: 'Open-source projects',
+      sortKey: '000000/000001/000000/123123',
+    }, {
+      id: 'cb_Root',
+      name: 'teamcity.codebetter.com',
+      sortKey: '000000/000001/000001',
+    }]);
+  });
+
+  it('refreshVisibleSort', () => {
+    const storage = new ProjectsStorage();
+    storage.visible = [{
+      id: 'cb_Root',
+      name: 'teamcity.codebetter.com',
+      sortKey: '000000/000001/000001',
+    }, {
+      id: 'OpenSourceProjects',
+      name: 'Open-source projects',
+      sortKey: '000000/000001/000000',
+    }, {
+      id: 'Hibernate_HibernateOrm',
+      name: 'Open-source projects',
+      sortKey: '000000/000001/000000/123123',
+    }];
+
+    storage.refreshVisibleSort();
+
+    expect(storage.getVisible()).toEqual([{
+      id: 'OpenSourceProjects',
+      name: 'Open-source projects',
+      sortKey: '000000/000001/000000',
+    }, {
+      id: 'Hibernate_HibernateOrm',
+      name: 'Open-source projects',
+      sortKey: '000000/000001/000000/123123',
+    }, {
+      id: 'cb_Root',
+      name: 'teamcity.codebetter.com',
+      sortKey: '000000/000001/000001',
+    }]);
+  });
+
   describe('filterHidden', () => {
     const checkProjectFilterParams = (storage, filterMatchNames, filterTreeMatchNames) => {
       storage.getHidden().forEach((project) => {
@@ -46,6 +176,23 @@ describe('ProjectsStorage', () => {
         }
       });
     };
+
+    it('should clear filter if value is empty', () => {
+      const storage = new ProjectsStorage();
+      storage.fillFromServerData(serverProjects);
+      storage.hideItems(serverProjects.map(project => project.id));
+
+      storage.filterHidden('nu');
+
+      storage.filterHidden(' ');
+
+      const hidden = storage.getHidden();
+      const filterMatches = hidden.filter(project => project.filterMatch);
+      const filterTreeMatches = hidden.filter(project => project.filterTreeMatch);
+
+      expect(filterMatches.length).toBe(0);
+      expect(filterTreeMatches.length).toBe(0);
+    });
 
     it('should return matches for one word', () => {
       const storage = new ProjectsStorage();
