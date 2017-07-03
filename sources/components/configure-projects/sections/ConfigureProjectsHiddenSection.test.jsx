@@ -96,7 +96,7 @@ describe('ConfigureProjectsHiddenSection', () => {
       expect(select.prop('formVisible')).toBeFalsy();
     });
 
-    it('should property anyHiddenSelected in state on ProjectsSelect change', () => {
+    it('should set property anyHiddenSelected to state on ProjectsSelect change', () => {
       const wrapper = create({
         hidden: formattedProjects,
       });
@@ -115,15 +115,14 @@ describe('ConfigureProjectsHiddenSection', () => {
   describe('show button', () => {
     it('should has .configure-projects__control with modifiers classes', () => {
       const wrapper = create({});
-      expect(wrapper.find('.configure-projects__control').length).toBe(1);
-      expect(wrapper.find('.configure-projects__control_bottom').length).toBe(1);
-      expect(wrapper.find('.configure-projects__control_center').length).toBe(1);
+      const selector = '.configure-projects__control.configure-projects__control_bottom.configure-projects__control_center';
+      expect(wrapper.find(selector).length).toBe(1);
     });
 
     it('should render ArrowButton', () => {
       const wrapper = create({});
-      const hideButton = wrapper.find(ArrowButton);
-      expect(hideButton.prop('direction')).toEqual(directions.left);
+      const showButton = wrapper.find(ArrowButton);
+      expect(showButton.prop('direction')).toEqual(directions.left);
     });
 
     it('ArrowButton should be enabled on select change', () => {
@@ -133,13 +132,13 @@ describe('ConfigureProjectsHiddenSection', () => {
 
       const select = wrapper.find(ProjectsSelect);
 
-      let hideButton = wrapper.find(ArrowButton);
-      expect(hideButton.prop('disabled')).toBeTruthy();
+      let showButton = wrapper.find(ArrowButton);
+      expect(showButton.prop('disabled')).toBeTruthy();
 
       select.simulate('change', { target: { options: selectedOptions } });
 
-      hideButton = wrapper.find(ArrowButton);
-      expect(hideButton.prop('disabled')).toBeFalsy();
+      showButton = wrapper.find(ArrowButton);
+      expect(showButton.prop('disabled')).toBeFalsy();
     });
 
     it('should call property showProjects on button click', () => {
@@ -152,8 +151,8 @@ describe('ConfigureProjectsHiddenSection', () => {
       const select = wrapper.find(ProjectsSelect);
       select.simulate('change', { target: { options: selectedOptions } });
 
-      const hideButton = wrapper.find(ArrowButton);
-      hideButton.simulate('click');
+      const showButton = wrapper.find(ArrowButton);
+      showButton.simulate('click');
 
       expect(showProjects).toBeCalled();
       expect(showProjects.mock.calls[0][0]).toEqual(['ApacheAnt', 'Hibernate', 'Hibernate_HibernateOrm']);
