@@ -83,4 +83,20 @@ describe('ProjectsStorage', () => {
       checkProjectFilterParams(storage, filterMatchNames, filterTreeMatchNames);
     });
   });
+
+  describe('clearFilter', () => {
+    const storage = new ProjectsStorage();
+    storage.fillFromServerData(serverProjects);
+    storage.hideItems(serverProjects.map(project => project.id));
+    storage.filterHidden('nu');
+
+    storage.clearFilter();
+
+    const hidden = storage.getHidden();
+    const filterMatches = hidden.filter(project => project.filterMatch);
+    const filterTreeMatches = hidden.filter(project => project.filterTreeMatch);
+
+    expect(filterMatches.length).toBe(0);
+    expect(filterTreeMatches.length).toBe(0);
+  });
 });

@@ -1,9 +1,11 @@
 /* eslint-disable no-param-reassign */
 
+import { generateKey, regenerateKeyFromParent } from '../utils/keyUtils';
+
 import {
-  generateKey,
-  regenerateKeyFromParent,
-} from '../utils/keyUtils';
+  getProjectPropsFromParent, getProjectPropsFromServerData, getProjectOriginalProps,
+  getProjectSavedProps, getUpdatedProjectProps,
+} from '../utils/projectFormatter';
 
 class ProjectsStorage {
   constructor() {
@@ -17,31 +19,15 @@ class ProjectsStorage {
     this.visible = [];
     this.hidden = [];
 
-    items.forEach((projectData) => {
+    items.forEach((serverData) => {
       const project = {};
-      project.id = projectData.id;
-      project.name = projectData.name;
-      project.visible = true;
-      project.visibleChildrenCount = 0;
-      project.isAnyChildHidden = false;
-      project.customSort = false;
-      project.parentCustomSort = false;
 
-      project.filterMatch = false;
-      project.filterTreeMatch = false;
+      Object.assign(project, getProjectPropsFromServerData(serverData));
 
-      let sortNumber;
-      const parentData = projectData.parentProject;
+      const parentData = serverData.parentProject;
       if (parentData) {
         const parent = this.projects.get(parentData.id);
-        project.depth = parent.depth + 1;
-        project.parentId = parent.id;
-        project.visibleParentId = project.parentId;
-
-        sortNumber = parent.visibleChildrenCount;
-        project.sortNumber = sortNumber;
-        project.sortKey = generateKey(sortNumber, parent.sortKey);
-
+        Object.assign(project, getProjectPropsFromParent(parent));
         parent.visibleChildrenCount += 1;
       } else {
         project.depth = 0;
@@ -49,41 +35,17 @@ class ProjectsStorage {
         this.rootId = project.id;
       }
 
-      project.original = {
-        name: project.name,
-        depth: project.depth,
-        sortKey: project.sortKey,
-        sortNumber: project.sortNumber,
-      };
+      project.original = getProjectOriginalProps(project);
+      project.saved = getProjectSavedProps(project);
 
-      project.saved = {
-        visible: true,
-        name: project.name,
-        customSort: false,
-        parentCustomSort: false,
-        sortKey: project.sortKey,
-        depth: project.depth,
-        visibleChildrenCount: project.depth,
-        visibleParentId: project.visibleParentId,
-      };
-
-      this.projects.set(projectData.id, project);
+      this.projects.set(serverData.id, project);
       this.visible.push(project);
     });
   }
 
   saveState() {
     this.projects.forEach((project) => {
-      project.saved = {
-        visible: project.visible,
-        name: project.name,
-        customSort: project.customSort,
-        parentCustomSort: project.parentCustomSort,
-        sortKey: project.sortKey,
-        depth: project.depth,
-        visibleChildrenCount: project.visibleChildrenCount,
-        visibleParentId: project.visibleParentId,
-      };
+      project.saved = getProjectSavedProps(project);
 
       project.filterMatch = false;
       project.filterTreeMatch = false;
@@ -147,23 +109,7 @@ class ProjectsStorage {
         needMove = true;
       }
 
-      if (parent) {
-        if (parent.visible) {
-          project.name = project.original.name;
-          project.depth = parent.depth + 1;
-          project.visibleParentId = parent.id;
-          project.parentCustomSort = parent.customSort;
-
-          if (!parent.customSort && project.visible) {
-            project.sortKey = generateKey(project.original.sortNumber, parent.sortKey);
-          }
-        } else {
-          project.name = `${parent.name} :: ${project.original.name}`;
-          project.depth = parent.depth;
-          project.visibleParentId = parent.visibleParentId;
-          project.parentCustomSort = parent.parentCustomSort;
-        }
-      }
+      Object.assign(project, getUpdatedProjectProps(project, parent));
 
       if (needMove && project.parentCustomSort && project.visible) {
         const visibleParent = this.projects.get(project.visibleParentId);
@@ -211,19 +157,6 @@ class ProjectsStorage {
   sortDownVisible(ids) {
     let needRefreshSort = false;
 
-    const getNextSameLevelProject = (depth, nextIndex) => {
-      const nextProject = this.visible[nextIndex];
-      if (!nextProject || (nextProject.depth === depth && !nextProject.sorted)) {
-        return { nextProject, nextIndex };
-      }
-
-      if (nextProject.depth > depth) {
-        return getNextSameLevelProject(depth, nextIndex + 1);
-      }
-
-      return { nextProject: null, nextIndex };
-    };
-
     for (let i = this.visible.length - 1; i > -1; i -= 1) {
       if (!ids.length) {
         break;
@@ -235,7 +168,10 @@ class ProjectsStorage {
       if (ids[ids.length - 1] === project.id) {
         ids.pop();
 
-        const { nextProject, nextIndex } = getNextSameLevelProject(project.depth, i + 1);
+        const {
+          nextProject, nextIndex,
+        } = this.getNextVisibleSameLevelProject(project.depth, i + 1);
+
         if (nextProject) {
           this.swapWithPreviousVisibleProject(nextProject, nextIndex - 1);
 
@@ -255,26 +191,6 @@ class ProjectsStorage {
 
     return needRefreshSort;
   }
-
-  swapWithPreviousVisibleProject = (project, prevIndex) => {
-    const prevProject = prevIndex > -1 ? this.visible[prevIndex] : null;
-    if (!prevProject || !project || prevProject.depth < project.depth
-      || (prevProject.sorted && prevProject.depth === project.depth)) {
-      return;
-    }
-
-    this.visible[prevIndex + 1] = prevProject;
-    this.visible[prevIndex] = project;
-
-    const parent = this.projects.get(project.visibleParentId);
-    if (parent) {
-      parent.customSort = true;
-    }
-
-    if (prevProject.depth > project.depth) {
-      this.swapWithPreviousVisibleProject(project, prevIndex - 1);
-    }
-  };
 
   sortUpVisible(ids) {
     let needRefreshSort = false;
@@ -306,6 +222,39 @@ class ProjectsStorage {
 
     return needRefreshSort;
   }
+
+  getNextVisibleSameLevelProject = (depth, nextIndex) => {
+    const nextProject = this.visible[nextIndex];
+    if (!nextProject || (nextProject.depth === depth && !nextProject.sorted)) {
+      return { nextProject, nextIndex };
+    }
+
+    if (nextProject.depth > depth) {
+      return this.getNextVisibleSameLevelProject(depth, nextIndex + 1);
+    }
+
+    return { nextProject: null, nextIndex };
+  };
+
+  swapWithPreviousVisibleProject = (project, prevIndex) => {
+    const prevProject = prevIndex > -1 ? this.visible[prevIndex] : null;
+    if (!prevProject || !project || prevProject.depth < project.depth
+      || (prevProject.sorted && prevProject.depth === project.depth)) {
+      return;
+    }
+
+    this.visible[prevIndex + 1] = prevProject;
+    this.visible[prevIndex] = project;
+
+    const parent = this.projects.get(project.visibleParentId);
+    if (parent) {
+      parent.customSort = true;
+    }
+
+    if (prevProject.depth > project.depth) {
+      this.swapWithPreviousVisibleProject(project, prevIndex - 1);
+    }
+  };
 
   recalculateVisibleSortKeys() {
     this.visible.forEach((project) => {
@@ -349,29 +298,6 @@ class ProjectsStorage {
       withParentMatches: 0,
     };
 
-    const setAllParentsFilterMatch = (parentId) => {
-      if (parentId) {
-        const parent = this.projects.get(parentId);
-        if (parent) {
-          let scanParents = false;
-
-          if (matches[parent.id].wordMatches) {
-            if (!parent.filterMatch) {
-              parent.filterMatch = true;
-              scanParents = true;
-            }
-          } else if (!parent.filterTreeMatch) {
-            parent.filterTreeMatch = true;
-            scanParents = true;
-          }
-
-          if (scanParents) {
-            setAllParentsFilterMatch(parent.parentId);
-          }
-        }
-      }
-    };
-
     this.hidden.forEach((project) => {
       project.filterMatch = false;
       project.filterTreeMatch = false;
@@ -397,7 +323,7 @@ class ProjectsStorage {
       if (matches[project.id].withParentMatches === words.length) {
         if (matches[project.id].wordMatches) {
           project.filterMatch = true;
-          setAllParentsFilterMatch(project.parentId);
+          this.setAllParentsFilterMatch(matches, project.parentId);
         } else if (matches[project.id].withParentMatches) {
           project.filterTreeMatch = true;
         }
@@ -407,6 +333,29 @@ class ProjectsStorage {
       }
     });
   }
+
+  setAllParentsFilterMatch = (matches, parentId) => {
+    if (parentId) {
+      const parent = this.projects.get(parentId);
+      if (parent) {
+        let scanParents = false;
+
+        if (matches[parent.id].wordMatches) {
+          if (!parent.filterMatch) {
+            parent.filterMatch = true;
+            scanParents = true;
+          }
+        } else if (!parent.filterTreeMatch) {
+          parent.filterTreeMatch = true;
+          scanParents = true;
+        }
+
+        if (scanParents) {
+          this.setAllParentsFilterMatch(matches, parent.parentId);
+        }
+      }
+    }
+  };
 
   clearFilter() {
     this.hidden.forEach((project) => {
