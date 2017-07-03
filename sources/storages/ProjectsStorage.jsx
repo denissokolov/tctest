@@ -286,7 +286,7 @@ class ProjectsStorage {
 
   filterHidden(value) {
     const trimmedValue = value.trim();
-    const words = trimmedValue ? value.split(' ') : [];
+    const words = trimmedValue ? trimmedValue.split(' ') : [];
 
     if (!words.length) {
       this.clearFilter();
