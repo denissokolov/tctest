@@ -7,38 +7,51 @@
 
   height: 100%;
 
-  &__main {
+  &__sections {
+    position: relative;
     height: calc(100% - #{$form-buttons-height});
     padding-right: $padding;
   }
 
-  &__controls {
+  &__section {
     float: left;
-    width: $buttons-width;
+    width: 50%;
     height: 100%;
-    padding-top: $title-height;
-    text-align: center;
+    padding-left: $buttons-width;
   }
 
   &__control {
-    display: inline-block;
-    margin: ($padding / 2) 0;
+    position: absolute;
+
+    &_top {
+      bottom: 50%;
+      margin-bottom: $title-height / 2 - $padding / 2;
+    }
+
+    &_bottom {
+      top: 50%;
+      margin-top: $title-height / 2 - $padding / 2;
+    }
+
+    &_center {
+      left: 50%;
+      margin-left: $padding / 2;
+    }
+
+    &_left {
+      left: 0;
+      margin-left: $padding;
+    }
   }
 
-  &__items-wrapper {
-    float: left;
-    width: calc((100% - #{2 * $buttons-width}) / 2);
-    height: 100%;
-  }
-
-  &__items-title {
+  &__section-title {
     height: $title-height;
     padding-top: $padding;
     font-size: 12px;
     color: #737373;
   }
 
-  &__items {
+  &__select {
     height: calc(100% - #{$title-height + $padding});
     overflow: hidden;
     border: 1px solid #dedede;

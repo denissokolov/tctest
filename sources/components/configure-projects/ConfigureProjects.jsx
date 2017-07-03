@@ -5,7 +5,8 @@ import { Map } from 'immutable';
 import * as ConfigureProjectsActions from '../../actions/ConfigureProjectsActions';
 
 import ConfigureProjectsFooter from './footer/ConfigureProjectsFooter';
-import ConfigureProjectsMain from './ConfigureProjectsMain';
+import ConfigureProjectsVisibleSection from './sections/ConfigureProjectsVisibleSection';
+import ConfigureProjectsHiddenSection from './sections/ConfigureProjectsHiddenSection';
 
 import './configure-projects.scss';
 import '../centered-block/centered-block.scss';
@@ -30,16 +31,24 @@ class ConfigureProjects extends React.Component {
 
   render() {
     const { configureProjects, formVisible, dispatch } = this.props;
+    const boundActionCreators = bindActionCreators(ConfigureProjectsActions, dispatch);
 
     return (
       <form className="configure-projects" onSubmit={this.onSubmit}>
-        <ConfigureProjectsMain
-          visible={configureProjects.get('visible')}
-          hidden={configureProjects.get('hidden')}
-          hiddenFilterValue={configureProjects.get('hiddenFilterValue')}
-          formVisible={formVisible}
-          {...bindActionCreators(ConfigureProjectsActions, dispatch)}
-        />
+        <div className="configure-projects__sections">
+          <ConfigureProjectsVisibleSection
+            visible={configureProjects.get('visible')}
+            formVisible={formVisible}
+            {...boundActionCreators}
+          />
+
+          <ConfigureProjectsHiddenSection
+            hidden={configureProjects.get('hidden')}
+            hiddenFilterValue={configureProjects.get('hiddenFilterValue')}
+            formVisible={formVisible}
+            {...boundActionCreators}
+          />
+        </div>
 
         <ConfigureProjectsFooter
           onCancelClick={this.onCancelClick}
