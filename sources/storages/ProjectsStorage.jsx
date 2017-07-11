@@ -59,7 +59,47 @@ class ProjectsStorage {
   }
 
   showItems(ids) {
+    this.projects.forEach((project) => {
+      if (project.parentId) {
+        const parent = this.projects.get(project.parentId);
+        if (parent.visible) {
+          project.name = project.original.name;
+          project.depth = parent.depth + 1;
+          project.visibleParentId = parent.id;
+          project.parentCustomSort = parent.customSort;
+        } else {
+          project.name = `${parent.name} :: ${project.original.name}`;
+          project.depth = parent.depth;
+          project.visibleParentId = parent.visibleParentId;
+          project.parentCustomSort = parent.parentCustomSort;
+        }
+      }
 
+      if (!project.visible && ids.length) {
+        const idsIndex = ids.indexOf(project.id);
+        if (idsIndex !== -1) {
+          ids.splice(idsIndex, 1);
+          project.visible = true;
+        }
+      }
+
+      if (project.visible) {
+        if (project.visibleParentId) {
+          const visibleParent = this.projects.get(project.visibleParentId);
+          const lastParentChildIndex = visibleParent.visibleChildrenIds.length;
+          visibleParent.visibleChildrenIds.splice(lastParentChildIndex, 0, project.id);
+        }
+
+        if (!project.customSort) {
+          project.visibleChildrenIds = [];
+        }
+      }
+
+      project.isAnyChildHidden = false;
+    });
+
+    this.refreshVisible();
+    this.refreshHidden();
   }
 
   hideItems(ids) {
@@ -75,6 +115,7 @@ class ProjectsStorage {
 
           if (project.visibleParentId) {
             project.visible = false;
+            project.visibleChildrenIds = [];
 
             if (parentHideInfo) {
               hideInfo[project.id] = {
