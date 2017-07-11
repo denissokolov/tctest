@@ -9,6 +9,8 @@ class ProjectsStorage {
 
   fillFromServerData(items) {
     this.projects = new Map();
+    this.reversedProjectIds = [];
+
     this.visible = [];
     this.hidden = [];
 
@@ -19,6 +21,7 @@ class ProjectsStorage {
       project.name = serverData.name;
       project.visible = true;
       project.visibleChildrenIds = [];
+      project.isAnyChildHidden = false;
 
       project.customSort = false;
       project.parentCustomSort = false;
@@ -41,7 +44,8 @@ class ProjectsStorage {
         depth: project.depth,
       };
 
-      this.projects.set(serverData.id, project);
+      this.projects.set(project.id, project);
+      this.reversedProjectIds.unshift(project.id);
       this.pushProjectToVisible(project);
     });
   }
@@ -111,9 +115,12 @@ class ProjectsStorage {
           }
         }
       }
+
+      project.isAnyChildHidden = false;
     });
 
     this.refreshVisible();
+    this.refreshHidden();
   }
 
   sortDownVisible(ids) {
@@ -155,6 +162,30 @@ class ProjectsStorage {
       depth: project.depth,
       parentCustomSort: project.parentCustomSort,
       parentId: project.visibleParentId,
+    });
+  }
+
+  refreshHidden() {
+    this.hidden = [];
+
+    this.reversedProjectIds.forEach((id) => {
+      const project = this.projects.get(id);
+      if (project.parentId && (!project.visible || project.isAnyChildHidden)) {
+        const parent = this.projects.get(project.parentId);
+        parent.isAnyChildHidden = true;
+
+        this.unshiftProjectHidden(project);
+      }
+    });
+  }
+
+  unshiftProjectHidden(project) {
+    this.hidden.unshift({
+      id: project.id,
+      name: project.original.name,
+      depth: project.original.depth,
+      parentId: project.parentId,
+      noInteractive: project.visible,
     });
   }
 

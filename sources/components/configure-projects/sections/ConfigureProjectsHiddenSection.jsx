@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { getSelectedIdsWithChildren } from '../../../utils/projectSelectUtils';
-import ProjectsSelect, { types as projectsSelectTypes } from '../project-select/ProjectsSelect';
+import ProjectsSelect from '../project-select/ProjectsSelect';
 import ArrowButton, { directions as arrowButtonDirections } from '../../arrow-button/ArrowButton';
 import FilterProjects from '../filter/FilterProjects';
 
@@ -68,9 +68,8 @@ class ConfigureProjectsHiddenSection extends React.Component {
           <ProjectsSelect
             items={hidden}
             onChange={this.onHiddenSelectChange}
-            type={projectsSelectTypes.hidden}
-            filterActive={Boolean(hiddenFilterValue)}
             formVisible={formVisible}
+            filterActive={Boolean(hiddenFilterValue)}
           />
         </div>
       </div>

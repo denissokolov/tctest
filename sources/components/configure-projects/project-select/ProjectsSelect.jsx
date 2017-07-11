@@ -5,11 +5,6 @@ import { isIE } from '../../../utils/browserDetectUtils';
 import ProjectsSelectOption from './ProjectsSelectOption';
 import './projects-select.scss';
 
-export const types = {
-  visible: 'visible',
-  hidden: 'hidden',
-};
-
 class ProjectsSelect extends React.Component {
   componentWillMount() {
     this.browserIsIE = isIE();
@@ -24,7 +19,7 @@ class ProjectsSelect extends React.Component {
   }
 
   render() {
-    const { items, onChange, type, filterActive } = this.props;
+    const { items, onChange, filterActive } = this.props;
 
     return (
       <select
@@ -45,7 +40,7 @@ class ProjectsSelect extends React.Component {
               name={item.name}
               depth={item.depth}
               parentCustomSort={item.parentCustomSort}
-              disabled={type === types.hidden && item.visible}
+              disabled={item.noInteractive}
               filterMatch={filterActive && item.filterMatch}
               browserIsIE={this.browserIsIE}
             />
@@ -57,7 +52,6 @@ class ProjectsSelect extends React.Component {
 }
 
 ProjectsSelect.propTypes = {
-  type: PropTypes.oneOf([types.visible, types.hidden]).isRequired,
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
   onChange: PropTypes.func.isRequired,
   formVisible: PropTypes.bool.isRequired,

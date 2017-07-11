@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { getSelectedIds, getSelectedIdsWithChildren } from '../../../utils/projectSelectUtils';
-import ProjectsSelect, { types as projectsSelectTypes } from '../project-select/ProjectsSelect';
+import ProjectsSelect from '../project-select/ProjectsSelect';
 import ArrowButton, { directions as arrowButtonDirections } from '../../arrow-button/ArrowButton';
 
 class ConfigureProjectsVisibleSection extends React.Component {
@@ -76,7 +76,6 @@ class ConfigureProjectsVisibleSection extends React.Component {
           <ProjectsSelect
             items={visible}
             onChange={this.onVisibleSelectChange}
-            type={projectsSelectTypes.visible}
             formVisible={formVisible}
           />
         </div>
