@@ -1,5 +1,3 @@
-import { fromJS } from 'immutable';
-
 import { getSelectedIdsWithChildren, getSelectedIds } from './projectSelectUtils';
 
 describe('projectSelectUtils', () => {
@@ -68,7 +66,7 @@ describe('projectSelectUtils', () => {
         value: 7,
       }];
 
-      const projects = fromJS([{
+      const projects = [{
         id: 1,
       }, {
         id: 2,
@@ -86,9 +84,9 @@ describe('projectSelectUtils', () => {
       }, {
         id: 7,
         parentId: 5,
-      }]);
+      }];
 
-      expect(getSelectedIdsWithChildren(options, projects, 'parentId')).toEqual([1, 2, 3, 5, 6]);
+      expect(getSelectedIdsWithChildren(options, projects)).toEqual([1, 2, 3, 5, 6]);
     });
   });
 });

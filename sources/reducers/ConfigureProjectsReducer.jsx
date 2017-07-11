@@ -1,6 +1,6 @@
-import { fromJS } from 'immutable';
+import { Map } from 'immutable';
 
-const defaultState = fromJS({
+const defaultState = Map({
   loading: false,
   error: null,
   visible: [],
@@ -19,8 +19,8 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
     case 'LOAD_PROJECTS_SUCCESS': {
       return state
         .set('loading', false)
-        .set('visible', fromJS(action.visible))
-        .set('hidden', fromJS(action.hidden));
+        .set('visible', action.visible)
+        .set('hidden', action.hidden);
     }
 
     case 'LOAD_PROJECTS_FAIL':
@@ -31,8 +31,8 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
     case 'SHOW_PROJECTS':
     case 'HIDE_PROJECTS':
       return state
-        .set('visible', fromJS(action.visible))
-        .set('hidden', fromJS(action.hidden));
+        .set('visible', action.visible)
+        .set('hidden', action.hidden);
 
     case 'MOVE_PROJECTS_UP':
     case 'MOVE_PROJECTS_DOWN':
@@ -41,12 +41,12 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
       }
 
       return state
-        .set('visible', fromJS(action.items))
+        .set('visible', action.items)
         .set('customSort', true);
 
     case 'CHANGE_HIDDEN_PROJECTS_FILTER':
       return state
-        .set('hidden', fromJS(action.items))
+        .set('hidden', action.items)
         .set('hiddenFilterValue', action.value);
 
     case 'SAVE_PROJECTS_CONFIGURATION':
@@ -54,8 +54,8 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
 
     case 'REFRESH_PROJECTS_CONFIGURATION':
       return state
-        .set('visible', fromJS(action.visible))
-        .set('hidden', fromJS(action.hidden))
+        .set('visible', action.visible)
+        .set('hidden', action.hidden)
         .set('hiddenFilterValue', '')
         .set('customSort', false);
 

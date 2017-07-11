@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List } from 'immutable';
 
 import { isIE } from '../../../utils/browserDetectUtils';
 import ProjectsSelectOption from './ProjectsSelectOption';
@@ -34,20 +33,20 @@ class ProjectsSelect extends React.Component {
         multiple
         ref={(el) => { this.selectEl = el; }}
       >
-        {items.toArray().map((item) => {
-          if (filterActive && !item.get('filterTreeMatch') && !item.get('filterMatch')) {
+        {items.map((item) => {
+          if (filterActive && !item.filterTreeMatch && !item.filterMatch) {
             return null;
           }
 
           return (
             <ProjectsSelectOption
-              key={item.get('id')}
-              id={item.get('id')}
-              name={type === types.hidden ? item.get('original').get('name') : item.get('name')}
-              depth={type === types.hidden ? item.get('original').get('depth') : item.get('depth')}
-              parentCustomSort={type === types.visible && item.get('parentCustomSort')}
-              disabled={type === types.hidden && item.get('visible')}
-              filterMatch={filterActive && item.get('filterMatch')}
+              key={item.id}
+              id={item.id}
+              name={item.name}
+              depth={item.depth}
+              parentCustomSort={item.parentCustomSort}
+              disabled={type === types.hidden && item.visible}
+              filterMatch={filterActive && item.filterMatch}
               browserIsIE={this.browserIsIE}
             />
           );
@@ -59,7 +58,7 @@ class ProjectsSelect extends React.Component {
 
 ProjectsSelect.propTypes = {
   type: PropTypes.oneOf([types.visible, types.hidden]).isRequired,
-  items: PropTypes.instanceOf(List).isRequired,
+  items: PropTypes.arrayOf(PropTypes.object).isRequired,
   onChange: PropTypes.func.isRequired,
   formVisible: PropTypes.bool.isRequired,
   filterActive: PropTypes.bool,

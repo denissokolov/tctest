@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List } from 'immutable';
 
 import { getSelectedIdsWithChildren } from '../../../utils/projectSelectUtils';
 import ProjectsSelect, { types as projectsSelectTypes } from '../project-select/ProjectsSelect';
@@ -9,7 +8,7 @@ import FilterProjects from '../filter/FilterProjects';
 
 class ConfigureProjectsHiddenSection extends React.Component {
   static propTypes = {
-    hidden: PropTypes.instanceOf(List).isRequired,
+    hidden: PropTypes.arrayOf(PropTypes.object).isRequired,
     hiddenFilterValue: PropTypes.string.isRequired,
     formVisible: PropTypes.bool.isRequired,
     showProjects: PropTypes.func.isRequired,
@@ -23,7 +22,7 @@ class ConfigureProjectsHiddenSection extends React.Component {
   onShowClick = () => {
     const { showProjects, hidden } = this.props;
     this.setState({ anyHiddenSelected: false });
-    const selectedIds = getSelectedIdsWithChildren(this.hiddenOptions, hidden, 'parentId');
+    const selectedIds = getSelectedIdsWithChildren(this.hiddenOptions, hidden);
     showProjects(selectedIds);
   };
 

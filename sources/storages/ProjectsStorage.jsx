@@ -42,7 +42,7 @@ class ProjectsStorage {
       };
 
       this.projects.set(serverData.id, project);
-      this.visible.push(project);
+      this.pushProjectToVisible(project);
     });
   }
 
@@ -134,19 +134,29 @@ class ProjectsStorage {
 
   refreshVisible() {
     const root = this.projects.get(this.rootId);
-    this.visible = [root];
-
-    this.addVisibleChildrenProjects(root.visibleChildrenIds);
+    this.visible = [];
+    this.pushProjectToVisible(root);
+    this.pushChildrenProjectsToVisible(root.visibleChildrenIds);
   }
 
-  addVisibleChildrenProjects(projectsIds) {
+  pushChildrenProjectsToVisible(projectsIds) {
     projectsIds.forEach((projectId) => {
       const project = this.projects.get(projectId);
-      this.visible.push(project);
+      this.pushProjectToVisible(project);
 
       if (project.visibleChildrenIds.length) {
-        this.addVisibleChildrenProjects(project.visibleChildrenIds);
+        this.pushChildrenProjectsToVisible(project.visibleChildrenIds);
       }
+    });
+  }
+
+  pushProjectToVisible(project) {
+    this.visible.push({
+      id: project.id,
+      name: project.name,
+      depth: project.depth,
+      parentCustomSort: project.parentCustomSort,
+      parentId: project.visibleParentId,
     });
   }
 

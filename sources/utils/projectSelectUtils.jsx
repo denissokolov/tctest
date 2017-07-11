@@ -22,31 +22,32 @@ function setSelectedInfoFromOptions(selectedInfo, options) {
   });
 }
 
-function setIsAnyChildSelected(selectedInfo, items, parentProp) {
-  items.reverse().forEach((item) => {
-    const id = item.get('id');
+function setIsAnyChildSelected(selectedInfo, items) {
+  let item;
+  for (let i = items.length - 1; i > -1; i -= 1) {
+    item = items[i];
 
-    const info = selectedInfo[id];
+    const info = selectedInfo[item.id];
 
     if (info && (info.selected || info.isAnyChildSelected)) {
-      setItemSelectedInfo(selectedInfo, { id: item.get(parentProp), isAnyChildSelected: true });
+      setItemSelectedInfo(selectedInfo, { id: item.parentId, isAnyChildSelected: true });
     }
-  });
+  }
 }
 
-function getSelectedIdsFromSelectedInfo(selectedInfo, items, parentProp) {
+function getSelectedIdsFromSelectedInfo(selectedInfo, items) {
   const selectedIds = [];
 
   items.forEach((item) => {
-    const id = item.get('id');
+    const id = item.id;
 
     const info = selectedInfo[id];
     if (info && info.selected) {
       selectedIds.push(id);
     } else {
-      const parentInfo = selectedInfo[item.get(parentProp)];
+      const parentInfo = selectedInfo[item.parentId];
       if (parentInfo && parentInfo.selected && !parentInfo.isAnyChildSelected) {
-        selectedIds.push(item.get('id'));
+        selectedIds.push(item.id);
         setItemSelectedInfo(selectedInfo, { id, selected: true });
       }
     }
@@ -55,12 +56,12 @@ function getSelectedIdsFromSelectedInfo(selectedInfo, items, parentProp) {
   return selectedIds;
 }
 
-export function getSelectedIdsWithChildren(options, items, parentProp) {
+export function getSelectedIdsWithChildren(options, items) {
   const selectedInfo = {};
 
   setSelectedInfoFromOptions(selectedInfo, options);
-  setIsAnyChildSelected(selectedInfo, items, parentProp);
-  return getSelectedIdsFromSelectedInfo(selectedInfo, items, parentProp);
+  setIsAnyChildSelected(selectedInfo, items);
+  return getSelectedIdsFromSelectedInfo(selectedInfo, items);
 }
 
 export function getSelectedIds(options) {

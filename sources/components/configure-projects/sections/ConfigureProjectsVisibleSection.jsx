@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { List } from 'immutable';
 
 import { getSelectedIds, getSelectedIdsWithChildren } from '../../../utils/projectSelectUtils';
 import ProjectsSelect, { types as projectsSelectTypes } from '../project-select/ProjectsSelect';
@@ -8,7 +7,7 @@ import ArrowButton, { directions as arrowButtonDirections } from '../../arrow-bu
 
 class ConfigureProjectsVisibleSection extends React.Component {
   static propTypes = {
-    visible: PropTypes.instanceOf(List).isRequired,
+    visible: PropTypes.arrayOf(PropTypes.object).isRequired,
     formVisible: PropTypes.bool.isRequired,
     hideProjects: PropTypes.func.isRequired,
     moveProjectsUp: PropTypes.func.isRequired,
@@ -22,7 +21,7 @@ class ConfigureProjectsVisibleSection extends React.Component {
   onHideClick = () => {
     const { hideProjects, visible } = this.props;
     this.setState({ anyVisibleSelected: false });
-    const selectedIds = getSelectedIdsWithChildren(this.visibleOptions, visible, 'visibleParentId');
+    const selectedIds = getSelectedIdsWithChildren(this.visibleOptions, visible);
     hideProjects(selectedIds);
   };
 
