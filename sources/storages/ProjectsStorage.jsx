@@ -64,14 +64,12 @@ class ProjectsStorage {
     this.projects.forEach((project) => {
       const parentHideInfo = hideInfo[project.visibleParentId];
 
-      let hide = false;
       if (project.visible && ids.length) {
         const idsIndex = ids.indexOf(project.id);
         if (idsIndex !== -1) {
           ids.splice(idsIndex, 1);
 
           if (project.visibleParentId) {
-            hide = true;
             project.visible = false;
 
             if (parentHideInfo) {
@@ -105,11 +103,11 @@ class ProjectsStorage {
           project.visibleParentId = parent.visibleParentId;
           project.parentCustomSort = parent.parentCustomSort;
 
-          if (!hide && parentHideInfo) {
+          if (project.visible && parentHideInfo) {
             // copy project id to new visible parent
             const newVisibleParent = this.projects.get(project.visibleParentId);
             const fromEndIndex = parentHideInfo.inParentFromEndIndex;
-            newVisibleParent.visibleChildrenIds.splice(fromEndIndex, 0, project.id,);
+            newVisibleParent.visibleChildrenIds.splice(fromEndIndex, 0, project.id);
           }
         }
       }
