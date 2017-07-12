@@ -60,8 +60,12 @@ class ProjectsStorage {
 
   showItems(ids) {
     this.projects.forEach((project) => {
+      let addToVisibleParent = false;
+
       if (project.parentId) {
         const parent = this.projects.get(project.parentId);
+        const oldVisibleParentId = project.visibleParentId;
+
         if (parent.visible) {
           project.name = project.original.name;
           project.depth = parent.depth + 1;
@@ -73,6 +77,15 @@ class ProjectsStorage {
           project.visibleParentId = parent.visibleParentId;
           project.parentCustomSort = parent.parentCustomSort;
         }
+
+        if (project.visibleParentId !== oldVisibleParentId) {
+          const oldVisibleParent = this.projects.get(oldVisibleParentId);
+          const index = oldVisibleParent.visibleChildrenIds.indexOf(project.id);
+          if (index !== -1) {
+            oldVisibleParent.visibleChildrenIds.splice(index, 1);
+            addToVisibleParent = true;
+          }
+        }
       }
 
       if (!project.visible && ids.length) {
@@ -80,14 +93,14 @@ class ProjectsStorage {
         if (idsIndex !== -1) {
           ids.splice(idsIndex, 1);
           project.visible = true;
+          addToVisibleParent = true;
         }
       }
 
       if (project.visible) {
-        if (project.visibleParentId) {
+        if (project.visibleParentId && (!project.parentCustomSort || addToVisibleParent)) {
           const visibleParent = this.projects.get(project.visibleParentId);
-          const lastParentChildIndex = visibleParent.visibleChildrenIds.length;
-          visibleParent.visibleChildrenIds.splice(lastParentChildIndex, 0, project.id);
+          visibleParent.visibleChildrenIds.push(project.id);
         }
 
         if (!project.customSort) {
