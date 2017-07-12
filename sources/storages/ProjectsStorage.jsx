@@ -1,5 +1,10 @@
 /* eslint-disable no-param-reassign */
 
+import {
+  getProjectPropsFromServerData, getProjectOriginalProps, getProjectSavedProps,
+  getProjectPropsFromParent,
+} from '../utils/projectFormatter';
+
 class ProjectsStorage {
   constructor() {
     this.projects = new Map();
@@ -15,37 +20,21 @@ class ProjectsStorage {
     this.hidden = [];
 
     items.forEach((serverData) => {
-      const project = {};
-
-      project.id = serverData.id;
-      project.name = serverData.name;
-      project.visible = true;
-      project.visibleChildrenIds = [];
-      project.isAnyChildHidden = false;
-
-      project.filterMatch = false;
-      project.filterTreeMatch = false;
-
-      project.customSort = false;
-      project.parentCustomSort = false;
+      const project = getProjectPropsFromServerData(serverData);
 
       const parentData = serverData.parentProject;
       if (parentData) {
         const parent = this.projects.get(parentData.id);
-        project.depth = parent.depth + 1;
-        project.parentId = parent.id;
-        project.visibleParentId = parent.id;
-
+        Object.assign(project, getProjectPropsFromParent(parent));
         parent.visibleChildrenIds.push(project.id);
+        parent.saved.visibleChildrenIds.push(project.id);
       } else {
         project.depth = 0;
         this.rootId = project.id;
       }
 
-      project.original = {
-        name: project.name,
-        depth: project.depth,
-      };
+      project.original = getProjectOriginalProps(project);
+      project.saved = getProjectSavedProps(project);
 
       this.projects.set(project.id, project);
       this.reversedProjectIds.unshift(project.id);
@@ -54,11 +43,26 @@ class ProjectsStorage {
   }
 
   saveState() {
+    this.projects.forEach((project) => {
+      project.saved = getProjectSavedProps(project);
 
+      project.filterMatch = false;
+      project.filterTreeMatch = false;
+    });
   }
 
   refreshToSavedState() {
+    this.projects.forEach((project) => {
+      Object.assign(project, project.saved);
+      project.saved.visibleChildrenIds = [...project.saved.visibleChildrenIds];
 
+      project.filterMatch = false;
+      project.filterTreeMatch = false;
+      project.isAnyChildHidden = false;
+    });
+
+    this.refreshVisible();
+    this.refreshHidden();
   }
 
   showItems(ids) {
