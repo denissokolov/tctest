@@ -165,6 +165,14 @@ class ProjectsStorage {
   }
 
   sortDownVisible(ids) {
+    return this.changeSort(ids.reverse(), true);
+  }
+
+  sortUpVisible(ids) {
+    return this.changeSort(ids, false);
+  }
+
+  changeSort(ids, downDirection) {
     const sortedIds = {};
 
     if (ids.length === 1 && ids[0] === this.rootId) {
@@ -172,7 +180,7 @@ class ProjectsStorage {
     }
 
     let needRefresh = false;
-    ids.reverse().forEach((id) => {
+    ids.forEach((id) => {
       const project = this.projects.get(id);
       if (!project.visibleParentId) {
         return;
@@ -182,15 +190,22 @@ class ProjectsStorage {
 
       const visibleParent = this.projects.get(project.visibleParentId);
       const projectInParentIndex = visibleParent.visibleChildrenIds.indexOf(project.id);
+
       if (projectInParentIndex === -1
-        || projectInParentIndex === visibleParent.visibleChildrenIds.length - 1) {
+        || (downDirection && projectInParentIndex === visibleParent.visibleChildrenIds.length - 1)
+        || (!downDirection && projectInParentIndex === 0)) {
         return;
       }
 
-      const nextProjectId = visibleParent.visibleChildrenIds[projectInParentIndex + 1];
-      if (sortedIds[nextProjectId]) {
+      const targetProjectIndex = projectInParentIndex + (downDirection ? 1 : -1);
+      const targetProjectId = visibleParent.visibleChildrenIds[targetProjectIndex];
+      if (sortedIds[targetProjectId]) {
         return;
       }
+
+      visibleParent.visibleChildrenIds[projectInParentIndex] = targetProjectId;
+      visibleParent.visibleChildrenIds[targetProjectIndex] = project.id;
+      needRefresh = true;
 
       if (!visibleParent.customSort) {
         visibleParent.customSort = true;
@@ -199,18 +214,12 @@ class ProjectsStorage {
           child.parentCustomSort = true;
         });
       }
-
-      visibleParent.visibleChildrenIds[projectInParentIndex] = nextProjectId;
-      visibleParent.visibleChildrenIds[projectInParentIndex + 1] = project.id;
-
-      needRefresh = true;
     });
 
-    this.refreshVisible();
+    if (needRefresh) {
+      this.refreshVisible();
+    }
     return needRefresh;
-  }
-
-  sortUpVisible(ids) {
   }
 
   filterHidden(value) {
