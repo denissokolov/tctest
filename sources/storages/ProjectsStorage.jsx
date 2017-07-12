@@ -23,6 +23,9 @@ class ProjectsStorage {
       project.visibleChildrenIds = [];
       project.isAnyChildHidden = false;
 
+      project.filterMatch = false;
+      project.filterTreeMatch = false;
+
       project.customSort = false;
       project.parentCustomSort = false;
 
@@ -92,7 +95,11 @@ class ProjectsStorage {
         const idsIndex = ids.indexOf(project.id);
         if (idsIndex !== -1) {
           ids.splice(idsIndex, 1);
+
           project.visible = true;
+          project.filterMatch = false;
+          project.filterTreeMatch = false;
+
           addToVisibleParent = true;
         }
       }
@@ -236,11 +243,91 @@ class ProjectsStorage {
   }
 
   filterHidden(value) {
+    const trimmedValue = value.trim();
+    const words = trimmedValue ? trimmedValue.split(' ') : [];
 
+    if (!words.length) {
+      this.clearFilter();
+      return;
+    }
+
+    const matches = {};
+    matches[this.rootId] = {
+      wordMatches: 0,
+      withParentMatches: 0,
+    };
+
+    this.hidden.forEach((shortProject) => {
+      const project = this.projects.get(shortProject.id);
+      project.filterMatch = false;
+      project.filterTreeMatch = false;
+
+      matches[project.id] = {
+        wordMatches: 0,
+        withParentMatches: 0,
+      };
+
+      const parent = project.parentId ? this.projects.get(project.parentId) : null;
+
+      words.forEach((word, index) => {
+        if (project.original.name.toLowerCase().indexOf(word.toLowerCase()) !== -1) {
+          matches[project.id][`word_${index}`] = true;
+          matches[project.id].wordMatches += 1;
+          matches[project.id].withParentMatches += 1;
+        } else if (parent && matches[parent.id][`word_${index}`]) {
+          matches[project.id][`word_${index}`] = true;
+          matches[project.id].withParentMatches += 1;
+        }
+      });
+
+      if (matches[project.id].withParentMatches === words.length) {
+        if (matches[project.id].wordMatches) {
+          project.filterMatch = true;
+          this.setAllParentsFilterMatch(matches, project.parentId);
+        } else if (matches[project.id].withParentMatches) {
+          project.filterTreeMatch = true;
+        }
+      } else {
+        project.filterMatch = false;
+        project.filterTreeMatch = false;
+      }
+    });
+
+    this.hidden = this.hidden.map(
+      shortProject => this.convertHiddenProjectToShort(this.projects.get(shortProject.id)),
+    );
   }
 
-  clearFilter() {
+  setAllParentsFilterMatch = (matches, parentId) => {
+    if (parentId) {
+      const parent = this.projects.get(parentId);
+      if (parent) {
+        let scanParents = false;
 
+        if (matches[parent.id].wordMatches) {
+          if (!parent.filterMatch) {
+            parent.filterMatch = true;
+            scanParents = true;
+          }
+        } else if (!parent.filterTreeMatch) {
+          parent.filterTreeMatch = true;
+          scanParents = true;
+        }
+
+        if (scanParents) {
+          this.setAllParentsFilterMatch(matches, parent.parentId);
+        }
+      }
+    }
+  };
+
+  clearFilter() {
+    this.hidden = this.hidden.map((shortProject) => {
+      const project = this.projects.get(shortProject.id);
+      project.filterMatch = false;
+      project.filterTreeMatch = false;
+      return this.convertHiddenProjectToShort(project);
+    });
   }
 
   refreshVisible() {
@@ -280,20 +367,20 @@ class ProjectsStorage {
         const parent = this.projects.get(project.parentId);
         parent.isAnyChildHidden = true;
 
-        this.unshiftProjectHidden(project);
+        this.hidden.unshift(this.convertHiddenProjectToShort(project));
       }
     });
   }
 
-  unshiftProjectHidden(project) {
-    this.hidden.unshift({
-      id: project.id,
-      name: project.original.name,
-      depth: project.original.depth,
-      parentId: project.parentId,
-      noInteractive: project.visible,
-    });
-  }
+  convertHiddenProjectToShort = project => ({
+    id: project.id,
+    name: project.original.name,
+    depth: project.original.depth,
+    parentId: project.parentId,
+    noInteractive: project.visible,
+    filterMatch: project.filterMatch,
+    filterTreeMatch: project.filterTreeMatch,
+  });
 
   getVisible() {
     return this.visible;
