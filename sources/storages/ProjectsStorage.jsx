@@ -165,6 +165,49 @@ class ProjectsStorage {
   }
 
   sortDownVisible(ids) {
+    const sortedIds = {};
+
+    if (ids.length === 1 && ids[0] === this.rootId) {
+      return false;
+    }
+
+    let needRefresh = false;
+    ids.reverse().forEach((id) => {
+      const project = this.projects.get(id);
+      if (!project.visibleParentId) {
+        return;
+      }
+
+      sortedIds[project.id] = true;
+
+      const visibleParent = this.projects.get(project.visibleParentId);
+      const projectInParentIndex = visibleParent.visibleChildrenIds.indexOf(project.id);
+      if (projectInParentIndex === -1
+        || projectInParentIndex === visibleParent.visibleChildrenIds.length - 1) {
+        return;
+      }
+
+      const nextProjectId = visibleParent.visibleChildrenIds[projectInParentIndex + 1];
+      if (sortedIds[nextProjectId]) {
+        return;
+      }
+
+      if (!visibleParent.customSort) {
+        visibleParent.customSort = true;
+        visibleParent.visibleChildrenIds.forEach((childId) => {
+          const child = this.projects.get(childId);
+          child.parentCustomSort = true;
+        });
+      }
+
+      visibleParent.visibleChildrenIds[projectInParentIndex] = nextProjectId;
+      visibleParent.visibleChildrenIds[projectInParentIndex + 1] = project.id;
+
+      needRefresh = true;
+    });
+
+    this.refreshVisible();
+    return needRefresh;
   }
 
   sortUpVisible(ids) {
