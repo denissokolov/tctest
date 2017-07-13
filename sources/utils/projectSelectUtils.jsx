@@ -17,9 +17,11 @@ function setItemSelectedInfo(selectedInfo, { id, selected, isAnyChildSelected })
 }
 
 function setSelectedInfoFromOptions(selectedInfo, options) {
-  [...options].forEach((option) => {
-    setItemSelectedInfo(selectedInfo, { id: option.value, selected: option.selected });
-  });
+  for (let i = 0; i < options.length; i += 1) {
+    if (options[i].selected) {
+      setItemSelectedInfo(selectedInfo, { id: options[i].value, selected: true });
+    }
+  }
 }
 
 function setIsAnyChildSelected(selectedInfo, items) {
@@ -38,8 +40,9 @@ function setIsAnyChildSelected(selectedInfo, items) {
 function getSelectedIdsFromSelectedInfo(selectedInfo, items) {
   const selectedIds = [];
 
+  let id;
   items.forEach((item) => {
-    const id = item.id;
+    id = item.id;
 
     const info = selectedInfo[id];
     if (info && info.selected) {
