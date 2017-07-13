@@ -5,7 +5,7 @@ import { isIE } from '../../../utils/browserDetectUtils';
 import ProjectsSelectOption from './ProjectsSelectOption';
 import './projects-select.scss';
 
-class ProjectsSelect extends React.Component {
+class ProjectsSelect extends React.PureComponent {
   componentWillMount() {
     this.browserIsIE = isIE();
   }
