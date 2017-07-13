@@ -365,15 +365,20 @@ class ProjectsStorage {
   refreshHidden() {
     this.hidden = [];
 
+    let project;
+    let parent;
     this.reversedProjectIds.forEach((id) => {
-      const project = this.projects.get(id);
+      project = this.projects.get(id);
+
       if (project.parentId && (!project.visible || project.isAnyChildHidden)) {
-        const parent = this.projects.get(project.parentId);
+        parent = this.projects.get(project.parentId);
         parent.isAnyChildHidden = true;
 
-        this.hidden.unshift(this.convertHiddenProjectToShort(project));
+        this.hidden.push(this.convertHiddenProjectToShort(project));
       }
     });
+
+    this.hidden.reverse();
   }
 
   convertHiddenProjectToShort = project => ({
