@@ -1,4 +1,5 @@
-/* global fetch */
+/* globals fetch, PROJECTS_URL */
+
 import 'whatwg-fetch';
 import ProjectsStorage from '../storages/ProjectsStorage';
 
@@ -8,7 +9,7 @@ export function loadProjects() {
   return (dispatch) => {
     dispatch({ type: 'LOAD_PROJECTS_PROGRESS' });
 
-    return fetch('data.json')
+    return fetch(PROJECTS_URL)
       .then((response) => {
         if (response.ok) {
           return response.json();
