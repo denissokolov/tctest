@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { getSelectedIdsWithChildren } from '../../../utils/projectSelectUtils';
+import { getSelectedIdsWithChildren, getSelectedIds } from '../../../utils/projectSelectUtils';
 import ProjectsSelect from '../project-select/ProjectsSelect';
 import ArrowButton, { directions as arrowButtonDirections } from '../../arrow-button/ArrowButton';
 import FilterProjects from '../filter/FilterProjects';
@@ -20,18 +20,18 @@ class ConfigureProjectsHiddenSection extends React.Component {
   };
 
   onShowClick = () => {
-    const { showProjects, hidden } = this.props;
     this.setState({ anyHiddenSelected: false });
-    const selectedIds = getSelectedIdsWithChildren(this.hiddenOptions, hidden);
+
+    const { showProjects, hidden } = this.props;
+    const selectedIds = getSelectedIdsWithChildren(this.selectedIds, hidden);
     showProjects(selectedIds);
   };
 
   onHiddenSelectChange = (event) => {
-    this.hiddenOptions = event.target.options;
+    this.selectedIds = getSelectedIds(event.target.options);
 
-    const anyHiddenSelected = Boolean(event.target.options);
-    if (anyHiddenSelected !== this.state.anyHiddenSelected) {
-      this.setState({ anyHiddenSelected });
+    if (this.selectedIds.length && !this.state.anyHiddenSelected) {
+      this.setState({ anyHiddenSelected: true });
     }
   };
 
@@ -39,7 +39,7 @@ class ConfigureProjectsHiddenSection extends React.Component {
     this.props.changeHiddenFilter(event.target.value);
   };
 
-  hiddenOptions = [];
+  selectedIds = [];
 
   render() {
     const { anyHiddenSelected } = this.state;

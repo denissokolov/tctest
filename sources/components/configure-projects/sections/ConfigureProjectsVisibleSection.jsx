@@ -19,32 +19,30 @@ class ConfigureProjectsVisibleSection extends React.Component {
   };
 
   onHideClick = () => {
-    const { hideProjects, visible } = this.props;
     this.setState({ anyVisibleSelected: false });
-    const selectedIds = getSelectedIdsWithChildren(this.visibleOptions, visible);
-    hideProjects(selectedIds);
+
+    const { hideProjects, visible } = this.props;
+    const selectedIdsWithChildren = getSelectedIdsWithChildren(this.selectedIds, visible);
+    hideProjects(selectedIdsWithChildren);
   };
 
   onMoveUpClick = () => {
-    const selectedIds = getSelectedIds(this.visibleOptions);
-    this.props.moveProjectsUp(selectedIds);
+    this.props.moveProjectsUp(this.selectedIds);
   };
 
   onMoveDownClick = () => {
-    const selectedIds = getSelectedIds(this.visibleOptions);
-    this.props.moveProjectsDown(selectedIds);
+    this.props.moveProjectsDown(this.selectedIds);
   };
 
   onVisibleSelectChange = (event) => {
-    this.visibleOptions = event.target.options;
+    this.selectedIds = getSelectedIds(event.target.options);
 
-    const anyVisibleSelected = Boolean(event.target.options);
-    if (anyVisibleSelected !== this.state.anyVisibleSelected) {
-      this.setState({ anyVisibleSelected });
+    if (this.selectedIds.length && !this.state.anyVisibleSelected) {
+      this.setState({ anyVisibleSelected: true });
     }
   };
 
-  visibleOptions = [];
+  selectedIds = [];
 
   render() {
     const { anyVisibleSelected } = this.state;

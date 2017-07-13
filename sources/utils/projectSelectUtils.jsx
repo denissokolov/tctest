@@ -1,57 +1,58 @@
 /* eslint-disable no-param-reassign */
 
-function setItemSelectedInfo(selectedInfo, { id, selected, isAnyChildSelected }) {
+function setItemSelected(selectedInfo, id) {
   let info = selectedInfo[id];
   if (!info) {
     info = {};
     selectedInfo[id] = info;
   }
 
-  if (selected !== undefined) {
-    info.selected = selected;
-  }
-
-  if (isAnyChildSelected !== undefined) {
-    info.isAnyChildSelected = isAnyChildSelected;
-  }
+  info.selected = true;
 }
 
-function setSelectedInfoFromOptions(selectedInfo, options) {
-  for (let i = 0; i < options.length; i += 1) {
-    if (options[i].selected) {
-      setItemSelectedInfo(selectedInfo, { id: options[i].value, selected: true });
-    }
-  }
-}
+function fillSelectedInfo(selectedIds, items) {
+  const selectedInfo = {};
 
-function setIsAnyChildSelected(selectedInfo, items) {
   let item;
+  let lastSelectedIndex = selectedIds.length - 1;
+  let lastSelectedId = selectedIds[lastSelectedIndex];
+
   for (let i = items.length - 1; i > -1; i -= 1) {
     item = items[i];
 
-    const info = selectedInfo[item.id];
+    if (item.id === lastSelectedId) {
+      lastSelectedIndex -= 1;
+      lastSelectedId = lastSelectedIndex > -1 ? selectedIds[lastSelectedIndex] : null;
 
-    if (info && (info.selected || info.isAnyChildSelected)) {
-      setItemSelectedInfo(selectedInfo, { id: item.parentId, isAnyChildSelected: true });
+      setItemSelected(selectedInfo, item.id);
+
+      if (!selectedInfo[item.parentId]) {
+        selectedInfo[item.parentId] = { isAnyChildSelected: true };
+      }
+    } else if (selectedInfo[item.id] && !selectedInfo[item.parentId]) {
+      selectedInfo[item.parentId] = { isAnyChildSelected: true };
     }
   }
+
+  return selectedInfo;
 }
 
 function getSelectedIdsFromSelectedInfo(selectedInfo, items) {
   const selectedIds = [];
 
   let id;
+  let info;
   items.forEach((item) => {
     id = item.id;
 
-    const info = selectedInfo[id];
+    info = selectedInfo[id];
     if (info && info.selected) {
       selectedIds.push(id);
     } else {
       const parentInfo = selectedInfo[item.parentId];
       if (parentInfo && parentInfo.selected && !parentInfo.isAnyChildSelected) {
         selectedIds.push(item.id);
-        setItemSelectedInfo(selectedInfo, { id, selected: true });
+        setItemSelected(selectedInfo, id);
       }
     }
   });
@@ -59,11 +60,8 @@ function getSelectedIdsFromSelectedInfo(selectedInfo, items) {
   return selectedIds;
 }
 
-export function getSelectedIdsWithChildren(options, items) {
-  const selectedInfo = {};
-
-  setSelectedInfoFromOptions(selectedInfo, options);
-  setIsAnyChildSelected(selectedInfo, items);
+export function getSelectedIdsWithChildren(selectedIds, items) {
+  const selectedInfo = fillSelectedInfo(selectedIds, items);
   return getSelectedIdsFromSelectedInfo(selectedInfo, items);
 }
 
