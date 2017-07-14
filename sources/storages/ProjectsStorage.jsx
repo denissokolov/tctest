@@ -10,6 +10,8 @@ class ProjectsStorage {
     this.projects = new Map();
     this.visible = [];
     this.hidden = [];
+    this.hiddenFilteredIds = null;
+    this.hiddenIds = [];
   }
 
   fillFromServerData(items) {
@@ -261,8 +263,14 @@ class ProjectsStorage {
       withParentMatches: 0,
     };
 
-    this.hidden.forEach((shortProject) => {
-      const project = this.projects.get(shortProject.id);
+    this.hiddenFilteredIds = new Set();
+
+    this.hiddenIds.forEach((id) => {
+      const project = this.projects.get(id);
+      if (!project.parentId) {
+        return;
+      }
+
       project.filterMatch = false;
       project.filterTreeMatch = false;
 
@@ -287,9 +295,11 @@ class ProjectsStorage {
       if (matches[project.id].withParentMatches === words.length) {
         if (matches[project.id].wordMatches) {
           project.filterMatch = true;
+          this.hiddenFilteredIds.add(project.id);
           this.setAllParentsFilterMatch(matches, project.parentId);
         } else if (matches[project.id].withParentMatches) {
           project.filterTreeMatch = true;
+          this.hiddenFilteredIds.add(project.id);
         }
       } else {
         project.filterMatch = false;
@@ -297,24 +307,29 @@ class ProjectsStorage {
       }
     });
 
-    this.hidden = this.hidden.map(
-      shortProject => this.convertHiddenProjectToShort(this.projects.get(shortProject.id)),
-    );
+    this.hidden = [];
+    this.projects.forEach((project) => {
+      if (this.hiddenFilteredIds.has(project.id)) {
+        this.hidden.push(this.convertHiddenProjectToShort(project));
+      }
+    });
   }
 
-  setAllParentsFilterMatch = (matches, parentId) => {
+  setAllParentsFilterMatch(matches, parentId) {
     if (parentId) {
       const parent = this.projects.get(parentId);
-      if (parent) {
+      if (parent && parent.parentId) {
         let scanParents = false;
 
         if (matches[parent.id].wordMatches) {
           if (!parent.filterMatch) {
             parent.filterMatch = true;
+            this.hiddenFilteredIds.add(parentId);
             scanParents = true;
           }
         } else if (!parent.filterTreeMatch) {
           parent.filterTreeMatch = true;
+          this.hiddenFilteredIds.add(parent.id);
           scanParents = true;
         }
 
@@ -323,15 +338,11 @@ class ProjectsStorage {
         }
       }
     }
-  };
+  }
 
   clearFilter() {
-    this.hidden = this.hidden.map((shortProject) => {
-      const project = this.projects.get(shortProject.id);
-      project.filterMatch = false;
-      project.filterTreeMatch = false;
-      return this.convertHiddenProjectToShort(project);
-    });
+    this.hiddenFilteredIds = null;
+    this.refreshHidden();
   }
 
   refreshVisible() {
@@ -364,6 +375,9 @@ class ProjectsStorage {
 
   refreshHidden() {
     this.hidden = [];
+    this.hiddenIds = [];
+
+    const filterActive = Boolean(this.hiddenFilteredIds);
 
     let project;
     let parent;
@@ -374,11 +388,21 @@ class ProjectsStorage {
         parent = this.projects.get(project.parentId);
         parent.isAnyChildHidden = true;
 
-        this.hidden.push(this.convertHiddenProjectToShort(project));
+        this.hiddenIds.push(project.id);
+
+        if (!filterActive) {
+          project.filterMatch = false;
+          project.filterTreeMatch = false;
+        }
+
+        if (!filterActive || this.hiddenFilteredIds.has(project.id)) {
+          this.hidden.push(this.convertHiddenProjectToShort(project));
+        }
       }
     });
 
     this.hidden.reverse();
+    this.hiddenIds.reverse();
   }
 
   convertHiddenProjectToShort = project => ({
@@ -388,7 +412,6 @@ class ProjectsStorage {
     parentId: project.parentId,
     noInteractive: project.visible,
     filterMatch: project.filterMatch,
-    filterTreeMatch: project.filterTreeMatch,
   });
 
   getVisible() {

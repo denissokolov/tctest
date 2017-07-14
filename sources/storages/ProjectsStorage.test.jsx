@@ -31,18 +31,12 @@ describe('ProjectsStorage', () => {
   });
 
   describe('filterHidden', () => {
-    const checkProjectFilterParams = (storage, filterMatchNames, filterTreeMatchNames) => {
-      storage.getHidden().forEach((project) => {
+    const checkProjectFilterParams = (hidden, filterMatchNames) => {
+      hidden.forEach((project) => {
         if (filterMatchNames.indexOf(project.name) !== -1) {
           expect(project.filterMatch).toBeTruthy();
         } else {
           expect(project.filterMatch).toBeFalsy();
-        }
-
-        if (filterTreeMatchNames.indexOf(project.name) !== -1) {
-          expect(project.filterTreeMatch).toBeTruthy();
-        } else {
-          expect(project.filterTreeMatch).toBeFalsy();
         }
       });
     };
@@ -58,10 +52,9 @@ describe('ProjectsStorage', () => {
 
       const hidden = storage.getHidden();
       const filterMatches = hidden.filter(project => project.filterMatch);
-      const filterTreeMatches = hidden.filter(project => project.filterTreeMatch);
 
       expect(filterMatches.length).toBe(0);
-      expect(filterTreeMatches.length).toBe(0);
+      expect(hidden.length).toBe(serverProjects.length - 1);
     });
 
     it('should return matches for one word', () => {
@@ -75,11 +68,9 @@ describe('ProjectsStorage', () => {
         'Implicit Nullability', 'NUnit', 'NUnit 2', 'NUnit 3', 'NUnitLite', 'Mono Linux Hang',
       ];
 
-      const filterTreeMatchNames = [
-        '<Root project>', 'Open-source projects', 'Sandbox', 'Build And Test',
-      ];
-
-      checkProjectFilterParams(storage, filterMatchNames, filterTreeMatchNames);
+      const hidden = storage.getHidden();
+      checkProjectFilterParams(hidden, filterMatchNames);
+      expect(hidden.length).toBe(9);
     });
 
     it('should return matches for two words', () => {
@@ -93,11 +84,9 @@ describe('ProjectsStorage', () => {
         'Implicit Nullability', 'NUnit', 'Mono Linux Hang', 'NUnitLite',
       ];
 
-      const filterTreeMatchNames = [
-        '<Root project>', 'Open-source projects', 'Sandbox',
-      ];
-
-      checkProjectFilterParams(storage, filterMatchNames, filterTreeMatchNames);
+      const hidden = storage.getHidden();
+      checkProjectFilterParams(hidden, filterMatchNames);
+      expect(hidden.length).toBe(6);
     });
   });
 
@@ -111,9 +100,8 @@ describe('ProjectsStorage', () => {
 
     const hidden = storage.getHidden();
     const filterMatches = hidden.filter(project => project.filterMatch);
-    const filterTreeMatches = hidden.filter(project => project.filterTreeMatch);
 
     expect(filterMatches.length).toBe(0);
-    expect(filterTreeMatches.length).toBe(0);
+    expect(hidden.length).toBe(serverProjects.length - 1);
   });
 });

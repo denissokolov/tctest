@@ -28,24 +28,18 @@ class ProjectsSelect extends React.PureComponent {
         multiple
         ref={(el) => { this.selectEl = el; }}
       >
-        {items.map((item) => {
-          if (filterActive && !item.filterTreeMatch && !item.filterMatch) {
-            return null;
-          }
-
-          return (
-            <ProjectsSelectOption
-              key={item.id}
-              id={item.id}
-              name={item.name}
-              depth={item.depth}
-              parentCustomSort={item.parentCustomSort}
-              disabled={item.noInteractive}
-              filterMatch={filterActive && item.filterMatch}
-              browserIsIE={this.browserIsIE}
-            />
-          );
-        })}
+        {items.map(item => (
+          <ProjectsSelectOption
+            key={item.id}
+            id={item.id}
+            name={item.name}
+            depth={item.depth}
+            parentCustomSort={item.parentCustomSort}
+            disabled={item.noInteractive}
+            filterMatch={filterActive && item.filterMatch}
+            browserIsIE={this.browserIsIE}
+          />
+        ))}
       </select>
     );
   }

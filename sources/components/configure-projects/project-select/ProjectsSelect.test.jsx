@@ -52,14 +52,6 @@ describe('Projects', () => {
     expect(wrapper.find(ProjectsSelectOption).length).toBe(formattedProjects.length);
   });
 
-  it('should render only matched items for property filterActive=true', () => {
-    const wrapper = create({ items: formattedProjects, filterActive: true });
-
-    const matchedItems = formattedProjects.filter(item => item.filterMatch || item.filterTreeMatch);
-
-    expect(wrapper.find(ProjectsSelectOption).length).toBe(matchedItems.length);
-  });
-
   it('should set option properties', () => {
     const item = {
       id: 'OpenSourceProjects',
