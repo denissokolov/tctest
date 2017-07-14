@@ -9,7 +9,6 @@ function create(props) {
   const {
     items = [],
     onChange = jest.fn(),
-    filterActive = false,
   } = props;
 
   return shallow(
@@ -17,7 +16,6 @@ function create(props) {
       items={items}
       formVisible
       onChange={onChange}
-      filterActive={filterActive}
     />,
   );
 }
@@ -57,18 +55,11 @@ describe('Projects', () => {
       id: 'OpenSourceProjects',
       name: '<Root project> :: Open-source projects',
       depth: 1,
-      parentProjectId: '_Root',
-      filterTreeMatch: true,
       parentCustomSort: true,
       filterMatch: true,
-      visible: true,
-      original: {
-        name: 'Open-source projects',
-        depth: 2,
-      },
     };
 
-    const wrapper = create({ items: [item], filterActive: true });
+    const wrapper = create({ items: [item] });
     const option = wrapper.find(ProjectsSelectOption).first();
 
     expect(option.prop('id')).toEqual(item.id);

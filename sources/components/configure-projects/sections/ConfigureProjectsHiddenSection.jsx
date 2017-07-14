@@ -69,7 +69,6 @@ class ConfigureProjectsHiddenSection extends React.Component {
             items={hidden}
             onChange={this.onHiddenSelectChange}
             formVisible={formVisible}
-            filterActive={Boolean(hiddenFilterValue)}
           />
         </div>
       </div>

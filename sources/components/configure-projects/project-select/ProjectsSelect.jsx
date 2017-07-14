@@ -19,7 +19,7 @@ class ProjectsSelect extends React.PureComponent {
   }
 
   render() {
-    const { items, onChange, filterActive } = this.props;
+    const { items, onChange } = this.props;
 
     return (
       <select
@@ -36,7 +36,7 @@ class ProjectsSelect extends React.PureComponent {
             depth={item.depth}
             parentCustomSort={item.parentCustomSort}
             disabled={item.noInteractive}
-            filterMatch={filterActive && item.filterMatch}
+            filterMatch={item.filterMatch}
             browserIsIE={this.browserIsIE}
           />
         ))}
@@ -49,11 +49,6 @@ ProjectsSelect.propTypes = {
   items: PropTypes.arrayOf(PropTypes.object).isRequired,
   onChange: PropTypes.func.isRequired,
   formVisible: PropTypes.bool.isRequired,
-  filterActive: PropTypes.bool,
-};
-
-ProjectsSelect.defaultProps = {
-  filterActive: false,
 };
 
 export default ProjectsSelect;

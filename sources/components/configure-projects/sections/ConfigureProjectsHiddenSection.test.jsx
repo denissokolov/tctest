@@ -85,12 +85,10 @@ describe('ConfigureProjectsHiddenSection', () => {
     it('should render ProjectsSelect', () => {
       const wrapper = create({
         hidden: formattedProjects,
-        hiddenFilterValue: 'test',
         formVisible: false,
       });
-      const select = wrapper.find(ProjectsSelect);
 
-      expect(select.prop('filterActive')).toBeTruthy();
+      const select = wrapper.find(ProjectsSelect);
       expect(select.prop('formVisible')).toBeFalsy();
     });
 
