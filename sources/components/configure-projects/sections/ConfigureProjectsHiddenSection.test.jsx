@@ -1,10 +1,9 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { fromJS } from 'immutable';
 
 import formattedProjects from '../../../__mocks__/formattedProjects';
 import ConfigureProjectsHiddenSection from './ConfigureProjectsHiddenSection';
-import ProjectsSelect, { types as projectsSelectTypes } from '../project-select/ProjectsSelect';
+import ProjectsSelect from '../project-select/ProjectsSelect';
 import ArrowButton, { directions } from '../../arrow-button/ArrowButton';
 import FilterProjects from '../filter/FilterProjects';
 
@@ -19,7 +18,7 @@ function create(props) {
 
   return shallow(
     <ConfigureProjectsHiddenSection
-      hidden={fromJS(hidden)}
+      hidden={hidden}
       hiddenFilterValue={hiddenFilterValue}
       showProjects={showProjects}
       changeHiddenFilter={changeHiddenFilter}
@@ -91,7 +90,6 @@ describe('ConfigureProjectsHiddenSection', () => {
       });
       const select = wrapper.find(ProjectsSelect);
 
-      expect(select.prop('type')).toEqual(projectsSelectTypes.hidden);
       expect(select.prop('filterActive')).toBeTruthy();
       expect(select.prop('formVisible')).toBeFalsy();
     });

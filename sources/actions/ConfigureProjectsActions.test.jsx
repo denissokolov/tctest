@@ -12,6 +12,14 @@ const mockStore = configureMockStore(middlewares);
 jest.mock('../storages/ProjectsStorage');
 
 describe('ConfigureProjectsActions', () => {
+  beforeAll(() => {
+    global.PROJECTS_URL = '/test';
+  });
+
+  afterAll(() => {
+    global.PROJECTS_URL = undefined;
+  });
+
   describe('loadProjects', () => {
     it('should create actions LOAD_PROJECTS_PROGRESS & LOAD_PROJECTS_FAIL for invalid server response status', () => {
       fetch.mockResponse('', { status: 500 });
