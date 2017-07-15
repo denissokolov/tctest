@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Set as ImmutableSet } from 'immutable';
+import { Set } from 'immutable';
 
 import ProjectsSelectOption from './ProjectsSelectOption';
 import './projects-select.scss';
@@ -13,7 +13,7 @@ class ProjectsSelect extends React.Component {
   };
 
   state = {
-    selectedIds: new ImmutableSet(),
+    selectedIds: new Set(),
     currentSelectedFirstIndex: null,
     currentSelectedLastIndex: null,
     currentActionIsRemove: false,
@@ -37,24 +37,12 @@ class ProjectsSelect extends React.Component {
 
   onItemMouseDown = (id, index, event) => {
     if (event.button === 0) {
-      this.mouseDownIndex = index;
-      const reset = !event.ctrlKey && !event.metaKey;
-
-      this.setState((state) => {
-        const nextState = {
-          currentSelectedFirstIndex: index,
-          currentSelectedLastIndex: index,
-        };
-
-        if (reset) {
-          nextState.selectedIds = new ImmutableSet();
-          nextState.currentActionIsRemove = false;
-        } else {
-          nextState.currentActionIsRemove = state.selectedIds.has(id);
-        }
-
-        return nextState;
-      });
+      if (event.shiftKey) {
+        this.handleShiftMouseDown(index);
+      } else {
+        const reset = !event.ctrlKey && !event.metaKey;
+        this.handleMouseDown(index, id, reset);
+      }
     }
   };
 
@@ -70,28 +58,84 @@ class ProjectsSelect extends React.Component {
 
   onGlobalMouseUp = () => {
     if (this.mouseDownIndex !== null) {
-      const { items } = this.props;
-      const selectedIds = [];
-
-      let index = this.state.currentSelectedFirstIndex;
-      const last = this.state.currentSelectedLastIndex;
-      while (index <= last) {
-        selectedIds.push(items[index].id);
-        index += 1;
-      }
-
-      this.setState(state => ({
-        selectedIds: state.currentActionIsRemove
-          ? state.selectedIds.subtract(selectedIds)
-          : state.selectedIds.union(selectedIds),
-      }));
-
+      const { currentSelectedFirstIndex, currentSelectedLastIndex } = this.state;
+      this.changeSelectedRange(currentSelectedFirstIndex, currentSelectedLastIndex);
       this.mouseDownIndex = null;
     }
   };
 
+  handleShiftMouseDown(index) {
+    let firstIndex;
+    let lastIndex;
+
+    const lastMouseDownIndex = this.lastMouseDownIndex;
+    if (lastMouseDownIndex === null) {
+      firstIndex = index;
+      lastIndex = index;
+    } else if (lastMouseDownIndex < index) {
+      firstIndex = lastMouseDownIndex;
+      lastIndex = index;
+    } else {
+      firstIndex = index;
+      lastIndex = lastMouseDownIndex;
+    }
+
+    this.changeSelectedRange(firstIndex, lastIndex, true);
+  }
+
+  handleMouseDown(index, id, reset) {
+    this.mouseDownIndex = index;
+    this.lastMouseDownIndex = index;
+
+    this.setState((state) => {
+      const nextState = {
+        currentSelectedFirstIndex: index,
+        currentSelectedLastIndex: index,
+      };
+
+      if (reset) {
+        nextState.selectedIds = new Set();
+        nextState.currentActionIsRemove = false;
+      } else {
+        nextState.currentActionIsRemove = state.selectedIds.has(id);
+      }
+
+      return nextState;
+    });
+  }
+
+  changeSelectedRange(firstIndex, lastIndex, reset = false) {
+    const { items } = this.props;
+    const ids = [];
+
+    let index = firstIndex;
+    while (index <= lastIndex) {
+      ids.push(items[index].id);
+      index += 1;
+    }
+
+    this.setState((state) => {
+      let selectedIds;
+      if (reset) {
+        selectedIds = new Set(ids);
+      } else if (state.currentActionIsRemove) {
+        selectedIds = state.selectedIds.subtract(ids);
+      } else {
+        selectedIds = state.selectedIds.union(ids);
+      }
+
+      return {
+        currentActionIsRemove: false,
+        currentSelectedFirstIndex: null,
+        currentSelectedLastIndex: null,
+        selectedIds,
+      };
+    });
+  }
+
   focused = false;
   mouseDownIndex = null;
+  lastMouseDownIndex = null;
 
   render() {
     const { items } = this.props;
