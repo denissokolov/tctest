@@ -14,6 +14,7 @@ class ProjectsSelect extends React.Component {
   };
 
   state = {
+    selectedIds: new Set(),
     savedSelectedIds: new Set(),
     activeSelectStartIndex: null,
     activeSelectEndIndex: null,
@@ -32,36 +33,35 @@ class ProjectsSelect extends React.Component {
     this.mouseDown = true;
 
     if (event.ctrlKey || event.metaKey) {
-      this.setState((state) => {
-        const selectedIds = this.getActiveSelectedIds(state);
-        const currentId = this.props.items[index].id;
-
-        return {
-          savedSelectedIds: selectedIds,
-          activeSelectStartIndex: index,
-          activeSelectEndIndex: index,
-          currentActionIsDeselect: selectedIds.has(currentId),
-        };
-      });
+      this.setState(state => this.setNextState(state, {
+        savedSelectedIds: state.selectedIds,
+        activeSelectStartIndex: index,
+        activeSelectEndIndex: index,
+        currentActionIsDeselect: state.selectedIds.has(id),
+      }));
     } else if (event.shiftKey) {
-      this.setState(state => ({
+      this.setState(state => this.setNextState(state, {
         savedSelectedIds: new Set(),
         activeSelectStartIndex:
           state.activeSelectStartIndex !== null ? state.activeSelectStartIndex : index,
         activeSelectEndIndex: index,
+        currentActionIsDeselect: false,
       }));
     } else {
-      this.setState({
+      this.setState(state => this.setNextState(state, {
         savedSelectedIds: new Set(),
         activeSelectStartIndex: index,
         activeSelectEndIndex: index,
-      });
+        currentActionIsDeselect: false,
+      }));
     }
   };
 
   onItemMouseEnter = (id, index) => {
     if (this.mouseDown) {
-      this.setState({ activeSelectEndIndex: index });
+      this.setState(state => this.setNextState(state, {
+        activeSelectEndIndex: index,
+      }));
     }
   };
 
@@ -93,6 +93,12 @@ class ProjectsSelect extends React.Component {
         break;
     }
   };
+
+  setNextState(state, nextState) {
+    const stateMerged = Object.assign({}, state, nextState);
+    stateMerged.selectedIds = this.getActiveSelectedIds(stateMerged);
+    return stateMerged;
+  }
 
   getActiveSelectedIds(state) {
     const { activeSelectStartIndex, activeSelectEndIndex } = state;
@@ -129,12 +135,7 @@ class ProjectsSelect extends React.Component {
 
   render() {
     const { items } = this.props;
-    const {
-      savedSelectedIds, activeSelectStartIndex, activeSelectEndIndex, currentActionIsDeselect,
-    } = this.state;
-
-    const isCurrentSelect = activeSelectStartIndex !== null && activeSelectEndIndex !== null;
-    const indexes = this.getSortedActiveSelectIndexes(activeSelectStartIndex, activeSelectEndIndex);
+    const { selectedIds } = this.state;
 
     return (
       <div
@@ -145,31 +146,21 @@ class ProjectsSelect extends React.Component {
         role="listbox"
         tabIndex={0}
       >
-        {items.map((item, index) => {
-          let selected;
-          if (isCurrentSelect
-            && index >= indexes.firstIndex && index <= indexes.lastIndex) {
-            selected = !currentActionIsDeselect;
-          } else {
-            selected = savedSelectedIds.has(item.id);
-          }
-
-          return (
-            <ProjectsSelectOption
-              key={item.id}
-              id={item.id}
-              index={index}
-              name={item.name}
-              depth={item.depth}
-              parentCustomSort={item.parentCustomSort}
-              disabled={item.noInteractive}
-              filterMatch={item.filterMatch}
-              selected={selected}
-              onMouseDown={this.onItemMouseDown}
-              onMouseEnter={this.onItemMouseEnter}
-            />
-          );
-        })}
+        {items.map((item, index) => (
+          <ProjectsSelectOption
+            key={item.id}
+            id={item.id}
+            index={index}
+            name={item.name}
+            depth={item.depth}
+            parentCustomSort={item.parentCustomSort}
+            disabled={item.noInteractive}
+            filterMatch={item.filterMatch}
+            selected={selectedIds.has(item.id)}
+            onMouseDown={this.onItemMouseDown}
+            onMouseEnter={this.onItemMouseEnter}
+          />
+        ))}
       </div>
     );
   }
