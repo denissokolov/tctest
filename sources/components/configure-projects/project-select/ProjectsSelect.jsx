@@ -4,6 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Set } from 'immutable';
 
+import keyCodes from '../../../utils/keyCodes';
 import ProjectsSelectOption from './ProjectsSelectOption';
 import './projects-select.scss';
 
@@ -26,14 +27,6 @@ class ProjectsSelect extends React.Component {
   componentWillUnmount() {
     document.removeEventListener('mouseup', this.onGlobalMouseUp);
   }
-
-  onFocus = () => {
-    this.focused = true;
-  };
-
-  onBlur = () => {
-    this.focused = false;
-  };
 
   onItemMouseDown = (id, index, event) => {
     if (event.button === 0) {
@@ -63,6 +56,33 @@ class ProjectsSelect extends React.Component {
       this.mouseDownIndex = null;
     }
   };
+
+  onKeyDown = (event) => {
+    switch (event.keyCode) {
+      case keyCodes.downArrow: {
+        event.preventDefault();
+        this.handleDownArrowPress(event.shiftKey);
+        break;
+      }
+
+      case keyCodes.upArrow: {
+        event.preventDefault();
+        this.handleUpArrowPress(event.shiftKey);
+        break;
+      }
+
+      default:
+        break;
+    }
+  };
+
+  handleDownArrowPress() {
+
+  }
+
+  handleUpArrowPress() {
+
+  }
 
   handleShiftMouseDown(index) {
     let firstIndex;
@@ -133,7 +153,6 @@ class ProjectsSelect extends React.Component {
     });
   }
 
-  focused = false;
   mouseDownIndex = null;
   lastMouseDownIndex = null;
 
@@ -148,8 +167,8 @@ class ProjectsSelect extends React.Component {
     return (
       <div
         className="projects-select"
-        onFocus={this.onFocus}
         onBlur={this.onBlur}
+        onKeyDown={this.onKeyDown}
         ref={(el) => { this.selectEl = el; }}
         role="listbox"
         tabIndex={0}
