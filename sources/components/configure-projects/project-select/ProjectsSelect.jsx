@@ -14,10 +14,10 @@ class ProjectsSelect extends React.Component {
   };
 
   state = {
-    selectedIds: new Set(),
-    currentSelectedFirstIndex: null,
-    currentSelectedLastIndex: null,
-    currentActionIsRemove: false,
+    savedSelectedIds: new Set(),
+    activeSelectStartIndex: null,
+    activeSelectEndIndex: null,
+    currentActionIsDeselect: false,
   };
 
   componentDidMount() {
@@ -29,45 +29,63 @@ class ProjectsSelect extends React.Component {
   }
 
   onItemMouseDown = (id, index, event) => {
-    if (event.button === 0) {
-      if (event.shiftKey) {
-        this.handleShiftMouseDown(index);
-      } else {
-        const reset = !event.ctrlKey && !event.metaKey;
-        this.handleMouseDown(index, id, reset);
-      }
-    }
-  };
+    this.mouseDown = true;
 
-  onItemMouseEnter = (id, index) => {
-    const mouseDownIndex = this.mouseDownIndex;
-    if (mouseDownIndex !== null) {
+    if (event.ctrlKey || event.metaKey) {
+      this.setState((state) => {
+        const selectedIds = this.getActiveSelectedIds(state);
+        const currentId = this.props.items[index].id;
+
+        return {
+          savedSelectedIds: selectedIds,
+          activeSelectStartIndex: index,
+          activeSelectEndIndex: index,
+          currentActionIsDeselect: selectedIds.has(currentId),
+        };
+      });
+    } else if (event.shiftKey) {
+      this.setState(state => ({
+        savedSelectedIds: new Set(),
+        activeSelectStartIndex:
+          state.activeSelectStartIndex !== null ? state.activeSelectStartIndex : index,
+        activeSelectEndIndex: index,
+      }));
+    } else {
       this.setState({
-        currentSelectedFirstIndex: mouseDownIndex < index ? mouseDownIndex : index,
-        currentSelectedLastIndex: mouseDownIndex > index ? mouseDownIndex : index,
+        savedSelectedIds: new Set(),
+        activeSelectStartIndex: index,
+        activeSelectEndIndex: index,
       });
     }
   };
 
+  onItemMouseEnter = (id, index) => {
+    if (this.mouseDown) {
+      this.setState({ activeSelectEndIndex: index });
+    }
+  };
+
   onGlobalMouseUp = () => {
-    if (this.mouseDownIndex !== null) {
-      const { currentSelectedFirstIndex, currentSelectedLastIndex } = this.state;
-      this.changeSelectedRange(currentSelectedFirstIndex, currentSelectedLastIndex);
-      this.mouseDownIndex = null;
+    if (this.mouseDown) {
+      this.mouseDown = false;
     }
   };
 
   onKeyDown = (event) => {
+    if (!this.props.items.length) {
+      return;
+    }
+
     switch (event.keyCode) {
       case keyCodes.downArrow: {
         event.preventDefault();
-        this.handleDownArrowPress(event.shiftKey);
+
         break;
       }
 
       case keyCodes.upArrow: {
         event.preventDefault();
-        this.handleUpArrowPress(event.shiftKey);
+
         break;
       }
 
@@ -76,93 +94,47 @@ class ProjectsSelect extends React.Component {
     }
   };
 
-  handleDownArrowPress() {
-
-  }
-
-  handleUpArrowPress() {
-
-  }
-
-  handleShiftMouseDown(index) {
-    let firstIndex;
-    let lastIndex;
-
-    const lastMouseDownIndex = this.lastMouseDownIndex;
-    if (lastMouseDownIndex === null) {
-      firstIndex = index;
-      lastIndex = index;
-    } else if (lastMouseDownIndex < index) {
-      firstIndex = lastMouseDownIndex;
-      lastIndex = index;
-    } else {
-      firstIndex = index;
-      lastIndex = lastMouseDownIndex;
+  getActiveSelectedIds(state) {
+    const { activeSelectStartIndex, activeSelectEndIndex } = state;
+    if (activeSelectStartIndex === null || activeSelectEndIndex === null) {
+      return new Set();
     }
 
-    this.changeSelectedRange(firstIndex, lastIndex, true);
-  }
-
-  handleMouseDown(index, id, reset) {
-    this.mouseDownIndex = index;
-    this.lastMouseDownIndex = index;
-
-    this.setState((state) => {
-      const nextState = {
-        currentSelectedFirstIndex: index,
-        currentSelectedLastIndex: index,
-      };
-
-      if (reset) {
-        nextState.selectedIds = new Set();
-        nextState.currentActionIsRemove = false;
-      } else {
-        nextState.currentActionIsRemove = state.selectedIds.has(id);
-      }
-
-      return nextState;
-    });
-  }
-
-  changeSelectedRange(firstIndex, lastIndex, reset = false) {
+    const { currentActionIsDeselect, savedSelectedIds } = state;
     const { items } = this.props;
     const ids = [];
 
-    let index = firstIndex;
-    while (index <= lastIndex) {
+    const indexes = this.getSortedActiveSelectIndexes(activeSelectStartIndex, activeSelectEndIndex);
+
+    let index = indexes.firstIndex;
+    while (index <= indexes.lastIndex) {
       ids.push(items[index].id);
       index += 1;
     }
 
-    this.setState((state) => {
-      let selectedIds;
-      if (reset) {
-        selectedIds = new Set(ids);
-      } else if (state.currentActionIsRemove) {
-        selectedIds = state.selectedIds.subtract(ids);
-      } else {
-        selectedIds = state.selectedIds.union(ids);
-      }
-
-      return {
-        currentActionIsRemove: false,
-        currentSelectedFirstIndex: null,
-        currentSelectedLastIndex: null,
-        selectedIds,
-      };
-    });
+    return currentActionIsDeselect ? savedSelectedIds.subtract(ids) : savedSelectedIds.union(ids);
   }
 
-  mouseDownIndex = null;
-  lastMouseDownIndex = null;
+  getSortedActiveSelectIndexes = (activeSelectStartIndex, activeSelectEndIndex) => (
+    activeSelectStartIndex < activeSelectEndIndex ? {
+      firstIndex: activeSelectStartIndex,
+      lastIndex: activeSelectEndIndex,
+    } : {
+      firstIndex: activeSelectEndIndex,
+      lastIndex: activeSelectStartIndex,
+    }
+  );
+
+  mouseDown = false;
 
   render() {
     const { items } = this.props;
     const {
-      selectedIds, currentSelectedFirstIndex, currentSelectedLastIndex, currentActionIsRemove,
+      savedSelectedIds, activeSelectStartIndex, activeSelectEndIndex, currentActionIsDeselect,
     } = this.state;
 
-    const isCurrentSelect = currentSelectedFirstIndex !== null && currentSelectedLastIndex !== null;
+    const isCurrentSelect = activeSelectStartIndex !== null && activeSelectEndIndex !== null;
+    const indexes = this.getSortedActiveSelectIndexes(activeSelectStartIndex, activeSelectEndIndex);
 
     return (
       <div
@@ -176,10 +148,10 @@ class ProjectsSelect extends React.Component {
         {items.map((item, index) => {
           let selected;
           if (isCurrentSelect
-            && index >= currentSelectedFirstIndex && index <= currentSelectedLastIndex) {
-            selected = !currentActionIsRemove;
+            && index >= indexes.firstIndex && index <= indexes.lastIndex) {
+            selected = !currentActionIsDeselect;
           } else {
-            selected = selectedIds.has(item.id);
+            selected = savedSelectedIds.has(item.id);
           }
 
           return (
