@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "lint": "npm run jsonlint && npm run stylelint && npm run eslint",
-    "eslint": "eslint sources/**/*.jsx *.js",
+    "eslint": "eslint --ext .jsx --ext .js sources/**/* *.js",
     "jsonlint": "jsonlint -q package.json && jsonlint -q .eslintrc && jsonlint -q .babelrc && jsonlint -q .stylelintrc",
-    "stylelint": "stylelint **/*.scss",
+    "stylelint": "stylelint sources/**/*.scss",
     "start": "webpack-dev-server --config webpack.dev.config.js --progress --inline --colors",
     "build": "webpack",
     "test": "jest sources/*",
