@@ -3,6 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
+import keyCodes from '../../utils/keyCodes';
 
 import './popup.scss';
 
@@ -47,8 +48,7 @@ class Popup extends React.Component {
   };
 
   onDocumentKeyDown = (event) => {
-    const escapeCode = 27;
-    if (event.keyCode === escapeCode) {
+    if (event.keyCode === keyCodes.escape) {
       this.props.onClose();
     }
   };
