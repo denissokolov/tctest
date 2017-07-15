@@ -60,6 +60,9 @@ class ProjectsSelectOption extends React.Component {
         title={name}
         onMouseDown={this.onMouseDown}
         onMouseEnter={this.onMouseEnter}
+        role="option"
+        aria-selected={selected}
+        tabIndex={-1}
       >
         {name}
       </div>

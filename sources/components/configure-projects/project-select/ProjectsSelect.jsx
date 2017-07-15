@@ -104,10 +104,11 @@ class ProjectsSelect extends React.Component {
     return (
       <div
         className="projects-select"
-        tabIndex={1}
         onFocus={this.onFocus}
         onBlur={this.onBlur}
         ref={(el) => { this.selectEl = el; }}
+        role="listbox"
+        tabIndex={0}
       >
         {items.map((item, index) => {
           let selected;
