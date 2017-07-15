@@ -5,5 +5,14 @@
   height: 100%;
   padding: 0;
   margin: 0;
-  border: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: 1px solid #dedede;
+  outline: none;
+  user-select: none;
+  cursor: default;
+
+  &:focus {
+    border-color: #438ed7;
+  }
 }

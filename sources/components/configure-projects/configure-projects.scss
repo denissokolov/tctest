@@ -53,8 +53,6 @@
 
   &__select {
     height: calc(100% - #{$title-height + $padding});
-    overflow: hidden;
-    border: 1px solid #dedede;
 
     &_with-filter {
       margin-top: 5px;

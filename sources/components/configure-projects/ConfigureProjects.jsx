@@ -16,7 +16,7 @@ class ConfigureProjects extends React.Component {
     dispatch: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
-    formVisible: PropTypes.bool.isRequired,
+    formVisible: PropTypes.bool.isRequired, // TODO: remove this prop
   };
 
   onCancelClick = () => {

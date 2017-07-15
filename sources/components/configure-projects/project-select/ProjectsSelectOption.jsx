@@ -4,44 +4,67 @@ import cn from 'classnames';
 
 import './projects-select-option.scss';
 
-function ProjectsSelectOption(props) {
-  const { id, name, depth, disabled, parentCustomSort, filterMatch, browserIsIE } = props;
+class ProjectsSelectOption extends React.Component {
+  static propTypes = {
+    id: PropTypes.string.isRequired,
+    index: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    depth: PropTypes.number.isRequired,
+    selected: PropTypes.bool,
+    disabled: PropTypes.bool,
+    parentCustomSort: PropTypes.bool,
+    filterMatch: PropTypes.bool,
+    onMouseDown: PropTypes.func.isRequired,
+    onMouseEnter: PropTypes.func.isRequired,
+  };
 
-  const iePadding = browserIsIE && '\u00a0'.repeat(depth * 4);
+  static defaultProps = {
+    selected: false,
+    disabled: false,
+    parentCustomSort: false,
+    filterMatch: false,
+  };
 
-  const classNames = cn(
-    'projects-select-option',
-    `projects-select-option_depth_${depth}`,
-    parentCustomSort && 'projects-select-option_custom-sort',
-    filterMatch && 'projects-select-option_filter-match',
-  );
+  onMouseDown = (event) => {
+    const { onMouseDown, id, disabled, index } = this.props;
 
-  return (
-    <option
-      className={classNames}
-      value={id}
-      disabled={disabled}
-      title={name}
-    >
-      {iePadding}{name}
-    </option>
-  );
+    if (!disabled) {
+      onMouseDown(id, index, event);
+    }
+  };
+
+  onMouseEnter = (event) => {
+    const { onMouseEnter, id, disabled, index } = this.props;
+
+    if (!disabled) {
+      onMouseEnter(id, index, event);
+    }
+  };
+
+  render() {
+    const { index, name, depth, selected, disabled, parentCustomSort, filterMatch } = this.props;
+
+    const classNames = cn(
+      'projects-select-option',
+      `projects-select-option_depth_${depth}`,
+      selected && 'projects-select-option_selected',
+      disabled && 'projects-select-option_disabled',
+      parentCustomSort && 'projects-select-option_custom-sort',
+      filterMatch && 'projects-select-option_filter-match',
+      index % 2 === 0 && 'projects-select-option_even',
+    );
+
+    return (
+      <div
+        className={classNames}
+        title={name}
+        onMouseDown={this.onMouseDown}
+        onMouseEnter={this.onMouseEnter}
+      >
+        {name}
+      </div>
+    );
+  }
 }
-
-ProjectsSelectOption.propTypes = {
-  id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  depth: PropTypes.number.isRequired,
-  browserIsIE: PropTypes.bool.isRequired,
-  disabled: PropTypes.bool,
-  parentCustomSort: PropTypes.bool,
-  filterMatch: PropTypes.bool,
-};
-
-ProjectsSelectOption.defaultProps = {
-  disabled: false,
-  parentCustomSort: false,
-  filterMatch: false,
-};
 
 export default ProjectsSelectOption;
