@@ -6,23 +6,29 @@ import ProjectsSelectOption from './ProjectsSelectOption';
 function create(options) {
   const {
     id = 'testId',
+    index = 0,
     name = 'test',
     depth = 1,
+    selected = false,
     disabled = false,
     parentCustomSort = false,
     filterMatch = false,
-    browserIsIE = false,
+    onMouseDown = jest.fn(),
+    onMouseEnter = jest.fn(),
   } = options;
 
   return shallow(
     <ProjectsSelectOption
       id={id}
+      index={index}
       name={name}
       depth={depth}
+      selected={selected}
       disabled={disabled}
       parentCustomSort={parentCustomSort}
       filterMatch={filterMatch}
-      browserIsIE={browserIsIE}
+      onMouseDown={onMouseDown}
+      onMouseEnter={onMouseEnter}
     />,
   );
 }
@@ -34,30 +40,25 @@ describe('ProjectsSelectOption', () => {
     expect(wrapper.find('.projects-select-option_depth_4').length).toBe(1);
   });
 
-  it('should insert non-breaking space before name for property browserIsIE=true', () => {
-    const wrapper = create({ browserIsIE: true, depth: 2, name: 'Test Project', id: 'TESTID' });
-    const ecpected = '<option class="projects-select-option projects-select-option_depth_2" value="TESTID" title="Test Project">\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0Test Project</option>';
-    expect(wrapper.html()).toEqual(ecpected);
-  });
-
   it('should has .projects-select-option_custom-sort for property parentCustomSort=true', () => {
     const wrapper = create({ parentCustomSort: true });
     expect(wrapper.find('.projects-select-option_custom-sort').length).toBe(1);
   });
 
-  it('should has .projects-select-option_custom-sort for property parentCustomSort=true', () => {
+  it('should has .projects-select-option_custom-sort for property filterMatch=true', () => {
     const wrapper = create({ filterMatch: true });
     expect(wrapper.find('.projects-select-option_filter-match').length).toBe(1);
   });
 
-  it('value should be equal id property', () => {
-    const wrapper = create({ id: 'TESTID' });
-    expect(wrapper.prop('value')).toEqual('TESTID');
+  it('should be selected for property selected=true', () => {
+    const wrapper = create({ selected: true });
+    expect(wrapper.find('.projects-select-option_selected').length).toBe(1);
+    expect(wrapper.props('aria-selected')).toBeTruthy();
   });
 
-  it('disabled should be equal disabled property', () => {
+  it('should has .projects-select-option_disabled for property disabled=true', () => {
     const wrapper = create({ disabled: true });
-    expect(wrapper.prop('disabled')).toBeTruthy();
+    expect(wrapper.find('.projects-select-option_disabled').length).toBe(1);
   });
 
   it('title should be equal name property', () => {

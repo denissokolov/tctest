@@ -26,20 +26,6 @@ describe('Projects', () => {
     expect(wrapper.find('.projects-select').length).toBe(1);
   });
 
-  it('should has multiple property', () => {
-    const wrapper = create({});
-    expect(wrapper.prop('multiple')).toBeTruthy();
-  });
-
-  it('should call onChange on option selected', () => {
-    const onChange = jest.fn();
-    const wrapper = create({ items: formattedProjects, onChange });
-
-    wrapper.find('select').simulate('change');
-
-    expect(onChange).toBeCalled();
-  });
-
   it('should no render items for empty list', () => {
     const wrapper = create({});
     expect(wrapper.find(ProjectsSelectOption).length).toBe(0);

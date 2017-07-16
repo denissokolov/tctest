@@ -58,11 +58,11 @@ class ProjectsSelectOption extends React.Component {
       // No need focus for select options. There is keyboard support in ProjectSelect component.
       // eslint-disable-next-line jsx-a11y/interactive-supports-focus
       <div
+        role="option"
         className={classNames}
         title={name}
         onMouseDown={this.onMouseDown}
         onMouseEnter={this.onMouseEnter}
-        role="option"
         aria-selected={selected}
       >
         {name}
