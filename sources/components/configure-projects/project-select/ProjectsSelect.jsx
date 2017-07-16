@@ -72,22 +72,34 @@ class ProjectsSelect extends React.Component {
   };
 
   onKeyDown = (event) => {
-    if (!this.props.items.length) {
+    const itemsCount = this.props.items.length;
+    if (itemsCount === 0) {
       return;
     }
 
     switch (event.keyCode) {
-      case keyCodes.downArrow: {
+      case keyCodes.downArrow:
         event.preventDefault();
-        this.handleDownButton(event.shiftKey);
+        this.handleDownButton(event.shiftKey, itemsCount);
         break;
-      }
 
-      case keyCodes.upArrow: {
+      case keyCodes.upArrow:
         event.preventDefault();
-        this.handleUpButton(event.shiftKey);
+        this.handleUpButton(event.shiftKey, itemsCount);
         break;
-      }
+
+      case keyCodes.a:
+        if (event.ctrlKey || event.metaKey) {
+          event.preventDefault();
+
+          this.setState(state => this.setNextState(state, {
+            savedSelectedIds: state.selectedIds,
+            activeSelectStartIndex: 0,
+            activeSelectEndIndex: itemsCount - 1,
+            currentActionIsDeselect: false,
+          }));
+        }
+        break;
 
       default:
         break;
@@ -131,7 +143,7 @@ class ProjectsSelect extends React.Component {
     }
   );
 
-  handleDownButton(shiftPressed) {
+  handleDownButton(shiftPressed, itemsCount) {
     this.setState((state) => {
       let startIndex;
       let endIndex;
@@ -140,7 +152,7 @@ class ProjectsSelect extends React.Component {
         endIndex = 0;
         startIndex = endIndex;
       } else {
-        endIndex = state.activeSelectEndIndex === (this.props.items.length - 1)
+        endIndex = state.activeSelectEndIndex === (itemsCount - 1)
           ? state.activeSelectEndIndex : (state.activeSelectEndIndex + 1);
 
         if (shiftPressed) {
@@ -159,13 +171,13 @@ class ProjectsSelect extends React.Component {
     });
   }
 
-  handleUpButton(shiftPressed) {
+  handleUpButton(shiftPressed, itemsCount) {
     this.setState((state) => {
       let startIndex;
       let endIndex;
 
       if (state.activeSelectStartIndex === null) {
-        endIndex = this.props.items.length - 1;
+        endIndex = itemsCount - 1;
         startIndex = endIndex;
       } else {
         endIndex = state.activeSelectEndIndex === 0 ? 0 : (state.activeSelectEndIndex - 1);
