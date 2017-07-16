@@ -1,9 +1,6 @@
 /* globals fetch, PROJECTS_URL */
 
 import 'whatwg-fetch';
-import ProjectsStorage from '../storages/ProjectsStorage';
-
-const projectsStorage = new ProjectsStorage();
 
 export function loadProjects() {
   return (dispatch) => {
@@ -25,12 +22,9 @@ export function loadProjects() {
       })
       .then((data) => {
         if (data) {
-          projectsStorage.fillFromServerData(data.project);
-
           dispatch({
             type: 'LOAD_PROJECTS_SUCCESS',
-            visible: projectsStorage.getVisible(),
-            hidden: projectsStorage.getHidden(),
+            projects: data.project,
           });
         }
       });
@@ -38,69 +32,48 @@ export function loadProjects() {
 }
 
 export function hideProjects(ids) {
-  projectsStorage.hideItems(ids);
-
   return {
     type: 'HIDE_PROJECTS',
-    visible: projectsStorage.getVisible(),
-    hidden: projectsStorage.getHidden(),
+    ids,
   };
 }
 
 export function showProjects(ids) {
-  projectsStorage.showItems(ids);
-
   return {
     type: 'SHOW_PROJECTS',
-    visible: projectsStorage.getVisible(),
-    hidden: projectsStorage.getHidden(),
+    ids,
   };
 }
 
 export function moveProjectsUp(ids) {
-  const sortChanged = projectsStorage.sortUpVisible(ids);
-
   return {
     type: 'MOVE_PROJECTS_UP',
-    items: projectsStorage.getVisible(),
-    sortChanged,
+    ids,
   };
 }
 
 export function moveProjectsDown(ids) {
-  const sortChanged = projectsStorage.sortDownVisible(ids);
-
   return {
     type: 'MOVE_PROJECTS_DOWN',
-    items: projectsStorage.getVisible(),
-    sortChanged,
+    ids,
   };
 }
 
 export function changeHiddenFilter(value) {
-  projectsStorage.filterHidden(value);
-
   return {
     type: 'CHANGE_HIDDEN_PROJECTS_FILTER',
-    items: projectsStorage.getHidden(),
     value,
   };
 }
 
 export function saveProjectsConfiguration() {
-  projectsStorage.saveState();
-
   return {
     type: 'SAVE_PROJECTS_CONFIGURATION',
   };
 }
 
 export function refreshProjectsConfiguration() {
-  projectsStorage.refreshToSavedState();
-
   return {
     type: 'REFRESH_PROJECTS_CONFIGURATION',
-    visible: projectsStorage.getVisible(),
-    hidden: projectsStorage.getHidden(),
   };
 }
