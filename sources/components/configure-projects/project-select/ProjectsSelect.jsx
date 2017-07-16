@@ -79,13 +79,13 @@ class ProjectsSelect extends React.Component {
     switch (event.keyCode) {
       case keyCodes.downArrow: {
         event.preventDefault();
-
+        this.handleDownButton(event.shiftKey);
         break;
       }
 
       case keyCodes.upArrow: {
         event.preventDefault();
-
+        this.handleUpButton(event.shiftKey);
         break;
       }
 
@@ -130,6 +130,61 @@ class ProjectsSelect extends React.Component {
       lastIndex: activeSelectStartIndex,
     }
   );
+
+  handleDownButton(shiftPressed) {
+    this.setState((state) => {
+      let startIndex;
+      let endIndex;
+
+      if (state.activeSelectStartIndex === null) {
+        endIndex = 0;
+        startIndex = endIndex;
+      } else {
+        endIndex = state.activeSelectEndIndex === (this.props.items.length - 1)
+          ? state.activeSelectEndIndex : (state.activeSelectEndIndex + 1);
+
+        if (shiftPressed) {
+          startIndex = state.activeSelectStartIndex;
+        } else {
+          startIndex = endIndex;
+        }
+      }
+
+      return this.setNextState(state, {
+        activeSelectStartIndex: startIndex,
+        activeSelectEndIndex: endIndex,
+        currentActionIsDeselect: false,
+        savedSelectedIds: shiftPressed ? state.savedSelectedIds : new Set(),
+      });
+    });
+  }
+
+  handleUpButton(shiftPressed) {
+    this.setState((state) => {
+      let startIndex;
+      let endIndex;
+
+      if (state.activeSelectStartIndex === null) {
+        endIndex = this.props.items.length - 1;
+        startIndex = endIndex;
+      } else {
+        endIndex = state.activeSelectEndIndex === 0 ? 0 : (state.activeSelectEndIndex - 1);
+
+        if (shiftPressed) {
+          startIndex = state.activeSelectStartIndex;
+        } else {
+          startIndex = endIndex;
+        }
+      }
+
+      return this.setNextState(state, {
+        activeSelectStartIndex: startIndex,
+        activeSelectEndIndex: endIndex,
+        currentActionIsDeselect: false,
+        savedSelectedIds: shiftPressed ? state.savedSelectedIds : new Set(),
+      });
+    });
+  }
 
   mouseDown = false;
 
