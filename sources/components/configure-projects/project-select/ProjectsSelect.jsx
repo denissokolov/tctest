@@ -15,14 +15,6 @@ class ProjectsSelect extends React.Component {
     onChange: PropTypes.func.isRequired,
   };
 
-  // TODO: no need store data in state
-  state = {
-    savedSelectedIds: new Set(),
-    activeSelectStartIndex: null,
-    activeSelectEndIndex: null,
-    currentActionIsDeselect: false,
-  };
-
   componentDidMount() {
     document.addEventListener('mouseup', this.onGlobalMouseUp);
   }
@@ -37,35 +29,34 @@ class ProjectsSelect extends React.Component {
     if (event.ctrlKey || event.metaKey) {
       const { selectedIds } = this.props;
 
-      this.setState(state => this.setNextState(state, {
-        savedSelectedIds: selectedIds,
-        activeSelectStartIndex: index,
-        activeSelectEndIndex: index,
-        currentActionIsDeselect: selectedIds.has(id),
-      }));
+      this.savedSelectedIds = selectedIds;
+      this.activeSelectStartIndex = index;
+      this.activeSelectEndIndex = index;
+      this.currentActionIsDeselect = selectedIds.has(id);
+
+      this.updateSelectedIds();
     } else if (event.shiftKey) {
-      this.setState(state => this.setNextState(state, {
-        savedSelectedIds: new Set(),
-        activeSelectStartIndex:
-          state.activeSelectStartIndex !== null ? state.activeSelectStartIndex : index,
-        activeSelectEndIndex: index,
-        currentActionIsDeselect: false,
-      }));
+      this.savedSelectedIds = new Set();
+      this.activeSelectStartIndex = this.activeSelectStartIndex !== null
+        ? this.activeSelectStartIndex : index;
+      this.activeSelectEndIndex = index;
+      this.currentActionIsDeselect = false;
+
+      this.updateSelectedIds();
     } else {
-      this.setState(state => this.setNextState(state, {
-        savedSelectedIds: new Set(),
-        activeSelectStartIndex: index,
-        activeSelectEndIndex: index,
-        currentActionIsDeselect: false,
-      }));
+      this.savedSelectedIds = new Set();
+      this.activeSelectStartIndex = index;
+      this.activeSelectEndIndex = index;
+      this.currentActionIsDeselect = false;
+
+      this.updateSelectedIds();
     }
   };
 
   onItemMouseEnter = (id, index) => {
     if (this.mouseDown) {
-      this.setState(state => this.setNextState(state, {
-        activeSelectEndIndex: index,
-      }));
+      this.activeSelectEndIndex = index;
+      this.updateSelectedIds();
     }
   };
 
@@ -95,14 +86,13 @@ class ProjectsSelect extends React.Component {
       case keyCodes.a:
         if (event.ctrlKey || event.metaKey) {
           event.preventDefault();
-          const { selectedIds } = this.props;
 
-          this.setState(state => this.setNextState(state, {
-            savedSelectedIds: selectedIds,
-            activeSelectStartIndex: 0,
-            activeSelectEndIndex: itemsCount - 1,
-            currentActionIsDeselect: false,
-          }));
+          this.savedSelectedIds = this.props.selectedIds;
+          this.activeSelectStartIndex = 0;
+          this.activeSelectEndIndex = itemsCount - 1;
+          this.currentActionIsDeselect = false;
+
+          this.updateSelectedIds();
         }
         break;
 
@@ -111,25 +101,15 @@ class ProjectsSelect extends React.Component {
     }
   };
 
-  setNextState(state, nextState) {
-    const stateMerged = Object.assign({}, state, nextState);
-
-    this.props.onChange(this.getActiveSelectedIds(stateMerged));
-
-    return stateMerged;
-  }
-
-  getActiveSelectedIds(state) {
-    const { activeSelectStartIndex, activeSelectEndIndex } = state;
-    if (activeSelectStartIndex === null || activeSelectEndIndex === null) {
+  getSelectedIdsForUpdate() {
+    if (this.activeSelectStartIndex === null || this.activeSelectEndIndex === null) {
       return new Set();
     }
 
-    const { currentActionIsDeselect, savedSelectedIds } = state;
     const { items } = this.props;
     const ids = [];
 
-    const indexes = this.getSortedActiveSelectIndexes(activeSelectStartIndex, activeSelectEndIndex);
+    const indexes = this.getSortedActiveSelectIndexes();
 
     let index = indexes.firstIndex;
     let item;
@@ -141,105 +121,111 @@ class ProjectsSelect extends React.Component {
       index += 1;
     }
 
-    return currentActionIsDeselect ? savedSelectedIds.subtract(ids) : savedSelectedIds.union(ids);
+    return this.currentActionIsDeselect
+      ? this.savedSelectedIds.subtract(ids)
+      : this.savedSelectedIds.union(ids);
   }
 
-  getSortedActiveSelectIndexes = (activeSelectStartIndex, activeSelectEndIndex) => (
-    activeSelectStartIndex < activeSelectEndIndex ? {
-      firstIndex: activeSelectStartIndex,
-      lastIndex: activeSelectEndIndex,
+  getSortedActiveSelectIndexes = () => (
+    this.activeSelectStartIndex < this.activeSelectEndIndex ? {
+      firstIndex: this.activeSelectStartIndex,
+      lastIndex: this.activeSelectEndIndex,
     } : {
-      firstIndex: activeSelectEndIndex,
-      lastIndex: activeSelectStartIndex,
+      firstIndex: this.activeSelectEndIndex,
+      lastIndex: this.activeSelectStartIndex,
     }
   );
 
   handleDownButton(shiftPressed) {
-    this.setState((state) => {
-      let startIndex;
-      let endIndex;
+    let startIndex;
+    let endIndex;
 
-      if (state.activeSelectStartIndex === null) {
-        endIndex = 0;
-        startIndex = endIndex;
-      } else {
-        const { items } = this.props;
-        const itemsCount = items.length;
+    if (this.activeSelectStartIndex === null) {
+      endIndex = 0;
+      startIndex = endIndex;
+    } else {
+      const { items } = this.props;
+      const itemsCount = items.length;
 
-        let needNext = true;
-        endIndex = state.activeSelectEndIndex;
+      let needNext = true;
+      endIndex = this.activeSelectEndIndex;
 
-        while (needNext) {
-          if (endIndex === itemsCount - 1) {
-            needNext = false;
-            endIndex = state.activeSelectEndIndex;
-          } else {
-            endIndex += 1;
-            if (!items[endIndex].disabled) {
-              needNext = false;
-            }
-          }
-        }
-
-        if (shiftPressed) {
-          startIndex = state.activeSelectStartIndex;
+      while (needNext) {
+        if (endIndex === itemsCount - 1) {
+          needNext = false;
+          endIndex = this.activeSelectEndIndex;
         } else {
-          startIndex = endIndex;
+          endIndex += 1;
+          if (!items[endIndex].disabled) {
+            needNext = false;
+          }
         }
       }
 
-      return this.setNextState(state, {
-        activeSelectStartIndex: startIndex,
-        activeSelectEndIndex: endIndex,
-        currentActionIsDeselect: false,
-        savedSelectedIds: shiftPressed ? state.savedSelectedIds : new Set(),
-      });
-    });
+      if (shiftPressed) {
+        startIndex = this.activeSelectStartIndex;
+      } else {
+        startIndex = endIndex;
+      }
+    }
+
+    this.activeSelectStartIndex = startIndex;
+    this.activeSelectEndIndex = endIndex;
+    this.currentActionIsDeselect = false;
+    this.savedSelectedIds = shiftPressed ? this.savedSelectedIds : new Set();
+
+    this.updateSelectedIds();
   }
 
   handleUpButton(shiftPressed) {
     const { items } = this.props;
     const itemsCount = items.length;
 
-    this.setState((state) => {
-      let startIndex;
-      let endIndex;
+    let startIndex;
+    let endIndex;
 
-      if (state.activeSelectStartIndex === null) {
-        endIndex = itemsCount - 1;
-        startIndex = endIndex;
-      } else {
-        let needPrev = true;
-        endIndex = state.activeSelectEndIndex;
+    if (this.activeSelectStartIndex === null) {
+      endIndex = itemsCount - 1;
+      startIndex = endIndex;
+    } else {
+      let needPrev = true;
+      endIndex = this.activeSelectEndIndex;
 
-        while (needPrev) {
-          if (endIndex === 0) {
-            needPrev = false;
-            endIndex = state.activeSelectEndIndex;
-          } else {
-            endIndex -= 1;
-            if (!items[endIndex].disabled) {
-              needPrev = false;
-            }
-          }
-        }
-
-        if (shiftPressed) {
-          startIndex = state.activeSelectStartIndex;
+      while (needPrev) {
+        if (endIndex === 0) {
+          needPrev = false;
+          endIndex = this.activeSelectEndIndex;
         } else {
-          startIndex = endIndex;
+          endIndex -= 1;
+          if (!items[endIndex].disabled) {
+            needPrev = false;
+          }
         }
       }
 
-      return this.setNextState(state, {
-        activeSelectStartIndex: startIndex,
-        activeSelectEndIndex: endIndex,
-        currentActionIsDeselect: false,
-        savedSelectedIds: shiftPressed ? state.savedSelectedIds : new Set(),
-      });
-    });
+      if (shiftPressed) {
+        startIndex = this.activeSelectStartIndex;
+      } else {
+        startIndex = endIndex;
+      }
+    }
+
+    this.activeSelectStartIndex = startIndex;
+    this.activeSelectEndIndex = endIndex;
+    this.currentActionIsDeselect = false;
+    this.savedSelectedIds = shiftPressed ? this.savedSelectedIds : new Set();
+
+    this.updateSelectedIds();
   }
 
+  updateSelectedIds() {
+    this.props.onChange(this.getSelectedIdsForUpdate());
+  }
+
+  savedSelectedIds = new Set();
+  activeSelectStartIndex = null;
+  activeSelectEndIndex = null;
+  currentActionIsDeselect = false;
   mouseDown = false;
 
   render() {
