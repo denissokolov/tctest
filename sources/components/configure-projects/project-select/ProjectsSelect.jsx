@@ -84,12 +84,12 @@ class ProjectsSelect extends React.Component {
     switch (event.keyCode) {
       case keyCodes.downArrow:
         event.preventDefault();
-        this.handleDownButton(event.shiftKey, itemsCount);
+        this.handleDownButton(event.shiftKey);
         break;
 
       case keyCodes.upArrow:
         event.preventDefault();
-        this.handleUpButton(event.shiftKey, itemsCount);
+        this.handleUpButton(event.shiftKey);
         break;
 
       case keyCodes.a:
@@ -132,8 +132,12 @@ class ProjectsSelect extends React.Component {
     const indexes = this.getSortedActiveSelectIndexes(activeSelectStartIndex, activeSelectEndIndex);
 
     let index = indexes.firstIndex;
+    let item;
     while (index <= indexes.lastIndex) {
-      ids.push(items[index].id);
+      item = items[index];
+      if (!item.disabled) {
+        ids.push(items[index].id);
+      }
       index += 1;
     }
 
@@ -150,7 +154,7 @@ class ProjectsSelect extends React.Component {
     }
   );
 
-  handleDownButton(shiftPressed, itemsCount) {
+  handleDownButton(shiftPressed) {
     this.setState((state) => {
       let startIndex;
       let endIndex;
@@ -159,8 +163,23 @@ class ProjectsSelect extends React.Component {
         endIndex = 0;
         startIndex = endIndex;
       } else {
-        endIndex = state.activeSelectEndIndex === (itemsCount - 1)
-          ? state.activeSelectEndIndex : (state.activeSelectEndIndex + 1);
+        const { items } = this.props;
+        const itemsCount = items.length;
+
+        let needNext = true;
+        endIndex = state.activeSelectEndIndex;
+
+        while (needNext) {
+          if (endIndex === itemsCount - 1) {
+            needNext = false;
+            endIndex = state.activeSelectEndIndex;
+          } else {
+            endIndex += 1;
+            if (!items[endIndex].disabled) {
+              needNext = false;
+            }
+          }
+        }
 
         if (shiftPressed) {
           startIndex = state.activeSelectStartIndex;
@@ -178,7 +197,10 @@ class ProjectsSelect extends React.Component {
     });
   }
 
-  handleUpButton(shiftPressed, itemsCount) {
+  handleUpButton(shiftPressed) {
+    const { items } = this.props;
+    const itemsCount = items.length;
+
     this.setState((state) => {
       let startIndex;
       let endIndex;
@@ -187,7 +209,20 @@ class ProjectsSelect extends React.Component {
         endIndex = itemsCount - 1;
         startIndex = endIndex;
       } else {
-        endIndex = state.activeSelectEndIndex === 0 ? 0 : (state.activeSelectEndIndex - 1);
+        let needPrev = true;
+        endIndex = state.activeSelectEndIndex;
+
+        while (needPrev) {
+          if (endIndex === 0) {
+            needPrev = false;
+            endIndex = state.activeSelectEndIndex;
+          } else {
+            endIndex -= 1;
+            if (!items[endIndex].disabled) {
+              needPrev = false;
+            }
+          }
+        }
 
         if (shiftPressed) {
           startIndex = state.activeSelectStartIndex;
@@ -227,7 +262,7 @@ class ProjectsSelect extends React.Component {
             name={item.name}
             depth={item.depth}
             parentCustomSort={item.parentCustomSort}
-            disabled={item.noInteractive}
+            disabled={item.disabled}
             filterMatch={item.filterMatch}
             selected={selectedIds.has(item.id)}
             onMouseDown={this.onItemMouseDown}

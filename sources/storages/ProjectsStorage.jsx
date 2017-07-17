@@ -411,7 +411,7 @@ class ProjectsStorage {
     name: project.original.name,
     depth: project.original.depth,
     parentId: project.parentId,
-    noInteractive: project.visible,
+    disabled: project.visible,
     filterMatch: project.filterMatch,
   });
 
