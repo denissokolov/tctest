@@ -25,7 +25,8 @@ class ProjectsSelect extends React.Component {
   }
 
   componentWillUpdate(nextProps) {
-    if (this.props.selectedIds !== nextProps.selectedIds) {
+    if (this.props.items.length === nextProps.items.length
+      && this.props.items !== nextProps.items) {
       this.listRef.forceUpdateGrid();
     }
   }
