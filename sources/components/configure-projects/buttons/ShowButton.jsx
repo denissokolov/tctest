@@ -2,18 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { hideProjects } from '../../../../actions/ConfigureProjectsActions';
+import { showProjects } from '../../../actions/ConfigureProjectsActions';
 
-import ArrowButton, { directions as arrowButtonDirections } from '../../../arrow-button/ArrowButton';
+import ArrowButton, { directions as arrowButtonDirections } from '../../arrow-button/ArrowButton';
 
-export class HideButton extends React.Component {
+export class ShowButton extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     disabled: PropTypes.bool.isRequired,
   };
 
   onClick = () => {
-    this.props.dispatch(hideProjects());
+    this.props.dispatch(showProjects());
   };
 
   render() {
@@ -21,7 +21,7 @@ export class HideButton extends React.Component {
 
     return (
       <ArrowButton
-        direction={arrowButtonDirections.right}
+        direction={arrowButtonDirections.left}
         onClick={this.onClick}
         disabled={disabled}
       />
@@ -30,7 +30,7 @@ export class HideButton extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  disabled: state.configureProjects.get('visibleSelectedIds').size === 0,
+  disabled: state.configureProjects.get('hiddenSelectedIds').size === 0,
 });
 
-export default connect(mapStateToProps)(HideButton);
+export default connect(mapStateToProps)(ShowButton);

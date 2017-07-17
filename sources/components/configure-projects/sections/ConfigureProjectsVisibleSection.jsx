@@ -1,9 +1,9 @@
 import React from 'react';
 
-import ConnectedMoveUpButton from './buttons/MoveUpButton';
-import ConnectedMoveDownButton from './buttons/MoveDownButton';
-import ConnectedHideButton from './buttons/HideButton';
-import ConnectedVisibleProjectsSelect from './selects/VisibleProjectsSelect';
+import ConnectedMoveUpButton from '../buttons/MoveUpButton';
+import ConnectedMoveDownButton from '../buttons/MoveDownButton';
+import ConnectedHideButton from '../buttons/HideButton';
+import ConnectedVisibleProjectsSelect from '../selects/VisibleProjectsSelect';
 
 function ConfigureProjectsVisibleSection() {
   return (

@@ -3,7 +3,7 @@ import { shallow } from 'enzyme';
 
 import formattedProjects from '../../../__mocks__/formattedProjects';
 import ConfigureProjectsVisibleSection from './ConfigureProjectsVisibleSection';
-import ProjectsSelect from '../project-select/ProjectsSelect';
+import ProjectsSelect from '../selects/ProjectsSelect';
 import ArrowButton, { directions } from '../../arrow-button/ArrowButton';
 
 function create(props) {

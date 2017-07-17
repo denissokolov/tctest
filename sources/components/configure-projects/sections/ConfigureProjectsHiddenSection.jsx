@@ -1,8 +1,8 @@
 import React from 'react';
 
 import ConnectedFilterProjects from '../filter/FilterProjects';
-import ConnectedShowButton from './buttons/ShowButton';
-import ConnectedHiddenProjectsSelect from './selects/HiddenProjectsSelect';
+import ConnectedShowButton from '../buttons/ShowButton';
+import ConnectedHiddenProjectsSelect from '../selects/HiddenProjectsSelect';
 
 function ConfigureProjectsHiddenSection() {
   return (

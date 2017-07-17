@@ -2,18 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { moveProjectsDown } from '../../../../actions/ConfigureProjectsActions';
+import { hideProjects } from '../../../actions/ConfigureProjectsActions';
 
-import ArrowButton, { directions as arrowButtonDirections } from '../../../arrow-button/ArrowButton';
+import ArrowButton, { directions as arrowButtonDirections } from '../../arrow-button/ArrowButton';
 
-export class MoveDownButton extends React.Component {
+export class HideButton extends React.Component {
   static propTypes = {
     dispatch: PropTypes.func.isRequired,
     disabled: PropTypes.bool.isRequired,
   };
 
   onClick = () => {
-    this.props.dispatch(moveProjectsDown());
+    this.props.dispatch(hideProjects());
   };
 
   render() {
@@ -21,7 +21,7 @@ export class MoveDownButton extends React.Component {
 
     return (
       <ArrowButton
-        direction={arrowButtonDirections.down}
+        direction={arrowButtonDirections.right}
         onClick={this.onClick}
         disabled={disabled}
       />
@@ -33,4 +33,4 @@ const mapStateToProps = state => ({
   disabled: state.configureProjects.get('visibleSelectedIds').size === 0,
 });
 
-export default connect(mapStateToProps)(MoveDownButton);
+export default connect(mapStateToProps)(HideButton);

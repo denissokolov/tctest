@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Set } from 'immutable';
 
-import { changeHiddenSelectedProjects } from '../../../../actions/ConfigureProjectsActions';
+import { changeVisibleSelectedProjects } from '../../../actions/ConfigureProjectsActions';
 
-import ProjectsSelect from '../../project-select/ProjectsSelect';
+import ProjectsSelect from './ProjectsSelect';
 
-export class HiddenProjectsSelect extends React.Component {
+class VisibleProjectsSelect extends React.Component {
   static propTypes = {
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
     selectedIds: PropTypes.instanceOf(Set).isRequired,
@@ -15,7 +15,7 @@ export class HiddenProjectsSelect extends React.Component {
   };
 
   onChange = (selectedIds) => {
-    this.props.dispatch(changeHiddenSelectedProjects(selectedIds));
+    this.props.dispatch(changeVisibleSelectedProjects(selectedIds));
   };
 
   render() {
@@ -32,8 +32,8 @@ export class HiddenProjectsSelect extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  items: state.configureProjects.get('hiddenItems'),
-  selectedIds: state.configureProjects.get('hiddenSelectedIds'),
+  items: state.configureProjects.get('visibleItems'),
+  selectedIds: state.configureProjects.get('visibleSelectedIds'),
 });
 
-export default connect(mapStateToProps)(HiddenProjectsSelect);
+export default connect(mapStateToProps)(VisibleProjectsSelect);

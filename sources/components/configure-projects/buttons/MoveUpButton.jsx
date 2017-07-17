@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { moveProjectsUp } from '../../../../actions/ConfigureProjectsActions';
+import { moveProjectsUp } from '../../../actions/ConfigureProjectsActions';
 
-import ArrowButton, { directions as arrowButtonDirections } from '../../../arrow-button/ArrowButton';
+import ArrowButton, { directions as arrowButtonDirections } from '../../arrow-button/ArrowButton';
 
 export class MoveUpButton extends React.Component {
   static propTypes = {
