@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { Set } from 'immutable';
 import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
 import List from 'react-virtualized/dist/commonjs/List';
+import ArrowKeyStepper from 'react-virtualized/dist/commonjs/ArrowKeyStepper';
 
 import keyCodes from '../../../utils/keyCodes';
 import ProjectsSelectOption from './ProjectsSelectOption';
@@ -275,19 +276,32 @@ class ProjectsSelect extends React.Component {
         role="listbox"
         tabIndex={0}
       >
-        <AutoSizer>
-          {({ height, width }) => (
-            <List
-              className="projects-select__list"
-              width={width}
-              height={height}
-              rowCount={rowCount}
-              rowHeight={OPTION_HEIGHT}
-              rowRenderer={this.optionRenderer}
-              ref={this.setListRef}
-            />
+        <ArrowKeyStepper
+          className="projects-select__arrow-key-stepper"
+          mode="cells"
+          columnCount={1}
+          rowCount={rowCount}
+          scrollToRow={this.activeSelectEndIndex || 0}
+          isControlled
+        >
+          {({ onSectionRendered, scrollToRow }) => (
+            <AutoSizer>
+              {({ height, width }) => (
+                <List
+                  className="projects-select__list"
+                  width={width}
+                  height={height}
+                  rowCount={rowCount}
+                  rowHeight={OPTION_HEIGHT}
+                  rowRenderer={this.optionRenderer}
+                  onSectionRendered={onSectionRendered}
+                  scrollToIndex={scrollToRow}
+                  ref={this.setListRef}
+                />
+              )}
+            </AutoSizer>
           )}
-        </AutoSizer>
+        </ArrowKeyStepper>
       </div>
     );
   }

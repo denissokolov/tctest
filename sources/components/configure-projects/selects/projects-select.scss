@@ -1,6 +1,10 @@
 .projects-select {
   height: 100%;
 
+  &__arrow-key-stepper {
+    height: 100%;
+  }
+
   &__list {
     border: 1px solid #dedede;
     outline: none;
