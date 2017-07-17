@@ -9,8 +9,11 @@
   overflow-y: auto;
   border: 1px solid #dedede;
   outline: none;
-  user-select: none;
   cursor: default;
+
+  ::selection {
+    background-color: transparent;
+  }
 
   &:focus {
     border-color: #438ed7;
