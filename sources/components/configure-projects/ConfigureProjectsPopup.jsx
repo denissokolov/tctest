@@ -41,7 +41,10 @@ export class ConfigureProjectsPopup extends React.Component {
   render() {
     const { visible, error, loading } = this.props;
     let content;
-    if (error) {
+
+    if (!visible) {
+      content = (<div />);
+    } else if (error) {
       content = <div className="popup-message popup-message_error">{error}</div>;
     } else if (loading) {
       content = (<div className="popup-message popup-message_loading">Loading</div>);
