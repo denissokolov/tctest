@@ -1,21 +1,17 @@
 .projects-select {
-  $max-depth: 10;
-
-  width: 100%;
   height: 100%;
-  padding: 0;
-  margin: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  border: 1px solid #dedede;
-  outline: none;
-  cursor: default;
 
-  ::selection {
-    background-color: transparent;
-  }
+  &__list {
+    border: 1px solid #dedede;
+    outline: none;
+    cursor: default;
 
-  &:focus {
-    border-color: #438ed7;
+    &:focus {
+      border-color: #438ed7;
+    }
+
+    ::selection {
+      background-color: transparent;
+    }
   }
 }

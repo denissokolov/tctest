@@ -16,6 +16,7 @@ class ProjectsSelectOption extends React.Component {
     filterMatch: PropTypes.bool,
     onMouseDown: PropTypes.func.isRequired,
     onMouseEnter: PropTypes.func.isRequired,
+    style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
   };
 
   static defaultProps = {
@@ -23,6 +24,7 @@ class ProjectsSelectOption extends React.Component {
     disabled: false,
     parentCustomSort: false,
     filterMatch: false,
+    style: {},
   };
 
   onMouseDown = (event) => {
@@ -42,7 +44,9 @@ class ProjectsSelectOption extends React.Component {
   };
 
   render() {
-    const { index, name, depth, selected, disabled, parentCustomSort, filterMatch } = this.props;
+    const {
+      index, name, depth, selected, disabled, parentCustomSort, filterMatch, style,
+    } = this.props;
 
     const classNames = cn(
       'projects-select-option',
@@ -64,6 +68,7 @@ class ProjectsSelectOption extends React.Component {
         onMouseDown={this.onMouseDown}
         onMouseEnter={this.onMouseEnter}
         aria-selected={selected}
+        style={style}
       >
         {name}
       </div>

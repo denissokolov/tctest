@@ -3,10 +3,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Set } from 'immutable';
+import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
+import List from 'react-virtualized/dist/commonjs/List';
 
 import keyCodes from '../../../utils/keyCodes';
 import ProjectsSelectOption from './ProjectsSelectOption';
 import './projects-select.scss';
+
+const OPTION_HEIGHT = 26;
 
 class ProjectsSelect extends React.Component {
   static propTypes = {
@@ -17,6 +21,12 @@ class ProjectsSelect extends React.Component {
 
   componentDidMount() {
     document.addEventListener('mouseup', this.onGlobalMouseUp);
+  }
+
+  componentWillUpdate(nextProps) {
+    if (this.props.selectedIds !== nextProps.selectedIds) {
+      this.listRef.forceUpdateGrid();
+    }
   }
 
   componentWillUnmount() {
@@ -136,6 +146,10 @@ class ProjectsSelect extends React.Component {
     }
   );
 
+  setListRef = (ref) => {
+    this.listRef = ref;
+  };
+
   handleDownButton(shiftPressed) {
     let startIndex;
     let endIndex;
@@ -222,6 +236,28 @@ class ProjectsSelect extends React.Component {
     this.props.onChange(this.getSelectedIdsForUpdate());
   }
 
+  optionRenderer = ({ index, style }) => {
+    const { items, selectedIds } = this.props;
+    const item = items[index];
+
+    return (
+      <ProjectsSelectOption
+        key={item.id}
+        id={item.id}
+        index={index}
+        name={item.name}
+        depth={item.depth}
+        parentCustomSort={item.parentCustomSort}
+        disabled={item.disabled}
+        filterMatch={item.filterMatch}
+        selected={selectedIds.has(item.id)}
+        onMouseDown={this.onItemMouseDown}
+        onMouseEnter={this.onItemMouseEnter}
+        style={style}
+      />
+    );
+  };
+
   savedSelectedIds = new Set();
   activeSelectStartIndex = null;
   activeSelectEndIndex = null;
@@ -229,32 +265,29 @@ class ProjectsSelect extends React.Component {
   mouseDown = false;
 
   render() {
-    const { items, selectedIds } = this.props;
+    const { items } = this.props;
+    const rowCount = items.length;
 
     return (
       <div
         className="projects-select"
-        onBlur={this.onBlur}
         onKeyDown={this.onKeyDown}
-        ref={(el) => { this.selectEl = el; }}
         role="listbox"
         tabIndex={0}
       >
-        {items.map((item, index) => (
-          <ProjectsSelectOption
-            key={item.id}
-            id={item.id}
-            index={index}
-            name={item.name}
-            depth={item.depth}
-            parentCustomSort={item.parentCustomSort}
-            disabled={item.disabled}
-            filterMatch={item.filterMatch}
-            selected={selectedIds.has(item.id)}
-            onMouseDown={this.onItemMouseDown}
-            onMouseEnter={this.onItemMouseEnter}
-          />
-        ))}
+        <AutoSizer>
+          {({ height, width }) => (
+            <List
+              className="projects-select__list"
+              width={width}
+              height={height}
+              rowCount={rowCount}
+              rowHeight={OPTION_HEIGHT}
+              rowRenderer={this.optionRenderer}
+              ref={this.setListRef}
+            />
+          )}
+        </AutoSizer>
       </div>
     );
   }
