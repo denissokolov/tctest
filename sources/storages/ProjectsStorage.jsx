@@ -132,6 +132,7 @@ class ProjectsStorage {
       if (project.visible && ids.has(project.id) && project.visibleParentId) {
         project.visible = false;
         project.visibleChildrenIds = [];
+        project.customSort = false;
 
         if (parentHideInfo) {
           hideInfo[project.id] = {
