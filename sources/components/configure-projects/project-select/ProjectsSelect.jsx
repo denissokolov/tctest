@@ -11,10 +11,12 @@ import './projects-select.scss';
 class ProjectsSelect extends React.Component {
   static propTypes = {
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
+    selectedIds: PropTypes.instanceOf(Set).isRequired,
+    onChange: PropTypes.func.isRequired,
   };
 
+  // TODO: no need store data in state
   state = {
-    selectedIds: new Set(),
     savedSelectedIds: new Set(),
     activeSelectStartIndex: null,
     activeSelectEndIndex: null,
@@ -33,11 +35,13 @@ class ProjectsSelect extends React.Component {
     this.mouseDown = true;
 
     if (event.ctrlKey || event.metaKey) {
+      const { selectedIds } = this.props;
+
       this.setState(state => this.setNextState(state, {
-        savedSelectedIds: state.selectedIds,
+        savedSelectedIds: selectedIds,
         activeSelectStartIndex: index,
         activeSelectEndIndex: index,
-        currentActionIsDeselect: state.selectedIds.has(id),
+        currentActionIsDeselect: selectedIds.has(id),
       }));
     } else if (event.shiftKey) {
       this.setState(state => this.setNextState(state, {
@@ -91,9 +95,10 @@ class ProjectsSelect extends React.Component {
       case keyCodes.a:
         if (event.ctrlKey || event.metaKey) {
           event.preventDefault();
+          const { selectedIds } = this.props;
 
           this.setState(state => this.setNextState(state, {
-            savedSelectedIds: state.selectedIds,
+            savedSelectedIds: selectedIds,
             activeSelectStartIndex: 0,
             activeSelectEndIndex: itemsCount - 1,
             currentActionIsDeselect: false,
@@ -108,7 +113,9 @@ class ProjectsSelect extends React.Component {
 
   setNextState(state, nextState) {
     const stateMerged = Object.assign({}, state, nextState);
-    stateMerged.selectedIds = this.getActiveSelectedIds(stateMerged);
+
+    this.props.onChange(this.getActiveSelectedIds(stateMerged));
+
     return stateMerged;
   }
 
@@ -201,8 +208,7 @@ class ProjectsSelect extends React.Component {
   mouseDown = false;
 
   render() {
-    const { items } = this.props;
-    const { selectedIds } = this.state;
+    const { items, selectedIds } = this.props;
 
     return (
       <div

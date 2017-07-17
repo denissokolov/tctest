@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Map } from 'immutable';
 
 import ConfigureProjects from '../configure-projects/ConfigureProjects';
 import {
@@ -13,10 +12,16 @@ import '../popup/popup-message.scss';
 
 export class ConfigureProjectsPopup extends React.Component {
   static propTypes = {
-    configureProjects: PropTypes.instanceOf(Map).isRequired,
     dispatch: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
+    error: PropTypes.string,
+    loading: PropTypes.bool,
     visible: PropTypes.bool.isRequired,
+  };
+
+  static defaultProps = {
+    error: undefined,
+    loading: false,
   };
 
   componentDidMount() {
@@ -34,22 +39,17 @@ export class ConfigureProjectsPopup extends React.Component {
   };
 
   render() {
-    const { dispatch, visible, configureProjects } = this.props;
-    const error = configureProjects.get('error');
-
+    const { visible, error, loading } = this.props;
     let content;
     if (error) {
       content = <div className="popup-message popup-message_error">{error}</div>;
-    } else if (configureProjects.get('loading')) {
+    } else if (loading) {
       content = (<div className="popup-message popup-message_loading">Loading</div>);
     } else {
       content = (
         <ConfigureProjects
-          configureProjects={configureProjects}
-          dispatch={dispatch}
           onSubmit={this.onSubmit}
           onCancel={this.onCancel}
-          formVisible={visible}
         />
       );
     }
@@ -66,6 +66,9 @@ export class ConfigureProjectsPopup extends React.Component {
   }
 }
 
-export default connect(state => ({
-  configureProjects: state.configureProjects,
-}))(ConfigureProjectsPopup);
+const mapStateToProps = state => ({
+  error: state.configureProjects.get('error'),
+  loading: state.configureProjects.get('loading'),
+});
+
+export default connect(mapStateToProps)(ConfigureProjectsPopup);

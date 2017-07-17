@@ -1,14 +1,18 @@
-import { Map } from 'immutable';
+import { Map, Set } from 'immutable';
+
+import { getSelectedIdsWithChildren } from '../utils/projectSelectUtils';
 
 import ProjectsStorage from '../storages/ProjectsStorage';
 
 const projectsStorage = new ProjectsStorage();
 
-const defaultState = Map({
+const defaultState = new Map({
   loading: false,
   error: null,
-  visible: [],
-  hidden: [],
+  visibleItems: [],
+  visibleSelectedIds: new Set(),
+  hiddenItems: [],
+  hiddenSelectedIds: new Set(),
   customSort: false,
   hiddenFilterValue: '',
 });
@@ -24,8 +28,8 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
       projectsStorage.fillFromServerData(action.projects);
       return state
         .set('loading', false)
-        .set('visible', projectsStorage.getVisible())
-        .set('hidden', projectsStorage.getHidden());
+        .set('visibleItems', projectsStorage.getVisible())
+        .set('hiddenItems', projectsStorage.getHidden());
 
     case 'LOAD_PROJECTS_FAIL':
       return state
@@ -33,35 +37,47 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         .set('error', action.error ? action.error.message : '');
 
     case 'SHOW_PROJECTS':
-      projectsStorage.showItems(action.ids);
+      projectsStorage.showItems(
+        getSelectedIdsWithChildren(state.get('hiddenSelectedIds'), state.get('hiddenItems')),
+      );
       return state
-        .set('visible', action.getVisible())
-        .set('hidden', action.getHidden());
+        .set('visibleItems', projectsStorage.getVisible())
+        .set('visibleSelectedIds', state.get('hiddenSelectedIds'))
+        .set('hiddenItems', projectsStorage.getHidden())
+        .set('hiddenSelectedIds', new Set());
 
     case 'HIDE_PROJECTS':
-      projectsStorage.hideItems(action.ids);
+      projectsStorage.hideItems(
+        getSelectedIdsWithChildren(state.get('visibleSelectedIds'), state.get('visibleItems')),
+      );
       return state
-        .set('visible', action.getVisible())
-        .set('hidden', action.getHidden());
+        .set('visibleItems', projectsStorage.getVisible())
+        .set('visibleSelectedIds', new Set())
+        .set('hiddenItems', projectsStorage.getHidden())
+        .set('hiddenSelectedIds', state.get('visibleSelectedIds'));
 
     case 'MOVE_PROJECTS_UP': {
-      const sortChanged = projectsStorage.sortUpVisible(action.ids);
+      const sortChanged = projectsStorage.sortUpVisible(state.get('visibleSelectedIds'));
       return sortChanged
-        ? state.set('visible', action.getVisible()).set('customSort', true)
+        ? state
+            .set('visibleItems', projectsStorage.getVisible())
+            .set('customSort', true)
         : state;
     }
 
     case 'MOVE_PROJECTS_DOWN': {
-      const sortChanged = projectsStorage.sortDownVisible(action.ids);
+      const sortChanged = projectsStorage.sortDownVisible(state.get('visibleSelectedIds'));
       return sortChanged
-        ? state.set('visible', action.getVisible()).set('customSort', true)
+        ? state
+            .set('visibleItems', projectsStorage.getVisible())
+            .set('customSort', true)
         : state;
     }
 
     case 'CHANGE_HIDDEN_PROJECTS_FILTER':
       projectsStorage.filterHidden(action.value);
       return state
-        .set('hidden', action.getHidden())
+        .set('hiddenItems', projectsStorage.getHidden())
         .set('hiddenFilterValue', action.value);
 
     case 'SAVE_PROJECTS_CONFIGURATION':
@@ -71,10 +87,16 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
     case 'REFRESH_PROJECTS_CONFIGURATION':
       projectsStorage.refreshToSavedState();
       return state
-        .set('visible', action.getVisible())
-        .set('hidden', action.getHidden())
+        .set('visibleItems', projectsStorage.getVisible())
+        .set('hiddenItems', projectsStorage.getHidden())
         .set('hiddenFilterValue', '')
         .set('customSort', false);
+
+    case 'CHANGE_HIDDEN_SELECTED_PROJECTS':
+      return state.set('hiddenSelectedIds', action.selectedIds);
+
+    case 'CHANGE_VISIBLE_SELECTED_PROJECTS':
+      return state.set('visibleSelectedIds', action.selectedIds);
 
     default:
       return state;

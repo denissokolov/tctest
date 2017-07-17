@@ -14,7 +14,7 @@ export const modifiers = {
   default: 'default',
 };
 
-class FormButton extends React.PureComponent {
+class FormButton extends React.Component {
   static propTypes = {
     text: PropTypes.string.isRequired,
     type: PropTypes.oneOf([types.submit, types.button]),

@@ -31,31 +31,27 @@ export function loadProjects() {
   };
 }
 
-export function hideProjects(ids) {
+export function hideProjects() {
   return {
     type: 'HIDE_PROJECTS',
-    ids,
   };
 }
 
-export function showProjects(ids) {
+export function showProjects() {
   return {
     type: 'SHOW_PROJECTS',
-    ids,
   };
 }
 
-export function moveProjectsUp(ids) {
+export function moveProjectsUp() {
   return {
     type: 'MOVE_PROJECTS_UP',
-    ids,
   };
 }
 
-export function moveProjectsDown(ids) {
+export function moveProjectsDown() {
   return {
     type: 'MOVE_PROJECTS_DOWN',
-    ids,
   };
 }
 
@@ -75,5 +71,19 @@ export function saveProjectsConfiguration() {
 export function refreshProjectsConfiguration() {
   return {
     type: 'REFRESH_PROJECTS_CONFIGURATION',
+  };
+}
+
+export function changeHiddenSelectedProjects(selectedIds) {
+  return {
+    type: 'CHANGE_HIDDEN_SELECTED_PROJECTS',
+    selectedIds,
+  };
+}
+
+export function changeVisibleSelectedProjects(selectedIds) {
+  return {
+    type: 'CHANGE_VISIBLE_SELECTED_PROJECTS',
+    selectedIds,
   };
 }

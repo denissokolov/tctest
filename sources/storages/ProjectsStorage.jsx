@@ -97,17 +97,12 @@ class ProjectsStorage {
         }
       }
 
-      if (!project.visible && ids.length) {
-        const idsIndex = ids.indexOf(project.id);
-        if (idsIndex !== -1) {
-          ids.splice(idsIndex, 1);
+      if (!project.visible && ids.has(project.id)) {
+        project.visible = true;
+        project.filterMatch = false;
+        project.filterTreeMatch = false;
 
-          project.visible = true;
-          project.filterMatch = false;
-          project.filterTreeMatch = false;
-
-          addToVisibleParent = true;
-        }
+        addToVisibleParent = true;
       }
 
       if (project.visible) {
@@ -134,29 +129,22 @@ class ProjectsStorage {
     this.projects.forEach((project) => {
       const parentHideInfo = hideInfo[project.visibleParentId];
 
-      if (project.visible && ids.length) {
-        const idsIndex = ids.indexOf(project.id);
-        if (idsIndex !== -1) {
-          ids.splice(idsIndex, 1);
+      if (project.visible && ids.has(project.id) && project.visibleParentId) {
+        project.visible = false;
+        project.visibleChildrenIds = [];
 
-          if (project.visibleParentId) {
-            project.visible = false;
-            project.visibleChildrenIds = [];
-
-            if (parentHideInfo) {
-              hideInfo[project.id] = {
-                inParentFromEndIndex: parentHideInfo.inParentFromEndIndex,
-              };
-            } else {
-              const visibleParent = this.projects.get(project.visibleParentId);
-              const index = visibleParent.visibleChildrenIds.indexOf(project.id);
-              if (index !== -1) {
-                visibleParent.visibleChildrenIds.splice(index, 1);
-                hideInfo[project.id] = {
-                  inParentFromEndIndex: index - visibleParent.visibleChildrenIds.length,
-                };
-              }
-            }
+        if (parentHideInfo) {
+          hideInfo[project.id] = {
+            inParentFromEndIndex: parentHideInfo.inParentFromEndIndex,
+          };
+        } else {
+          const visibleParent = this.projects.get(project.visibleParentId);
+          const index = visibleParent.visibleChildrenIds.indexOf(project.id);
+          if (index !== -1) {
+            visibleParent.visibleChildrenIds.splice(index, 1);
+            hideInfo[project.id] = {
+              inParentFromEndIndex: index - visibleParent.visibleChildrenIds.length,
+            };
           }
         }
       }
@@ -191,11 +179,23 @@ class ProjectsStorage {
   }
 
   sortDownVisible(ids) {
-    return this.changeSort(ids.reverse(), true);
+    const sortedIds = this.getVisible().reduceRight((idsArray, shortProject) => {
+      if (ids.has(shortProject.id)) {
+        idsArray.push(shortProject.id);
+      }
+      return idsArray;
+    }, []);
+    return this.changeSort(sortedIds, true);
   }
 
   sortUpVisible(ids) {
-    return this.changeSort(ids, false);
+    const sortedIds = this.getVisible().reduce((idsArray, shortProject) => {
+      if (ids.has(shortProject.id)) {
+        idsArray.push(shortProject.id);
+      }
+      return idsArray;
+    }, []);
+    return this.changeSort(sortedIds, false);
   }
 
   changeSort(ids, downDirection) {
