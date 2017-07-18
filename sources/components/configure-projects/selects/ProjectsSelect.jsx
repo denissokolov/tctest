@@ -116,8 +116,8 @@ class ProjectsSelect extends React.Component {
           event.preventDefault();
 
           this.savedSelectedIds = this.props.selectedIds;
-          this.activeSelectStartIndex = 0;
-          this.activeSelectEndIndex = itemsCount - 1;
+          this.activeSelectStartIndex = itemsCount - 1;
+          this.activeSelectEndIndex = 0;
           this.currentActionIsDeselect = false;
 
           this.updateSelectedIds();
