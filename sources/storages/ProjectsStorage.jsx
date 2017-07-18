@@ -16,7 +16,7 @@ class ProjectsStorage {
 
   fillFromServerData(items) {
     this.projects = new Map();
-    this.reversedProjectIds = [];
+    const projectIds = [];
 
     this.visible = [];
     this.hidden = [];
@@ -39,9 +39,11 @@ class ProjectsStorage {
       project.saved = getProjectSavedProps(project);
 
       this.projects.set(project.id, project);
-      this.reversedProjectIds.unshift(project.id);
+      projectIds.push(project.id);
       this.pushProjectToVisible(project);
     });
+
+    this.reversedProjectIds = projectIds.reverse();
   }
 
   saveState() {
