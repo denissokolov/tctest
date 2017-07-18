@@ -69,7 +69,7 @@ class ProjectsSelectOption extends React.Component {
     const classNames = cn(
       'projects-select-option',
       `projects-select-option_depth_${depth}`,
-      selected && 'projects-select-option_selected',
+      selected && !disabled && 'projects-select-option_selected',
       disabled && 'projects-select-option_disabled',
       parentCustomSort && 'projects-select-option_custom-sort',
       filterMatch && 'projects-select-option_filter-match',
