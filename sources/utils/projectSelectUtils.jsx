@@ -1,5 +1,4 @@
 /* eslint-disable no-param-reassign */
-import { Set } from 'immutable';
 
 function setItemSelected(selectedInfo, id) {
   let info = selectedInfo[id];
@@ -34,7 +33,7 @@ function fillSelectedInfo(selectedIds, items) {
 }
 
 function getSelectedIdsFromSelectedInfo(selectedInfo, items) {
-  const selectedIds = [];
+  const selectedIds = new Set();
 
   let id;
   let info;
@@ -43,17 +42,17 @@ function getSelectedIdsFromSelectedInfo(selectedInfo, items) {
 
     info = selectedInfo[id];
     if (info && info.selected) {
-      selectedIds.push(id);
+      selectedIds.add(id);
     } else {
       const parentInfo = selectedInfo[item.parentId];
       if (parentInfo && parentInfo.selected && !parentInfo.isAnyChildSelected) {
-        selectedIds.push(item.id);
+        selectedIds.add(item.id);
         setItemSelected(selectedInfo, id);
       }
     }
   });
 
-  return new Set(selectedIds);
+  return selectedIds;
 }
 
 export function getSelectedIdsWithChildren(selectedIds, items) {
