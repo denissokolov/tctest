@@ -1,10 +1,8 @@
 /* eslint-disable no-param-reassign */
 
-import { generateKey, regenerateKeyFromParent } from '../utils/keyUtils';
-
 import {
-  getProjectPropsFromParent, getProjectPropsFromServerData, getProjectOriginalProps,
-  getProjectSavedProps, getUpdatedProjectProps,
+  getProjectPropsFromServerData, getProjectOriginalProps, getProjectSavedProps,
+  getProjectPropsFromParent,
 } from '../utils/projectFormatter';
 
 class ProjectsStorage {
@@ -12,35 +10,40 @@ class ProjectsStorage {
     this.projects = new Map();
     this.visible = [];
     this.hidden = [];
+    this.hiddenFilteredIds = null;
+    this.hiddenIds = [];
   }
 
   fillFromServerData(items) {
     this.projects = new Map();
+    const projectIds = [];
+
     this.visible = [];
     this.hidden = [];
 
     items.forEach((serverData) => {
-      const project = {};
-
-      Object.assign(project, getProjectPropsFromServerData(serverData));
+      const project = getProjectPropsFromServerData(serverData);
 
       const parentData = serverData.parentProject;
       if (parentData) {
         const parent = this.projects.get(parentData.id);
         Object.assign(project, getProjectPropsFromParent(parent));
-        parent.visibleChildrenCount += 1;
+        parent.visibleChildrenIds.push(project.id);
+        parent.saved.visibleChildrenIds.push(project.id);
       } else {
         project.depth = 0;
-        project.sortKey = generateKey(0);
         this.rootId = project.id;
       }
 
       project.original = getProjectOriginalProps(project);
       project.saved = getProjectSavedProps(project);
 
-      this.projects.set(serverData.id, project);
-      this.visible.push(project);
+      this.projects.set(project.id, project);
+      projectIds.push(project.id);
+      this.pushProjectToVisible(project);
     });
+
+    this.reversedProjectIds = projectIds.reverse();
   }
 
   saveState() {
@@ -53,235 +56,199 @@ class ProjectsStorage {
   }
 
   refreshToSavedState() {
-    this.visible = [];
-    this.hidden = [];
-
     this.projects.forEach((project) => {
       Object.assign(project, project.saved);
+      project.saved.visibleChildrenIds = [...project.saved.visibleChildrenIds];
 
       project.filterMatch = false;
       project.filterTreeMatch = false;
-
-      if (project.visible) {
-        this.visible.push(project);
-      } else {
-        this.hidden.push(project);
-      }
-
       project.isAnyChildHidden = false;
     });
 
-    this.refreshVisibleSort();
-    this.refreshHiddenSort();
+    this.refreshVisible();
     this.refreshHidden();
   }
 
   showItems(ids) {
-    this.toggleVisibility(true, ids);
-  }
-
-  hideItems(ids) {
-    this.toggleVisibility(false, ids);
-  }
-
-  toggleVisibility(visible, ids) {
-    const removeFromVisible = [];
-
     this.projects.forEach((project) => {
-      project.isAnyChildHidden = false;
+      let addToVisibleParent = false;
 
-      if (!project.parentId) {
-        return;
+      if (project.parentId) {
+        const parent = this.projects.get(project.parentId);
+        const oldVisibleParentId = project.visibleParentId;
+
+        if (parent.visible) {
+          project.name = project.original.name;
+          project.depth = parent.depth + 1;
+          project.visibleParentId = parent.id;
+          project.parentCustomSort = parent.customSort;
+        } else {
+          project.name = `${parent.name} :: ${project.original.name}`;
+          project.depth = parent.depth;
+          project.visibleParentId = parent.visibleParentId;
+          project.parentCustomSort = parent.parentCustomSort;
+        }
+
+        if (project.visibleParentId !== oldVisibleParentId) {
+          const oldVisibleParent = this.projects.get(oldVisibleParentId);
+          const index = oldVisibleParent.visibleChildrenIds.indexOf(project.id);
+          if (index !== -1) {
+            oldVisibleParent.visibleChildrenIds.splice(index, 1);
+            addToVisibleParent = true;
+          }
+        }
       }
 
-      const parent = this.projects.get(project.parentId);
-
-      let needMove = false;
-
-      const idsIndex = ids.indexOf(project.id);
-      if (ids.length && idsIndex !== -1) {
-        project.visible = visible;
+      if (!project.visible && ids.has(project.id)) {
+        project.visible = true;
         project.filterMatch = false;
         project.filterTreeMatch = false;
 
-        ids.splice(idsIndex, 1);
-
-        needMove = true;
+        addToVisibleParent = true;
       }
 
-      Object.assign(project, getUpdatedProjectProps(project, parent));
+      if (project.visible) {
+        if (project.visibleParentId && (!project.parentCustomSort || addToVisibleParent)) {
+          const visibleParent = this.projects.get(project.visibleParentId);
+          visibleParent.visibleChildrenIds.push(project.id);
+        }
 
-      if (needMove && project.parentCustomSort && project.visible) {
-        const visibleParent = this.projects.get(project.visibleParentId);
-        if (visibleParent) {
-          const level = visibleParent.visibleChildrenCount;
-          project.sortKey = generateKey(level, visibleParent && visibleParent.sortKey);
-
-          visibleParent.visibleChildrenCount += 1;
+        if (!project.customSort) {
+          project.visibleChildrenIds = [];
         }
       }
 
-      if (needMove) {
-        if (project.visible) {
-          this.visible.push(project);
-          if (parent) {
-            parent.visibleChildrenCount += 1;
-          }
-        } else {
-          removeFromVisible.push(project.id);
-        }
-      }
+      project.isAnyChildHidden = false;
     });
 
-    if (removeFromVisible.length) {
-      this.visible = this.visible.filter(project => removeFromVisible.indexOf(project.id) === -1);
-    }
-
+    this.refreshVisible(ids);
     this.refreshHidden();
-    this.recalculateVisibleSortKeys();
-    this.refreshVisibleSort();
   }
 
-  refreshHidden() {
-    this.hidden = [];
-    [...this.projects.values()].reverse().forEach((project) => {
-      if (project.parentId && (!project.visible || project.isAnyChildHidden)) {
-        this.hidden.unshift(project);
+  hideItems(ids) {
+    const hideInfo = {};
 
-        const parent = this.projects.get(project.parentId);
-        parent.isAnyChildHidden = true;
+    this.projects.forEach((project) => {
+      const parentHideInfo = hideInfo[project.visibleParentId];
+
+      if (project.visible && ids.has(project.id) && project.visibleParentId) {
+        project.visible = false;
+        project.visibleChildrenIds = [];
+        project.customSort = false;
+
+        if (parentHideInfo) {
+          hideInfo[project.id] = {
+            inParentFromEndIndex: parentHideInfo.inParentFromEndIndex,
+          };
+        } else {
+          const visibleParent = this.projects.get(project.visibleParentId);
+          const index = visibleParent.visibleChildrenIds.indexOf(project.id);
+          if (index !== -1) {
+            visibleParent.visibleChildrenIds.splice(index, 1);
+            hideInfo[project.id] = {
+              inParentFromEndIndex: index - visibleParent.visibleChildrenIds.length,
+            };
+          }
+        }
       }
+
+      if (project.parentId) {
+        const parent = this.projects.get(project.parentId);
+        if (parent.visible) {
+          project.name = project.original.name;
+          project.depth = parent.depth + 1;
+          project.visibleParentId = parent.id;
+          project.parentCustomSort = parent.customSort;
+        } else {
+          project.name = `${parent.name} :: ${project.original.name}`;
+          project.depth = parent.depth;
+          project.visibleParentId = parent.visibleParentId;
+          project.parentCustomSort = parent.parentCustomSort;
+
+          if (project.visible && parentHideInfo) {
+            // copy project id to new visible parent
+            const newVisibleParent = this.projects.get(project.visibleParentId);
+            const fromEndIndex = parentHideInfo.inParentFromEndIndex;
+            newVisibleParent.visibleChildrenIds.splice(fromEndIndex, 0, project.id);
+          }
+        }
+      }
+
+      project.isAnyChildHidden = false;
     });
+
+    this.refreshVisible();
+    this.refreshHidden(ids);
   }
 
   sortDownVisible(ids) {
-    let needRefreshSort = false;
-
-    for (let i = this.visible.length - 1; i > -1; i -= 1) {
-      if (!ids.length) {
-        break;
+    const sortedIds = this.getVisible().reduceRight((idsArray, shortProject) => {
+      if (ids.has(shortProject.id)) {
+        idsArray.push(shortProject.id);
       }
-
-      const project = this.visible[i];
-      project.sorted = false;
-
-      if (ids[ids.length - 1] === project.id) {
-        ids.pop();
-
-        const {
-          nextProject, nextIndex,
-        } = this.getNextVisibleSameLevelProject(project.depth, i + 1);
-
-        if (nextProject) {
-          this.swapWithPreviousVisibleProject(nextProject, nextIndex - 1);
-
-          if (!needRefreshSort && project.id !== this.visible[i].id) {
-            needRefreshSort = true;
-          }
-        }
-
-        project.sorted = true;
-      }
-    }
-
-    if (needRefreshSort) {
-      this.recalculateVisibleSortKeys();
-      this.refreshVisibleSort();
-    }
-
-    return needRefreshSort;
+      return idsArray;
+    }, []);
+    return this.changeSort(sortedIds, ids, true);
   }
 
   sortUpVisible(ids) {
-    let needRefreshSort = false;
-
-    for (let i = 0; i < this.visible.length; i += 1) {
-      if (!ids.length) {
-        break;
+    const sortedIds = this.getVisible().reduce((idsArray, shortProject) => {
+      if (ids.has(shortProject.id)) {
+        idsArray.push(shortProject.id);
       }
-
-      const project = this.visible[i];
-      project.sorted = false;
-
-      if (ids[0] === project.id) {
-        ids.shift();
-        this.swapWithPreviousVisibleProject(project, i - 1);
-
-        if (!needRefreshSort && project.id !== this.visible[i].id) {
-          needRefreshSort = true;
-        }
-
-        project.sorted = true;
-      }
-    }
-
-    if (needRefreshSort) {
-      this.recalculateVisibleSortKeys();
-      this.refreshVisibleSort();
-    }
-
-    return needRefreshSort;
+      return idsArray;
+    }, []);
+    return this.changeSort(sortedIds, ids, false);
   }
 
-  getNextVisibleSameLevelProject = (depth, nextIndex) => {
-    const nextProject = this.visible[nextIndex];
-    if (!nextProject || (nextProject.depth === depth && !nextProject.sorted)) {
-      return { nextProject, nextIndex };
+  changeSort(ids, changedIds, downDirection) {
+    const sortedIds = {};
+
+    if (ids.length === 1 && ids[0] === this.rootId) {
+      return false;
     }
 
-    if (nextProject.depth > depth) {
-      return this.getNextVisibleSameLevelProject(depth, nextIndex + 1);
-    }
+    let needRefresh = false;
+    ids.forEach((id) => {
+      const project = this.projects.get(id);
+      if (!project.visibleParentId) {
+        return;
+      }
 
-    return { nextProject: null, nextIndex };
-  };
+      sortedIds[project.id] = true;
 
-  swapWithPreviousVisibleProject = (project, prevIndex) => {
-    const prevProject = prevIndex > -1 ? this.visible[prevIndex] : null;
-    if (!prevProject || !project || prevProject.depth < project.depth
-      || (prevProject.sorted && prevProject.depth === project.depth)) {
-      return;
-    }
+      const visibleParent = this.projects.get(project.visibleParentId);
+      const projectInParentIndex = visibleParent.visibleChildrenIds.indexOf(project.id);
 
-    this.visible[prevIndex + 1] = prevProject;
-    this.visible[prevIndex] = project;
+      if (projectInParentIndex === -1
+        || (downDirection && projectInParentIndex === visibleParent.visibleChildrenIds.length - 1)
+        || (!downDirection && projectInParentIndex === 0)) {
+        return;
+      }
 
-    const parent = this.projects.get(project.visibleParentId);
-    if (parent) {
-      parent.customSort = true;
-    }
+      const targetProjectIndex = projectInParentIndex + (downDirection ? 1 : -1);
+      const targetProjectId = visibleParent.visibleChildrenIds[targetProjectIndex];
+      if (sortedIds[targetProjectId]) {
+        return;
+      }
 
-    if (prevProject.depth > project.depth) {
-      this.swapWithPreviousVisibleProject(project, prevIndex - 1);
-    }
-  };
+      visibleParent.visibleChildrenIds[projectInParentIndex] = targetProjectId;
+      visibleParent.visibleChildrenIds[targetProjectIndex] = project.id;
+      needRefresh = true;
 
-  recalculateVisibleSortKeys() {
-    this.visible.forEach((project) => {
-      project.sorted = false;
-      project.visibleChildrenCount = 0;
-
-      if (project.visibleParentId) {
-        const parent = this.projects.get(project.visibleParentId);
-        project.parentCustomSort = parent.customSort;
-
-        if (project.parentCustomSort) {
-          project.sortKey = generateKey(parent.visibleChildrenCount, parent.sortKey);
-        } else {
-          project.sortKey = regenerateKeyFromParent(project.sortKey, parent.sortKey);
-        }
-
-        parent.visibleChildrenCount += 1;
+      if (!visibleParent.customSort) {
+        visibleParent.customSort = true;
+        visibleParent.visibleChildrenIds.forEach((childId) => {
+          const child = this.projects.get(childId);
+          child.parentCustomSort = true;
+        });
       }
     });
-  }
 
-  refreshVisibleSort() {
-    this.visible.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
-  }
-
-  refreshHiddenSort() {
-    this.hidden.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    if (needRefresh) {
+      this.refreshVisible(changedIds);
+    }
+    return needRefresh;
   }
 
   filterHidden(value) {
@@ -299,7 +266,14 @@ class ProjectsStorage {
       withParentMatches: 0,
     };
 
-    this.hidden.forEach((project) => {
+    this.hiddenFilteredIds = new Set();
+
+    this.hiddenIds.forEach((id) => {
+      const project = this.projects.get(id);
+      if (!project.parentId) {
+        return;
+      }
+
       project.filterMatch = false;
       project.filterTreeMatch = false;
 
@@ -324,30 +298,41 @@ class ProjectsStorage {
       if (matches[project.id].withParentMatches === words.length) {
         if (matches[project.id].wordMatches) {
           project.filterMatch = true;
+          this.hiddenFilteredIds.add(project.id);
           this.setAllParentsFilterMatch(matches, project.parentId);
         } else if (matches[project.id].withParentMatches) {
           project.filterTreeMatch = true;
+          this.hiddenFilteredIds.add(project.id);
         }
       } else {
         project.filterMatch = false;
         project.filterTreeMatch = false;
       }
     });
+
+    this.hidden = [];
+    this.projects.forEach((project) => {
+      if (this.hiddenFilteredIds.has(project.id)) {
+        this.hidden.push(this.convertHiddenProjectToShort(project));
+      }
+    });
   }
 
-  setAllParentsFilterMatch = (matches, parentId) => {
+  setAllParentsFilterMatch(matches, parentId) {
     if (parentId) {
       const parent = this.projects.get(parentId);
-      if (parent) {
+      if (parent && parent.parentId) {
         let scanParents = false;
 
         if (matches[parent.id].wordMatches) {
           if (!parent.filterMatch) {
             parent.filterMatch = true;
+            this.hiddenFilteredIds.add(parentId);
             scanParents = true;
           }
         } else if (!parent.filterTreeMatch) {
           parent.filterTreeMatch = true;
+          this.hiddenFilteredIds.add(parent.id);
           scanParents = true;
         }
 
@@ -356,21 +341,110 @@ class ProjectsStorage {
         }
       }
     }
-  };
+  }
 
   clearFilter() {
-    this.hidden.forEach((project) => {
-      project.filterMatch = false;
-      project.filterTreeMatch = false;
+    this.hiddenFilteredIds = null;
+    this.refreshHidden();
+  }
+
+  refreshVisible(changedIds) {
+    this.visible = [];
+    this.firstChangedVisibleIndex = null;
+
+    const root = this.projects.get(this.rootId);
+    this.pushProjectToVisible(root);
+
+    this.pushChildrenProjectsToVisible(root.visibleChildrenIds, changedIds);
+  }
+
+  pushChildrenProjectsToVisible(projectsIds, changedIds) {
+    projectsIds.forEach((projectId) => {
+      const project = this.projects.get(projectId);
+      this.pushProjectToVisible(project);
+
+      if (changedIds && this.firstChangedVisibleIndex === null && changedIds.has(project.id)) {
+        this.firstChangedVisibleIndex = this.visible.length - 1;
+      }
+
+      if (project.visibleChildrenIds.length) {
+        this.pushChildrenProjectsToVisible(project.visibleChildrenIds, changedIds);
+      }
     });
   }
+
+  pushProjectToVisible(project) {
+    this.visible.push({
+      id: project.id,
+      name: project.name,
+      depth: project.depth,
+      parentCustomSort: project.parentCustomSort,
+      parentId: project.visibleParentId,
+    });
+  }
+
+  refreshHidden(changedIds) {
+    this.hidden = [];
+    this.hiddenIds = [];
+
+    this.firstChangedHiddenIndex = null;
+
+    const filterActive = Boolean(this.hiddenFilteredIds);
+
+    let project;
+    let parent;
+    this.reversedProjectIds.forEach((id) => {
+      project = this.projects.get(id);
+
+      if (project.parentId && (!project.visible || project.isAnyChildHidden)) {
+        parent = this.projects.get(project.parentId);
+        parent.isAnyChildHidden = true;
+
+        this.hiddenIds.push(project.id);
+
+        if (!filterActive) {
+          project.filterMatch = false;
+          project.filterTreeMatch = false;
+        }
+
+        if (!filterActive || this.hiddenFilteredIds.has(project.id)) {
+          this.hidden.push(this.convertHiddenProjectToShort(project));
+          if (changedIds && changedIds.has(project.id)) {
+            this.firstChangedHiddenIndex = this.hidden.length;
+          }
+        }
+      }
+    });
+
+    this.firstChangedHiddenIndex = this.hidden.length - this.firstChangedHiddenIndex;
+
+    this.hidden.reverse();
+    this.hiddenIds.reverse();
+  }
+
+  convertHiddenProjectToShort = project => ({
+    id: project.id,
+    name: project.original.name,
+    depth: project.original.depth,
+    parentId: project.parentId,
+    disabled: project.visible,
+    filterMatch: project.filterMatch,
+  });
 
   getVisible() {
     return this.visible;
   }
 
+  getFirstChangedVisibleIndex() {
+    return this.firstChangedVisibleIndex;
+  }
+
   getHidden() {
     return this.hidden;
+  }
+
+  getFirstChangedHiddenIndex() {
+    return this.firstChangedHiddenIndex;
   }
 }
 

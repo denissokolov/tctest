@@ -1,14 +1,12 @@
-/* global fetch */
-import 'whatwg-fetch';
-import ProjectsStorage from '../storages/ProjectsStorage';
+/* globals fetch, PROJECTS_URL */
 
-const projectsStorage = new ProjectsStorage();
+import 'whatwg-fetch';
 
 export function loadProjects() {
   return (dispatch) => {
     dispatch({ type: 'LOAD_PROJECTS_PROGRESS' });
 
-    return fetch('data.json')
+    return fetch(PROJECTS_URL)
       .then((response) => {
         if (response.ok) {
           return response.json();
@@ -24,82 +22,82 @@ export function loadProjects() {
       })
       .then((data) => {
         if (data) {
-          projectsStorage.fillFromServerData(data.project);
-
           dispatch({
             type: 'LOAD_PROJECTS_SUCCESS',
-            visible: projectsStorage.getVisible(),
-            hidden: projectsStorage.getHidden(),
+            projects: data.project,
           });
         }
       });
   };
 }
 
-export function hideProjects(ids) {
-  projectsStorage.hideItems(ids);
-
+export function hideProjects() {
   return {
     type: 'HIDE_PROJECTS',
-    visible: projectsStorage.getVisible(),
-    hidden: projectsStorage.getHidden(),
   };
 }
 
-export function showProjects(ids) {
-  projectsStorage.showItems(ids);
+export function hideProject(id) {
+  return {
+    type: 'HIDE_PROJECT',
+    id,
+  };
+}
 
+export function showProjects() {
   return {
     type: 'SHOW_PROJECTS',
-    visible: projectsStorage.getVisible(),
-    hidden: projectsStorage.getHidden(),
   };
 }
 
-export function moveProjectsUp(ids) {
-  const sortChanged = projectsStorage.sortUpVisible(ids);
+export function showProject(id) {
+  return {
+    type: 'SHOW_PROJECT',
+    id,
+  };
+}
 
+export function moveProjectsUp() {
   return {
     type: 'MOVE_PROJECTS_UP',
-    items: projectsStorage.getVisible(),
-    sortChanged,
   };
 }
 
-export function moveProjectsDown(ids) {
-  const sortChanged = projectsStorage.sortDownVisible(ids);
-
+export function moveProjectsDown() {
   return {
     type: 'MOVE_PROJECTS_DOWN',
-    items: projectsStorage.getVisible(),
-    sortChanged,
   };
 }
 
 export function changeHiddenFilter(value) {
-  projectsStorage.filterHidden(value);
-
   return {
     type: 'CHANGE_HIDDEN_PROJECTS_FILTER',
-    items: projectsStorage.getHidden(),
     value,
   };
 }
 
 export function saveProjectsConfiguration() {
-  projectsStorage.saveState();
-
   return {
     type: 'SAVE_PROJECTS_CONFIGURATION',
   };
 }
 
 export function refreshProjectsConfiguration() {
-  projectsStorage.refreshToSavedState();
-
   return {
     type: 'REFRESH_PROJECTS_CONFIGURATION',
-    visible: projectsStorage.getVisible(),
-    hidden: projectsStorage.getHidden(),
+  };
+}
+
+export function changeHiddenSelectedProjects(selectedIds) {
+  return {
+    type: 'CHANGE_HIDDEN_SELECTED_PROJECTS',
+    selectedIds,
+  };
+}
+
+export function changeVisibleSelectedProjects(selectedIds) {
+  return {
+    type: 'CHANGE_VISIBLE_SELECTED_PROJECTS',
+    selectedIds,
   };
 }

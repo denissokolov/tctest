@@ -1,9 +1,9 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { fromJS } from 'immutable';
+import { Map } from 'immutable';
 
 import ConfigureProjects from './ConfigureProjects';
-import ConfigureProjectsFooter from './footer/ConfigureProjectsFooter';
+import { ConfigureProjectsFooter } from './footer/ConfigureProjectsFooter';
 import ConfigureProjectsVisibleSection from './sections/ConfigureProjectsVisibleSection';
 import ConfigureProjectsHiddenSection from './sections/ConfigureProjectsHiddenSection';
 
@@ -18,7 +18,7 @@ function create(props) {
 
   return shallow(
     <ConfigureProjects
-      configureProjects={fromJS(configureProjects)}
+      configureProjects={Map(configureProjects)}
       dispatch={dispatch}
       onSubmit={onSubmit}
       onCancel={onCancel}

@@ -1,13 +1,14 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import FilterProjects from './FilterProjects';
+import { FilterProjects } from './FilterProjects';
+import { changeHiddenFilter } from '../../../actions/ConfigureProjectsActions';
 
-function create({ value = '', onChange = jest.fn() }) {
+function create({ value = '', dispatch = jest.fn() }) {
   return shallow(
     <FilterProjects
       value={value}
-      onChange={onChange}
+      dispatch={dispatch}
     />,
   );
 }
@@ -33,12 +34,13 @@ describe('FilterProjects', () => {
     expect(wrapper.prop('value')).toEqual('TTTEST');
   });
 
-  it('should call onChange', () => {
-    const onChange = jest.fn();
-    const wrapper = create({ onChange });
+  it('should call dispatch changeHiddenFilter with filter value', () => {
+    const dispatch = jest.fn();
+    const wrapper = create({ dispatch });
 
-    wrapper.simulate('change');
+    wrapper.simulate('change', { target: { value: 'testtest' } });
 
-    expect(onChange).toBeCalled();
+    const expectedAction = changeHiddenFilter('testtest');
+    expect(dispatch).toBeCalledWith(expectedAction);
   });
 });

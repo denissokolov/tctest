@@ -1,0 +1,21 @@
+.projects-select {
+  height: 100%;
+
+  &__arrow-key-stepper {
+    height: 100%;
+  }
+
+  &__list {
+    border: 1px solid #dedede;
+    outline: none;
+    cursor: default;
+
+    &:focus {
+      border-color: #438ed7;
+    }
+
+    ::selection {
+      background-color: transparent;
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { fromJS } from 'immutable';
+import { Map } from 'immutable';
 import ConfigureProjectsReducer from './ConfigureProjectsReducer';
 
 import formattedProjects from '../__mocks__/formattedProjects';
@@ -7,7 +7,7 @@ describe('ConfigureProjectsReducer', () => {
   it('should return the initial state', () => {
     const state = ConfigureProjectsReducer(undefined, {});
 
-    expect(state).toEqual(fromJS({
+    expect(state).toEqual(Map({
       loading: false,
       error: null,
       visible: [],
@@ -39,8 +39,8 @@ describe('ConfigureProjectsReducer', () => {
 
     expect(state.get('loading')).toBeFalsy();
     expect(state.get('error')).toBeNull();
-    expect(state.get('visible')).toEqual(fromJS(action.visible));
-    expect(state.get('hidden')).toEqual(fromJS(action.hidden));
+    expect(state.get('visible')).toEqual(action.visible);
+    expect(state.get('hidden')).toEqual(action.hidden);
   });
 
   it('should handle LOAD_PROJECTS_FAIL', () => {
@@ -81,8 +81,8 @@ describe('ConfigureProjectsReducer', () => {
 
     const state = ConfigureProjectsReducer(undefined, action);
 
-    expect(state.get('visible')).toEqual(fromJS(action.visible));
-    expect(state.get('hidden')).toEqual(fromJS(action.hidden));
+    expect(state.get('visible')).toEqual(action.visible);
+    expect(state.get('hidden')).toEqual(action.hidden);
   });
 
   it('should handle HIDE_PROJECTS', () => {
@@ -94,8 +94,8 @@ describe('ConfigureProjectsReducer', () => {
 
     const state = ConfigureProjectsReducer(undefined, action);
 
-    expect(state.get('visible')).toEqual(fromJS(action.visible));
-    expect(state.get('hidden')).toEqual(fromJS(action.hidden));
+    expect(state.get('visible')).toEqual(action.visible);
+    expect(state.get('hidden')).toEqual(action.hidden);
   });
 
   it('should handle MOVE_PROJECTS_UP if action.sortChanged is true', () => {
@@ -107,7 +107,7 @@ describe('ConfigureProjectsReducer', () => {
 
     const state = ConfigureProjectsReducer(undefined, action);
 
-    expect(state.get('visible')).toEqual(fromJS(action.items));
+    expect(state.get('visible')).toEqual(action.items);
     expect(state.get('customSort')).toBeTruthy();
   });
 
@@ -120,7 +120,7 @@ describe('ConfigureProjectsReducer', () => {
 
     const state = ConfigureProjectsReducer(undefined, action);
 
-    expect(state.get('visible')).toEqual(fromJS([]));
+    expect(state.get('visible')).toEqual([]);
     expect(state.get('customSort')).toBeFalsy();
   });
 
@@ -133,7 +133,7 @@ describe('ConfigureProjectsReducer', () => {
 
     const state = ConfigureProjectsReducer(undefined, action);
 
-    expect(state.get('visible')).toEqual(fromJS(action.items));
+    expect(state.get('visible')).toEqual(action.items);
     expect(state.get('customSort')).toBeTruthy();
   });
 
@@ -146,7 +146,7 @@ describe('ConfigureProjectsReducer', () => {
 
     const state = ConfigureProjectsReducer(undefined, action);
 
-    expect(state.get('visible')).toEqual(fromJS([]));
+    expect(state.get('visible')).toEqual([]);
     expect(state.get('customSort')).toBeFalsy();
   });
 
@@ -159,7 +159,7 @@ describe('ConfigureProjectsReducer', () => {
 
     const state = ConfigureProjectsReducer(undefined, action);
 
-    expect(state.get('hidden')).toEqual(fromJS(action.items));
+    expect(state.get('hidden')).toEqual(action.items);
     expect(state.get('hiddenFilterValue')).toEqual(action.value);
   });
 
@@ -180,15 +180,15 @@ describe('ConfigureProjectsReducer', () => {
       hidden: formattedProjects.reverse(),
     };
 
-    const state = ConfigureProjectsReducer(fromJS({
+    const state = ConfigureProjectsReducer(Map({
       visible: [],
       hidden: [],
       customSort: true,
       hiddenFilterValue: 'test',
     }), action);
 
-    expect(state.get('visible')).toEqual(fromJS(action.visible));
-    expect(state.get('hidden')).toEqual(fromJS(action.hidden));
+    expect(state.get('visible')).toEqual(action.visible);
+    expect(state.get('hidden')).toEqual(action.hidden);
     expect(state.get('hiddenFilterValue')).toEqual('');
     expect(state.get('customSort')).toBeFalsy();
   });

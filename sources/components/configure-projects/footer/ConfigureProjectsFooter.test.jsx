@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import ConfigureProjectsFooter from './ConfigureProjectsFooter';
+import { ConfigureProjectsFooter } from './ConfigureProjectsFooter';
 import FormButton from '../../form-button/FormButton';
 
 function create({ customSort = false, onCancelClick = jest.fn() }) {

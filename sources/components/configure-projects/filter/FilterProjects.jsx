@@ -1,21 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
-function FilterProjects({ onChange, value }) {
-  return (
-    <input
-      type="text"
-      onChange={onChange}
-      className="configure-projects__filter"
-      placeholder="filter projects"
-      value={value}
-    />
-  );
+import { changeHiddenFilter } from '../../../actions/ConfigureProjectsActions';
+
+export class FilterProjects extends React.Component {
+  static propTypes = {
+    value: PropTypes.string.isRequired,
+    dispatch: PropTypes.func.isRequired,
+  };
+
+  onChange = (event) => {
+    this.props.dispatch(changeHiddenFilter(event.target.value));
+  };
+
+  render() {
+    const { value } = this.props;
+
+    return (
+      <input
+        type="text"
+        onChange={this.onChange}
+        className="configure-projects__filter"
+        placeholder="filter projects"
+        value={value}
+      />
+    );
+  }
 }
 
-FilterProjects.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
-};
+const mapStateToProps = state => ({
+  value: state.configureProjects.get('hiddenFilterValue'),
+});
 
-export default FilterProjects;
+export default connect(mapStateToProps)(FilterProjects);

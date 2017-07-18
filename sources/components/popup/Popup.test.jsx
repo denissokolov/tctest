@@ -3,6 +3,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
+import keyCodes from '../../utils/keyCodes';
 import Popup from './Popup';
 
 function create({ title = '', visible = false, children = <div />, onClose = jest.fn() }) {
@@ -107,7 +108,7 @@ describe('Popup', () => {
 
     expect(map.keydown).not.toBeUndefined();
 
-    map.keydown({ keyCode: 27 });
+    map.keydown({ keyCode: keyCodes.escape });
 
     expect(onClose).toBeCalled();
   });

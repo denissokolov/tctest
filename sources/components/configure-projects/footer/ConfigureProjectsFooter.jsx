@@ -1,10 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import FormButton, { types as formButtonTypes, modifiers as formButtonModifiers } from '../../form-button/FormButton';
+import { connect } from 'react-redux';
+
+import FormButton, {
+  types as formButtonTypes,
+  modifiers as formButtonModifiers,
+} from '../../form-button/FormButton';
 
 import './configure-projects-footer.scss';
 
-function ConfigureProjectsFooter({ onCancelClick, customSort }) {
+export function ConfigureProjectsFooter({ onCancelClick, customSort }) {
   return (
     <div className="configure-projects-footer">
       <div className="configure-projects-footer__button">
@@ -40,4 +45,8 @@ ConfigureProjectsFooter.defaultProps = {
   customSort: false,
 };
 
-export default ConfigureProjectsFooter;
+const mapStateToProps = state => ({
+  customSort: state.configureProjects.get('customSort'),
+});
+
+export default connect(mapStateToProps)(ConfigureProjectsFooter);

@@ -1,10 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { bindActionCreators } from 'redux';
-import { Map } from 'immutable';
-import * as ConfigureProjectsActions from '../../actions/ConfigureProjectsActions';
 
-import ConfigureProjectsFooter from './footer/ConfigureProjectsFooter';
+import ConnectedConfigureProjectsFooter from './footer/ConfigureProjectsFooter';
 import ConfigureProjectsVisibleSection from './sections/ConfigureProjectsVisibleSection';
 import ConfigureProjectsHiddenSection from './sections/ConfigureProjectsHiddenSection';
 
@@ -12,11 +9,8 @@ import './configure-projects.scss';
 
 class ConfigureProjects extends React.Component {
   static propTypes = {
-    configureProjects: PropTypes.instanceOf(Map).isRequired,
-    dispatch: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
-    formVisible: PropTypes.bool.isRequired,
   };
 
   onCancelClick = () => {
@@ -29,29 +23,15 @@ class ConfigureProjects extends React.Component {
   };
 
   render() {
-    const { configureProjects, formVisible, dispatch } = this.props;
-    const boundActionCreators = bindActionCreators(ConfigureProjectsActions, dispatch);
-
     return (
       <form className="configure-projects" onSubmit={this.onSubmit}>
         <div className="configure-projects__sections">
-          <ConfigureProjectsVisibleSection
-            visible={configureProjects.get('visible')}
-            formVisible={formVisible}
-            {...boundActionCreators}
-          />
-
-          <ConfigureProjectsHiddenSection
-            hidden={configureProjects.get('hidden')}
-            hiddenFilterValue={configureProjects.get('hiddenFilterValue')}
-            formVisible={formVisible}
-            {...boundActionCreators}
-          />
+          <ConfigureProjectsVisibleSection />
+          <ConfigureProjectsHiddenSection />
         </div>
 
-        <ConfigureProjectsFooter
+        <ConnectedConfigureProjectsFooter
           onCancelClick={this.onCancelClick}
-          customSort={configureProjects.get('customSort')}
         />
       </form>
     );
