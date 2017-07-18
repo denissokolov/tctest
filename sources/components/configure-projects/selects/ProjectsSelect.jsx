@@ -35,6 +35,7 @@ class ProjectsSelect extends React.Component {
 
     if (items.length === nextItems.length
       && (items !== nextItems || this.props.selectedIds !== nextProps.selectedIds)) {
+      this.scrollToAlignment = 'auto';
       this.listRef.forceUpdateGrid();
     }
 
@@ -42,6 +43,7 @@ class ProjectsSelect extends React.Component {
       && nextProps.firstChangedIndex !== this.props.firstChangedIndex) {
       this.activeSelectStartIndex = nextProps.firstChangedIndex;
       this.activeSelectEndIndex = nextProps.firstChangedIndex;
+      this.scrollToAlignment = 'center';
     }
   }
 
@@ -280,6 +282,8 @@ class ProjectsSelect extends React.Component {
   currentActionIsDeselect = false;
   mouseDown = false;
 
+  scrollToAlignment = 'auto';
+
   render() {
     const { items } = this.props;
     const rowCount = items.length;
@@ -311,7 +315,7 @@ class ProjectsSelect extends React.Component {
                   rowRenderer={this.optionRenderer}
                   onSectionRendered={onSectionRendered}
                   scrollToIndex={scrollToRow}
-                  scrollToAlignment="center"
+                  scrollToAlignment={this.scrollToAlignment}
                   ref={this.setListRef}
                 />
               )}
