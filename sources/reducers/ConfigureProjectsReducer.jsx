@@ -102,11 +102,15 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         : state;
     }
 
-    case 'CHANGE_HIDDEN_PROJECTS_FILTER':
+    case 'CHANGE_HIDDEN_PROJECTS_FILTER': {
       projectsStorage.filterHidden(action.value);
+      const hiddenItems = projectsStorage.getHidden();
+
       return state
-        .set('hiddenItems', projectsStorage.getHidden())
-        .set('hiddenFilterValue', action.value);
+        .set('hiddenItems', hiddenItems)
+        .set('hiddenFilterValue', action.value)
+        .set('firstChangedHiddenIndex', hiddenItems.size > 0 ? 0 : null);
+    }
 
     case 'SAVE_PROJECTS_CONFIGURATION':
       projectsStorage.saveState();
