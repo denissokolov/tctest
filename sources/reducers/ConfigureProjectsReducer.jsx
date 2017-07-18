@@ -47,6 +47,18 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         .set('hiddenItems', projectsStorage.getHidden())
         .set('hiddenSelectedIds', new Set());
 
+    case 'SHOW_PROJECT': {
+      const ids = new Set([action.id]);
+      projectsStorage.showItems(
+        getSelectedIdsWithChildren(ids, state.get('hiddenItems')),
+      );
+      return state
+        .set('visibleItems', projectsStorage.getVisible())
+        .set('visibleSelectedIds', ids)
+        .set('firstChangedVisibleIndex', projectsStorage.getFirstChangedVisibleIndex())
+        .set('hiddenItems', projectsStorage.getHidden());
+    }
+
     case 'HIDE_PROJECTS':
       projectsStorage.hideItems(
         getSelectedIdsWithChildren(state.get('visibleSelectedIds'), state.get('visibleItems')),
@@ -57,6 +69,18 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         .set('hiddenItems', projectsStorage.getHidden())
         .set('hiddenSelectedIds', state.get('visibleSelectedIds'))
         .set('firstChangedHiddenIndex', projectsStorage.getFirstChangedHiddenIndex());
+
+    case 'HIDE_PROJECT': {
+      const ids = new Set([action.id]);
+      projectsStorage.hideItems(
+        getSelectedIdsWithChildren(ids, state.get('visibleItems')),
+      );
+      return state
+        .set('visibleItems', projectsStorage.getVisible())
+        .set('hiddenItems', projectsStorage.getHidden())
+        .set('hiddenSelectedIds', ids)
+        .set('firstChangedHiddenIndex', projectsStorage.getFirstChangedHiddenIndex());
+    }
 
     case 'MOVE_PROJECTS_UP': {
       const sortChanged = projectsStorage.sortUpVisible(state.get('visibleSelectedIds'));

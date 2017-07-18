@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Set } from 'immutable';
 
-import { changeHiddenSelectedProjects } from '../../../actions/ConfigureProjectsActions';
+import { changeHiddenSelectedProjects, showProject } from '../../../actions/ConfigureProjectsActions';
 
 import ProjectsSelect from './ProjectsSelect';
 
@@ -23,6 +23,10 @@ export class HiddenProjectsSelect extends React.Component {
     this.props.dispatch(changeHiddenSelectedProjects(selectedIds));
   };
 
+  optionActionOnClick = (projectId) => {
+    this.props.dispatch(showProject(projectId));
+  };
+
   render() {
     const { items, selectedIds, firstChangedIndex } = this.props;
 
@@ -32,6 +36,8 @@ export class HiddenProjectsSelect extends React.Component {
         selectedIds={selectedIds}
         firstChangedIndex={firstChangedIndex}
         onChange={this.onChange}
+        optionActionText="show"
+        optionActionOnClick={this.optionActionOnClick}
       />
     );
   }

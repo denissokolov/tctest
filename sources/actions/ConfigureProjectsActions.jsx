@@ -37,9 +37,23 @@ export function hideProjects() {
   };
 }
 
+export function hideProject(id) {
+  return {
+    type: 'HIDE_PROJECT',
+    id,
+  };
+}
+
 export function showProjects() {
   return {
     type: 'SHOW_PROJECTS',
+  };
+}
+
+export function showProject(id) {
+  return {
+    type: 'SHOW_PROJECT',
+    id,
   };
 }
 

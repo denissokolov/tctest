@@ -19,10 +19,14 @@ class ProjectsSelect extends React.Component {
     selectedIds: PropTypes.instanceOf(Set).isRequired,
     firstChangedIndex: PropTypes.number,
     onChange: PropTypes.func.isRequired,
+    optionActionText: PropTypes.string,
+    optionActionOnClick: PropTypes.func,
   };
 
   static defaultProps = {
     firstChangedIndex: undefined,
+    optionActionText: undefined,
+    optionActionOnClick: undefined,
   };
 
   componentDidMount() {
@@ -255,7 +259,7 @@ class ProjectsSelect extends React.Component {
   }
 
   optionRenderer = ({ index, style }) => {
-    const { items, selectedIds } = this.props;
+    const { items, selectedIds, optionActionText, optionActionOnClick } = this.props;
     const item = items[index];
 
     return (
@@ -269,6 +273,8 @@ class ProjectsSelect extends React.Component {
         disabled={item.disabled}
         filterMatch={item.filterMatch}
         selected={selectedIds.has(item.id)}
+        actionText={optionActionText}
+        actionOnClick={optionActionOnClick}
         onMouseDown={this.onItemMouseDown}
         onMouseEnter={this.onItemMouseEnter}
         style={style}

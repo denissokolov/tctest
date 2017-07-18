@@ -14,6 +14,8 @@ class ProjectsSelectOption extends React.Component {
     disabled: PropTypes.bool,
     parentCustomSort: PropTypes.bool,
     filterMatch: PropTypes.bool,
+    actionText: PropTypes.string,
+    actionOnClick: PropTypes.func,
     onMouseDown: PropTypes.func.isRequired,
     onMouseEnter: PropTypes.func.isRequired,
     style: PropTypes.object, // eslint-disable-line react/forbid-prop-types
@@ -24,6 +26,8 @@ class ProjectsSelectOption extends React.Component {
     disabled: false,
     parentCustomSort: false,
     filterMatch: false,
+    actionText: undefined,
+    actionOnClick: undefined,
     style: {},
   };
 
@@ -43,9 +47,23 @@ class ProjectsSelectOption extends React.Component {
     }
   };
 
+  onActionClick = (event) => {
+    event.preventDefault();
+
+    const { actionOnClick, id } = this.props;
+
+    if (actionOnClick) {
+      actionOnClick(id);
+    }
+  };
+
+  onActionMouseDown = (event) => {
+    event.stopPropagation();
+  };
+
   render() {
     const {
-      index, name, depth, selected, disabled, parentCustomSort, filterMatch, style,
+      index, name, depth, selected, disabled, parentCustomSort, filterMatch, style, actionText,
     } = this.props;
 
     const classNames = cn(
@@ -71,6 +89,18 @@ class ProjectsSelectOption extends React.Component {
         style={style}
       >
         {name}
+        {actionText && !disabled && (
+          // No need focus for action link. There is alternative keyboard shortcut for this.
+          // eslint-disable-next-line jsx-a11y/interactive-supports-focus
+          <a
+            className="projects-select-option__move"
+            role="button"
+            onMouseDown={this.onActionMouseDown}
+            onClick={this.onActionClick}
+          >
+            {actionText}
+          </a>
+        )}
       </div>
     );
   }
