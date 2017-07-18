@@ -3,7 +3,7 @@ import { shallow } from 'enzyme';
 import { Map } from 'immutable';
 
 import ConfigureProjects from './ConfigureProjects';
-import ConfigureProjectsFooter from './footer/ConfigureProjectsFooter';
+import { ConfigureProjectsFooter } from './footer/ConfigureProjectsFooter';
 import ConfigureProjectsVisibleSection from './sections/ConfigureProjectsVisibleSection';
 import ConfigureProjectsHiddenSection from './sections/ConfigureProjectsHiddenSection';
 

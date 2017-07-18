@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import FilterProjects from './FilterProjects';
+import { FilterProjects } from './FilterProjects';
 
 function create({ value = '', onChange = jest.fn() }) {
   return shallow(

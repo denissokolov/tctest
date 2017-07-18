@@ -5,7 +5,7 @@ import formattedProjects from '../../../__mocks__/formattedProjects';
 import ConfigureProjectsHiddenSection from './ConfigureProjectsHiddenSection';
 import ProjectsSelect from '../selects/ProjectsSelect';
 import ArrowButton, { directions } from '../../arrow-button/ArrowButton';
-import FilterProjects from '../filter/FilterProjects';
+import { FilterProjects } from '../filter/FilterProjects';
 
 function create(props) {
   const {
