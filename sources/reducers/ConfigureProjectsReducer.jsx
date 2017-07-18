@@ -43,6 +43,7 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
       return state
         .set('visibleItems', projectsStorage.getVisible())
         .set('visibleSelectedIds', state.get('hiddenSelectedIds'))
+        .set('firstChangedVisibleIndex', projectsStorage.getFirstChangedVisibleIndex())
         .set('hiddenItems', projectsStorage.getHidden())
         .set('hiddenSelectedIds', new Set());
 
@@ -54,7 +55,8 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         .set('visibleItems', projectsStorage.getVisible())
         .set('visibleSelectedIds', new Set())
         .set('hiddenItems', projectsStorage.getHidden())
-        .set('hiddenSelectedIds', state.get('visibleSelectedIds'));
+        .set('hiddenSelectedIds', state.get('visibleSelectedIds'))
+        .set('firstChangedHiddenIndex', projectsStorage.getFirstChangedHiddenIndex());
 
     case 'MOVE_PROJECTS_UP': {
       const sortChanged = projectsStorage.sortUpVisible(state.get('visibleSelectedIds'));
@@ -62,6 +64,7 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         ? state
             .set('visibleItems', projectsStorage.getVisible())
             .set('customSort', true)
+            .set('firstChangedVisibleIndex', projectsStorage.getFirstChangedVisibleIndex())
         : state;
     }
 
@@ -71,6 +74,7 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         ? state
             .set('visibleItems', projectsStorage.getVisible())
             .set('customSort', true)
+            .set('firstChangedVisibleIndex', projectsStorage.getFirstChangedVisibleIndex())
         : state;
     }
 

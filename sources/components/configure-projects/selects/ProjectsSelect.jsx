@@ -17,7 +17,12 @@ class ProjectsSelect extends React.Component {
   static propTypes = {
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
     selectedIds: PropTypes.instanceOf(Set).isRequired,
+    firstChangedIndex: PropTypes.number,
     onChange: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    firstChangedIndex: undefined,
   };
 
   componentDidMount() {
@@ -25,9 +30,18 @@ class ProjectsSelect extends React.Component {
   }
 
   componentWillUpdate(nextProps) {
-    if (this.props.items.length === nextProps.items.length
-      && this.props.items !== nextProps.items) {
+    const items = this.props.items;
+    const nextItems = nextProps.items;
+
+    if (items.length === nextItems.length
+      && (items !== nextItems || this.props.selectedIds !== nextProps.selectedIds)) {
       this.listRef.forceUpdateGrid();
+    }
+
+    if (nextProps.firstChangedIndex !== null
+      && nextProps.firstChangedIndex !== this.props.firstChangedIndex) {
+      this.activeSelectStartIndex = nextProps.firstChangedIndex;
+      this.activeSelectEndIndex = nextProps.firstChangedIndex;
     }
   }
 
@@ -282,7 +296,7 @@ class ProjectsSelect extends React.Component {
           mode="cells"
           columnCount={1}
           rowCount={rowCount}
-          scrollToRow={this.activeSelectEndIndex || 0}
+          scrollToRow={this.activeSelectEndIndex !== null ? this.activeSelectEndIndex : -1}
           isControlled
         >
           {({ onSectionRendered, scrollToRow }) => (
@@ -297,6 +311,7 @@ class ProjectsSelect extends React.Component {
                   rowRenderer={this.optionRenderer}
                   onSectionRendered={onSectionRendered}
                   scrollToIndex={scrollToRow}
+                  scrollToAlignment="center"
                   ref={this.setListRef}
                 />
               )}

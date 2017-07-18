@@ -119,7 +119,7 @@ class ProjectsStorage {
       project.isAnyChildHidden = false;
     });
 
-    this.refreshVisible();
+    this.refreshVisible(ids);
     this.refreshHidden();
   }
 
@@ -176,7 +176,7 @@ class ProjectsStorage {
     });
 
     this.refreshVisible();
-    this.refreshHidden();
+    this.refreshHidden(ids);
   }
 
   sortDownVisible(ids) {
@@ -186,7 +186,7 @@ class ProjectsStorage {
       }
       return idsArray;
     }, []);
-    return this.changeSort(sortedIds, true);
+    return this.changeSort(sortedIds, ids, true);
   }
 
   sortUpVisible(ids) {
@@ -196,10 +196,10 @@ class ProjectsStorage {
       }
       return idsArray;
     }, []);
-    return this.changeSort(sortedIds, false);
+    return this.changeSort(sortedIds, ids, false);
   }
 
-  changeSort(ids, downDirection) {
+  changeSort(ids, changedIds, downDirection) {
     const sortedIds = {};
 
     if (ids.length === 1 && ids[0] === this.rootId) {
@@ -244,7 +244,7 @@ class ProjectsStorage {
     });
 
     if (needRefresh) {
-      this.refreshVisible();
+      this.refreshVisible(changedIds);
     }
     return needRefresh;
   }
@@ -346,20 +346,27 @@ class ProjectsStorage {
     this.refreshHidden();
   }
 
-  refreshVisible() {
-    const root = this.projects.get(this.rootId);
+  refreshVisible(changedIds) {
     this.visible = [];
+    this.firstChangedVisibleIndex = null;
+
+    const root = this.projects.get(this.rootId);
     this.pushProjectToVisible(root);
-    this.pushChildrenProjectsToVisible(root.visibleChildrenIds);
+
+    this.pushChildrenProjectsToVisible(root.visibleChildrenIds, changedIds);
   }
 
-  pushChildrenProjectsToVisible(projectsIds) {
+  pushChildrenProjectsToVisible(projectsIds, changedIds) {
     projectsIds.forEach((projectId) => {
       const project = this.projects.get(projectId);
       this.pushProjectToVisible(project);
 
+      if (changedIds && this.firstChangedVisibleIndex === null && changedIds.has(project.id)) {
+        this.firstChangedVisibleIndex = this.visible.length - 1;
+      }
+
       if (project.visibleChildrenIds.length) {
-        this.pushChildrenProjectsToVisible(project.visibleChildrenIds);
+        this.pushChildrenProjectsToVisible(project.visibleChildrenIds, changedIds);
       }
     });
   }
@@ -374,9 +381,11 @@ class ProjectsStorage {
     });
   }
 
-  refreshHidden() {
+  refreshHidden(changedIds) {
     this.hidden = [];
     this.hiddenIds = [];
+
+    this.firstChangedHiddenIndex = null;
 
     const filterActive = Boolean(this.hiddenFilteredIds);
 
@@ -398,9 +407,14 @@ class ProjectsStorage {
 
         if (!filterActive || this.hiddenFilteredIds.has(project.id)) {
           this.hidden.push(this.convertHiddenProjectToShort(project));
+          if (changedIds && changedIds.has(project.id)) {
+            this.firstChangedHiddenIndex = this.hidden.length;
+          }
         }
       }
     });
+
+    this.firstChangedHiddenIndex = this.hidden.length - this.firstChangedHiddenIndex;
 
     this.hidden.reverse();
     this.hiddenIds.reverse();
@@ -419,8 +433,16 @@ class ProjectsStorage {
     return this.visible;
   }
 
+  getFirstChangedVisibleIndex() {
+    return this.firstChangedVisibleIndex;
+  }
+
   getHidden() {
     return this.hidden;
+  }
+
+  getFirstChangedHiddenIndex() {
+    return this.firstChangedHiddenIndex;
   }
 }
 
