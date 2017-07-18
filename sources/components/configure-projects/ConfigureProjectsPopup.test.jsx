@@ -1,6 +1,5 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { fromJS } from 'immutable';
 
 import { ConfigureProjectsPopup } from './ConfigureProjectsPopup';
 import ConfigureProjects from './ConfigureProjects';
@@ -10,7 +9,8 @@ jest.mock('../../actions/ConfigureProjectsActions');
 
 function create(props) {
   const {
-    configureProjects = { visible: [], hidden: [], hiddenFilterValue: '', error: null },
+    error = undefined,
+    loading = false,
     dispatch = jest.fn(),
     onClose = jest.fn(),
     visible = true,
@@ -18,7 +18,8 @@ function create(props) {
 
   return shallow(
     <ConfigureProjectsPopup
-      configureProjects={fromJS(configureProjects)}
+      error={error}
+      loading={loading}
       dispatch={dispatch}
       onClose={onClose}
       visible={visible}
@@ -27,15 +28,15 @@ function create(props) {
 }
 
 describe('ConfigureProjectsHiddenSection', () => {
-  it('should render popup with error message for configureProjects.error=true', () => {
-    const wrapper = create({ configureProjects: { error: 'Error!' } });
+  it('should render popup with error message for error=true', () => {
+    const wrapper = create({ error: 'Error!' });
     expect(wrapper.find(Popup).length).toBe(1);
     expect(wrapper.find('.popup-message_error').length).toBe(1);
     expect(wrapper.find('.popup-message_error').text()).toEqual('Error!');
   });
 
-  it('should render popup with loading message for configureProjects.loading=true', () => {
-    const wrapper = create({ configureProjects: { loading: true } });
+  it('should render popup with loading message for loading=true', () => {
+    const wrapper = create({ loading: true });
     expect(wrapper.find(Popup).length).toBe(1);
     expect(wrapper.find('.popup-message_loading').length).toBe(1);
     expect(wrapper.find('.popup-message_loading').text()).toEqual('Loading');
@@ -45,14 +46,18 @@ describe('ConfigureProjectsHiddenSection', () => {
     const wrapper = create({ visible: false });
     expect(wrapper.find(Popup).length).toBe(1);
     expect(wrapper.find(Popup).prop('title')).toBe('Configure visible projects');
-    expect(wrapper.find(ConfigureProjects).prop('visible')).toBeFalsy();
+    expect(wrapper.find(Popup).prop('visible')).toBeFalsy();
   });
 
   describe('ConfigureProjects', () => {
-    it('should render', () => {
+    it('should render for visible=false', () => {
       const wrapper = create({ visible: false });
+      expect(wrapper.find(ConfigureProjects).length).toBe(0);
+    });
+
+    it('should render for visible=true', () => {
+      const wrapper = create({ visible: true });
       expect(wrapper.find(ConfigureProjects).length).toBe(1);
-      expect(wrapper.find(ConfigureProjects).prop('formVisible')).toBeFalsy();
     });
 
     it('should call property onClose on ConfigureProjects onSubmit called', () => {
