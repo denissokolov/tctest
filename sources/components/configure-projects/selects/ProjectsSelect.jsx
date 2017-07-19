@@ -18,6 +18,7 @@ class ProjectsSelect extends React.Component {
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
     selectedIds: PropTypes.instanceOf(Set).isRequired,
     firstChangedIndex: PropTypes.number,
+    noScrollList: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
     onKeyDown: PropTypes.func,
     optionActionText: PropTypes.string,
@@ -298,7 +299,7 @@ class ProjectsSelect extends React.Component {
   scrollToAlignment = 'auto';
 
   render() {
-    const { items } = this.props;
+    const { items, noScrollList } = this.props;
     const rowCount = items.length;
 
     return (
@@ -328,7 +329,7 @@ class ProjectsSelect extends React.Component {
                   rowHeight={OPTION_HEIGHT}
                   rowRenderer={this.optionRenderer}
                   onSectionRendered={onSectionRendered}
-                  scrollToIndex={scrollToRow}
+                  scrollToIndex={noScrollList ? -1 : scrollToRow}
                   scrollToAlignment={this.scrollToAlignment}
                   ref={this.setListRef}
                 />

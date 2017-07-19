@@ -15,6 +15,7 @@ class VisibleProjectsSelect extends React.Component {
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
     selectedIds: PropTypes.instanceOf(Set).isRequired,
     firstChangedIndex: PropTypes.number,
+    noScrollList: PropTypes.bool.isRequired,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -59,13 +60,14 @@ class VisibleProjectsSelect extends React.Component {
   };
 
   render() {
-    const { items, selectedIds, firstChangedIndex } = this.props;
+    const { items, selectedIds, firstChangedIndex, noScrollList } = this.props;
 
     return (
       <ProjectsSelect
         items={items}
         selectedIds={selectedIds}
         firstChangedIndex={firstChangedIndex}
+        noScrollList={noScrollList}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
         optionActionText="hide"
@@ -79,6 +81,7 @@ const mapStateToProps = state => ({
   items: state.configureProjects.get('visibleItems'),
   selectedIds: state.configureProjects.get('visibleSelectedIds'),
   firstChangedIndex: state.configureProjects.get('firstChangedVisibleIndex'),
+  noScrollList: state.configureProjects.get('noScrollVisibleList'),
 });
 
 export default connect(mapStateToProps)(VisibleProjectsSelect);

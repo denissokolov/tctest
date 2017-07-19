@@ -15,6 +15,7 @@ export class HiddenProjectsSelect extends React.Component {
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
     selectedIds: PropTypes.instanceOf(Set).isRequired,
     firstChangedIndex: PropTypes.number,
+    noScrollList: PropTypes.bool.isRequired,
     dispatch: PropTypes.func.isRequired,
   };
 
@@ -45,13 +46,14 @@ export class HiddenProjectsSelect extends React.Component {
   };
 
   render() {
-    const { items, selectedIds, firstChangedIndex } = this.props;
+    const { items, selectedIds, firstChangedIndex, noScrollList } = this.props;
 
     return (
       <ProjectsSelect
         items={items}
         selectedIds={selectedIds}
         firstChangedIndex={firstChangedIndex}
+        noScrollList={noScrollList}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
         optionActionText="show"
@@ -65,6 +67,7 @@ const mapStateToProps = state => ({
   items: state.configureProjects.get('hiddenItems'),
   selectedIds: state.configureProjects.get('hiddenSelectedIds'),
   firstChangedIndex: state.configureProjects.get('firstChangedHiddenIndex'),
+  noScrollList: state.configureProjects.get('noScrollHiddenList'),
 });
 
 export default connect(mapStateToProps)(HiddenProjectsSelect);
