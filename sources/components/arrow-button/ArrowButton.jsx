@@ -11,7 +11,7 @@ export const directions = {
   down: 'down',
 };
 
-function ArrowButton({ direction, disabled, onClick }) {
+function ArrowButton({ direction, title, disabled, onClick, tabIndex}) {
   const classNames = cn(
     'arrow-button',
     disabled && 'arrow-button_disabled',
@@ -22,8 +22,10 @@ function ArrowButton({ direction, disabled, onClick }) {
     <button
       className={classNames}
       type="button"
+      title={title}
       onClick={onClick}
       disabled={disabled}
+      tabIndex={tabIndex}
     />
   );
 }
@@ -32,11 +34,15 @@ ArrowButton.propTypes = {
   direction: PropTypes.oneOf([
     directions.left, directions.right, directions.up, directions.down,
   ]).isRequired,
+  title: PropTypes.string,
   onClick: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
+  tabIndex: PropTypes.number,
 };
 
 ArrowButton.defaultProps = {
+  title: undefined,
+  tabIndex: undefined,
   disabled: false,
 };
 

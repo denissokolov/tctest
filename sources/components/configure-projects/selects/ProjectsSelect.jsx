@@ -19,12 +19,14 @@ class ProjectsSelect extends React.Component {
     selectedIds: PropTypes.instanceOf(Set).isRequired,
     firstChangedIndex: PropTypes.number,
     onChange: PropTypes.func.isRequired,
+    onKeyDown: PropTypes.func,
     optionActionText: PropTypes.string,
     optionActionOnClick: PropTypes.func,
   };
 
   static defaultProps = {
     firstChangedIndex: undefined,
+    onKeyDown: undefined,
     optionActionText: undefined,
     optionActionOnClick: undefined,
   };
@@ -130,6 +132,11 @@ class ProjectsSelect extends React.Component {
 
       default:
         break;
+    }
+
+    const { onKeyDown } = this.props;
+    if (onKeyDown) {
+      onKeyDown(event);
     }
   };
 
@@ -295,11 +302,12 @@ class ProjectsSelect extends React.Component {
     const rowCount = items.length;
 
     return (
+      // No need focus for this element because <List /> already have it.
+      // Unfortunately <List /> component doesn't have onKeyDown property.
+      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
         className="projects-select"
         onKeyDown={this.onKeyDown}
-        role="listbox"
-        tabIndex={0}
       >
         <ArrowKeyStepper
           className="projects-select__arrow-key-stepper"

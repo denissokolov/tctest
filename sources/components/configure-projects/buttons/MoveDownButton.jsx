@@ -22,8 +22,10 @@ export class MoveDownButton extends React.Component {
     return (
       <ArrowButton
         direction={arrowButtonDirections.down}
+        title="Move down selected (ctrl+D)"
         onClick={this.onClick}
         disabled={disabled}
+        tabIndex={-1}
       />
     );
   }

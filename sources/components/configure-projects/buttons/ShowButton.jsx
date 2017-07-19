@@ -22,8 +22,10 @@ export class ShowButton extends React.Component {
     return (
       <ArrowButton
         direction={arrowButtonDirections.left}
+        title="Show selected (ctrl+S)"
         onClick={this.onClick}
         disabled={disabled}
+        tabIndex={-1}
       />
     );
   }

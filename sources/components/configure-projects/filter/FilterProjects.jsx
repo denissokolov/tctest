@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import cn from 'classnames';
 
 import { changeHiddenFilter } from '../../../actions/ConfigureProjectsActions';
 
@@ -21,7 +22,7 @@ export class FilterProjects extends React.Component {
       <input
         type="text"
         onChange={this.onChange}
-        className="configure-projects__filter"
+        className={cn('configure-projects__filter', Boolean(value) && 'configure-projects__filter_active')}
         placeholder="filter projects"
         value={value}
       />

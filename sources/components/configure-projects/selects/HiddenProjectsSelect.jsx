@@ -3,8 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Set } from 'immutable';
 
-import { changeHiddenSelectedProjects, showProject } from '../../../actions/ConfigureProjectsActions';
+import {
+  changeHiddenSelectedProjects, showProject, showProjects,
+} from '../../../actions/ConfigureProjectsActions';
 
+import keyCodes from '../../../utils/keyCodes';
 import ProjectsSelect from './ProjectsSelect';
 
 export class HiddenProjectsSelect extends React.Component {
@@ -23,6 +26,20 @@ export class HiddenProjectsSelect extends React.Component {
     this.props.dispatch(changeHiddenSelectedProjects(selectedIds));
   };
 
+  onKeyDown = (event) => {
+    switch (event.keyCode) {
+      case keyCodes.s:
+        if (event.ctrlKey) {
+          event.preventDefault();
+          this.props.dispatch(showProjects());
+        }
+        break;
+
+      default:
+        break;
+    }
+  };
+
   optionActionOnClick = (projectId) => {
     this.props.dispatch(showProject(projectId));
   };
@@ -36,6 +53,7 @@ export class HiddenProjectsSelect extends React.Component {
         selectedIds={selectedIds}
         firstChangedIndex={firstChangedIndex}
         onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
         optionActionText="show"
         optionActionOnClick={this.optionActionOnClick}
       />

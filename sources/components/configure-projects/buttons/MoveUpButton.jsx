@@ -22,8 +22,10 @@ export class MoveUpButton extends React.Component {
     return (
       <ArrowButton
         direction={arrowButtonDirections.up}
+        title="Move up selected (ctrl+U)"
         onClick={this.onClick}
         disabled={disabled}
+        tabIndex={-1}
       />
     );
   }

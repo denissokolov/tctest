@@ -3,8 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Set } from 'immutable';
 
-import { changeVisibleSelectedProjects, hideProject } from '../../../actions/ConfigureProjectsActions';
+import {
+  changeVisibleSelectedProjects, hideProject, hideProjects, moveProjectsDown, moveProjectsUp,
+} from '../../../actions/ConfigureProjectsActions';
 
+import keyCodes from '../../../utils/keyCodes';
 import ProjectsSelect from './ProjectsSelect';
 
 class VisibleProjectsSelect extends React.Component {
@@ -23,6 +26,34 @@ class VisibleProjectsSelect extends React.Component {
     this.props.dispatch(changeVisibleSelectedProjects(selectedIds));
   };
 
+  onKeyDown = (event) => {
+    switch (event.keyCode) {
+      case keyCodes.h:
+        if (event.ctrlKey) {
+          event.preventDefault();
+          this.props.dispatch(hideProjects());
+        }
+        break;
+
+      case keyCodes.d:
+        if (event.ctrlKey) {
+          event.preventDefault();
+          this.props.dispatch(moveProjectsDown());
+        }
+        break;
+
+      case keyCodes.u:
+        if (event.ctrlKey) {
+          event.preventDefault();
+          this.props.dispatch(moveProjectsUp());
+        }
+        break;
+
+      default:
+        break;
+    }
+  };
+
   optionActionOnClick = (projectId) => {
     this.props.dispatch(hideProject(projectId));
   };
@@ -36,6 +67,7 @@ class VisibleProjectsSelect extends React.Component {
         selectedIds={selectedIds}
         firstChangedIndex={firstChangedIndex}
         onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
         optionActionText="hide"
         optionActionOnClick={this.optionActionOnClick}
       />
