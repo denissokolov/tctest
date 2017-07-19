@@ -18,13 +18,16 @@ class ProjectsSelect extends React.Component {
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
     selectedIds: PropTypes.instanceOf(Set).isRequired,
     firstChangedIndex: PropTypes.number,
+    noScrollList: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
+    onKeyDown: PropTypes.func,
     optionActionText: PropTypes.string,
     optionActionOnClick: PropTypes.func,
   };
 
   static defaultProps = {
     firstChangedIndex: undefined,
+    onKeyDown: undefined,
     optionActionText: undefined,
     optionActionOnClick: undefined,
   };
@@ -130,6 +133,11 @@ class ProjectsSelect extends React.Component {
 
       default:
         break;
+    }
+
+    const { onKeyDown } = this.props;
+    if (onKeyDown) {
+      onKeyDown(event);
     }
   };
 
@@ -291,15 +299,16 @@ class ProjectsSelect extends React.Component {
   scrollToAlignment = 'auto';
 
   render() {
-    const { items } = this.props;
+    const { items, noScrollList } = this.props;
     const rowCount = items.length;
 
     return (
+      // No need focus for this element because <List /> already have it.
+      // Unfortunately <List /> component doesn't have onKeyDown property.
+      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
         className="projects-select"
         onKeyDown={this.onKeyDown}
-        role="listbox"
-        tabIndex={0}
       >
         <ArrowKeyStepper
           className="projects-select__arrow-key-stepper"
@@ -320,7 +329,7 @@ class ProjectsSelect extends React.Component {
                   rowHeight={OPTION_HEIGHT}
                   rowRenderer={this.optionRenderer}
                   onSectionRendered={onSectionRendered}
-                  scrollToIndex={scrollToRow}
+                  scrollToIndex={noScrollList ? -1 : scrollToRow}
                   scrollToAlignment={this.scrollToAlignment}
                   ref={this.setListRef}
                 />

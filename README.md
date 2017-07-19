@@ -4,7 +4,11 @@ Realization of TC "Configure visible projects" popup. Powered by React and Redux
 
 ## Demo
 
-https://testdenis.github.io/tctest/public/
+589 projects: https://testdenis.github.io/tctest/public/
+
+12,349 projects: https://testdenis.github.io/tctest/public/projects-12000.html
+
+118,189 projects: https://testdenis.github.io/tctest/public/projects-118000.html
 
 ## Run
 

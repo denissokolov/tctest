@@ -66,5 +66,14 @@
     border: 1px solid #dedede;
     font-size: 14px;
     padding: 0 5px;
+    outline: none;
+
+    &_active {
+      border-color: #000;
+    }
+
+    &:focus {
+      border-color: #438ed7;
+    }
   }
 }

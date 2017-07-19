@@ -22,8 +22,10 @@ export class HideButton extends React.Component {
     return (
       <ArrowButton
         direction={arrowButtonDirections.right}
+        title="Hide selected (ctrl+H)"
         onClick={this.onClick}
         disabled={disabled}
+        tabIndex={-1}
       />
     );
   }

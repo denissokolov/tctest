@@ -53,6 +53,10 @@ class ProjectsStorage {
       project.filterMatch = false;
       project.filterTreeMatch = false;
     });
+
+    if (this.hiddenFilteredIds) {
+      this.clearFilter();
+    }
   }
 
   refreshToSavedState() {
@@ -65,6 +69,7 @@ class ProjectsStorage {
       project.isAnyChildHidden = false;
     });
 
+    this.hiddenFilteredIds = null;
     this.refreshVisible();
     this.refreshHidden();
   }

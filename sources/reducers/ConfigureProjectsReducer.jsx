@@ -11,8 +11,10 @@ const defaultState = new Map({
   error: null,
   visibleItems: [],
   visibleSelectedIds: new Set(),
+  noScrollVisibleList: false,
   hiddenItems: [],
   hiddenSelectedIds: new Set(),
+  noScrollHiddenList: false,
   customSort: false,
   hiddenFilterValue: '',
 });
@@ -45,7 +47,9 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         .set('visibleSelectedIds', state.get('hiddenSelectedIds'))
         .set('firstChangedVisibleIndex', projectsStorage.getFirstChangedVisibleIndex())
         .set('hiddenItems', projectsStorage.getHidden())
-        .set('hiddenSelectedIds', new Set());
+        .set('hiddenSelectedIds', new Set())
+        .set('noScrollVisibleList', false)
+        .set('noScrollHiddenList', false);
 
     case 'SHOW_PROJECT': {
       const ids = new Set([action.id]);
@@ -56,7 +60,9 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         .set('visibleItems', projectsStorage.getVisible())
         .set('visibleSelectedIds', ids)
         .set('firstChangedVisibleIndex', projectsStorage.getFirstChangedVisibleIndex())
-        .set('hiddenItems', projectsStorage.getHidden());
+        .set('hiddenItems', projectsStorage.getHidden())
+        .set('noScrollVisibleList', false)
+        .set('noScrollHiddenList', true);
     }
 
     case 'HIDE_PROJECTS':
@@ -68,7 +74,9 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         .set('visibleSelectedIds', new Set())
         .set('hiddenItems', projectsStorage.getHidden())
         .set('hiddenSelectedIds', state.get('visibleSelectedIds'))
-        .set('firstChangedHiddenIndex', projectsStorage.getFirstChangedHiddenIndex());
+        .set('firstChangedHiddenIndex', projectsStorage.getFirstChangedHiddenIndex())
+        .set('noScrollVisibleList', false)
+        .set('noScrollHiddenList', false);
 
     case 'HIDE_PROJECT': {
       const ids = new Set([action.id]);
@@ -79,7 +87,9 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         .set('visibleItems', projectsStorage.getVisible())
         .set('hiddenItems', projectsStorage.getHidden())
         .set('hiddenSelectedIds', ids)
-        .set('firstChangedHiddenIndex', projectsStorage.getFirstChangedHiddenIndex());
+        .set('firstChangedHiddenIndex', projectsStorage.getFirstChangedHiddenIndex())
+        .set('noScrollVisibleList', true)
+        .set('noScrollHiddenList', false);
     }
 
     case 'MOVE_PROJECTS_UP': {
@@ -88,6 +98,7 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         ? state
             .set('visibleItems', projectsStorage.getVisible())
             .set('customSort', true)
+            .set('noScrollVisibleList', false)
             .set('firstChangedVisibleIndex', projectsStorage.getFirstChangedVisibleIndex())
         : state;
     }
@@ -98,6 +109,7 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
         ? state
             .set('visibleItems', projectsStorage.getVisible())
             .set('customSort', true)
+            .set('noScrollVisibleList', false)
             .set('firstChangedVisibleIndex', projectsStorage.getFirstChangedVisibleIndex())
         : state;
     }
@@ -109,31 +121,45 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
       return state
         .set('hiddenItems', hiddenItems)
         .set('hiddenFilterValue', action.value)
-        .set('firstChangedHiddenIndex', hiddenItems.size > 0 ? 0 : null);
+        .set('firstChangedHiddenIndex', hiddenItems.length > 0 ? 0 : null)
+        .set('noScrollHiddenList', false);
     }
 
     case 'SAVE_PROJECTS_CONFIGURATION':
       projectsStorage.saveState();
       return state
-        .set('hiddenFilterValue', '')
         .set('visibleSelectedIds', new Set())
-        .set('hiddenSelectedIds', new Set());
+        .set('firstChangedVisibleIndex', null)
+        .set('hiddenFilterValue', '')
+        .set('hiddenItems', projectsStorage.getHidden())
+        .set('hiddenSelectedIds', new Set())
+        .set('firstChangedHiddenIndex', null)
+        .set('noScrollVisibleList', false)
+        .set('noScrollHiddenList', false);
 
     case 'REFRESH_PROJECTS_CONFIGURATION':
       projectsStorage.refreshToSavedState();
       return state
         .set('visibleItems', projectsStorage.getVisible())
+        .set('visibleSelectedIds', new Set())
+        .set('firstChangedVisibleIndex', null)
         .set('hiddenItems', projectsStorage.getHidden())
         .set('hiddenFilterValue', '')
         .set('customSort', false)
-        .set('visibleSelectedIds', new Set())
-        .set('hiddenSelectedIds', new Set());
+        .set('hiddenSelectedIds', new Set())
+        .set('firstChangedHiddenIndex', null)
+        .set('noScrollVisibleList', false)
+        .set('noScrollHiddenList', false);
 
     case 'CHANGE_HIDDEN_SELECTED_PROJECTS':
-      return state.set('hiddenSelectedIds', action.selectedIds);
+      return state
+        .set('hiddenSelectedIds', action.selectedIds)
+        .set('noScrollHiddenList', false);
 
     case 'CHANGE_VISIBLE_SELECTED_PROJECTS':
-      return state.set('visibleSelectedIds', action.selectedIds);
+      return state
+        .set('visibleSelectedIds', action.selectedIds)
+        .set('noScrollVisibleList', false);
 
     default:
       return state;
