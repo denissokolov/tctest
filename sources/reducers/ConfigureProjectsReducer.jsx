@@ -115,19 +115,24 @@ function ConfigureProjectsReducer(state = defaultState, action = {}) {
     case 'SAVE_PROJECTS_CONFIGURATION':
       projectsStorage.saveState();
       return state
-        .set('hiddenFilterValue', '')
         .set('visibleSelectedIds', new Set())
-        .set('hiddenSelectedIds', new Set());
+        .set('firstChangedVisibleIndex', null)
+        .set('hiddenFilterValue', '')
+        .set('hiddenItems', projectsStorage.getHidden())
+        .set('hiddenSelectedIds', new Set())
+        .set('firstChangedHiddenIndex', null);
 
     case 'REFRESH_PROJECTS_CONFIGURATION':
       projectsStorage.refreshToSavedState();
       return state
         .set('visibleItems', projectsStorage.getVisible())
+        .set('visibleSelectedIds', new Set())
+        .set('firstChangedVisibleIndex', null)
         .set('hiddenItems', projectsStorage.getHidden())
         .set('hiddenFilterValue', '')
         .set('customSort', false)
-        .set('visibleSelectedIds', new Set())
-        .set('hiddenSelectedIds', new Set());
+        .set('hiddenSelectedIds', new Set())
+        .set('firstChangedHiddenIndex', null);
 
     case 'CHANGE_HIDDEN_SELECTED_PROJECTS':
       return state.set('hiddenSelectedIds', action.selectedIds);
