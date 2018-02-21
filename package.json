@@ -14,9 +14,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://testdenis@github.com/testdenis/tctest.git"
+    "url": "git+https://denissokolov@github.com/denissokolov/tctest.git"
   },
-  "homepage": "https://github.com/testdenis/tctest#readme",
+  "homepage": "https://github.com/denissokolov/tctest#readme",
   "dependencies": {
     "classnames": "^2.2.5",
     "immutable": "^3.8.1",
